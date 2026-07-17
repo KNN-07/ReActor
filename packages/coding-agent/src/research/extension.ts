@@ -5,6 +5,7 @@ import { type } from "arktype";
 import type { ExtensionContext, ExtensionFactory } from "../extensibility/extensions";
 import * as git from "../utils/git";
 import { applyResearchCheckpoint } from "./checkpoint";
+import { createResearchState, researchDate, researchSlug } from "./helpers";
 import contextTemplate from "./prompt-context.md" with { type: "text" };
 import { getResearchDbPath, ResearchStorage } from "./storage";
 import type { ResearchState } from "./types";
@@ -16,44 +17,6 @@ const checkpointSchema = type({
 	"message?": "string",
 });
 const commands = ["survey", "peer-review", "autopaper"] as const;
-
-function slug(value: string): string {
-	return (
-		value
-			.toLowerCase()
-			.replace(/[^a-z0-9]+/g, "-")
-			.replace(/^-|-$/g, "")
-			.slice(0, 64) || "research"
-	);
-}
-function nowDate(): string {
-	return new Date().toISOString().slice(0, 10);
-}
-function makeState(
-	workflow: ResearchState["workflow"],
-	topic: string,
-	root: string,
-	branch: string | null,
-): ResearchState {
-	const id = `${workflow}-${slug(topic)}-${Date.now()}`;
-	const artifactRoot = workflow === "survey" ? "surveys" : "papers";
-	return {
-		id,
-		workflow,
-		topic,
-		phase: "intake",
-		projectRoot: root,
-		branch,
-		artifactDir: path.join(root, artifactRoot, `${slug(topic)}-${nowDate()}`),
-		createdAt: Date.now(),
-		updatedAt: Date.now(),
-		completedAt: null,
-		autoresearchSessionId: null,
-		bestMetrics: {},
-		verificationRequired: false,
-		lastError: null,
-	};
-}
 
 export const createResearchExtension: ExtensionFactory = api => {
 	const current = async (
@@ -72,7 +35,7 @@ export const createResearchExtension: ExtensionFactory = api => {
 				return;
 			}
 			if (await git.branch.current(root)) {
-				const branchName = `autopaper/${slug(topic)}-${nowDate()}`;
+				const branchName = `autopaper/${researchSlug(topic)}-${researchDate()}`;
 				try {
 					await git.branch.checkoutNew(root, branchName);
 				} catch (error) {
@@ -85,7 +48,7 @@ export const createResearchExtension: ExtensionFactory = api => {
 			}
 		}
 		const branch = await git.branch.current(root);
-		const state = makeState(workflow, topic, root, branch);
+		const state = createResearchState(workflow, topic, root, branch);
 		const storage = new ResearchStorage(getResearchDbPath(root));
 		storage.create(state);
 		storage.close();
@@ -110,7 +73,7 @@ export const createResearchExtension: ExtensionFactory = api => {
 					const output = path.join(
 						ctx.cwd,
 						"reviews",
-						`${slug(path.basename(paperPath, path.extname(paperPath)))}-${nowDate()}`,
+						`${researchSlug(path.basename(paperPath, path.extname(paperPath)))}-${researchDate()}`,
 					);
 					fs.mkdirSync(output, { recursive: true });
 					fs.writeFileSync(

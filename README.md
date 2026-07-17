@@ -478,23 +478,15 @@ The [Agent Client Protocol](https://github.com/zed-industries/agent-client-proto
 
 Full reference: [reactor.sh/docs/sdk](https://reactor.sh/docs/sdk).
 
-## A harness worth keeping is one you _don't_ outgrow.
+## Research workflows
 
-Pick it up at **[reactor.sh](https://reactor.sh)**.
+Research is built in:
 
-ReActor is norman's fork of [oh-my-pi](https://github.com/can1357/oh-my-pi), itself built on [Pi](https://github.com/badlogic/pi-mono) by [Mario Zechner](https://github.com/mariozechner). norman is evolving it as a coding-first surface: sessions, subagents, slash commands, extensions, and bounded autonomy — all TypeScript, all MIT, all on [GitHub](https://github.com/KNN-07/ReActor). Shape it from config, hook it from outside, or read the source when you need to.
+- `/survey [topic]` — verified literature, LaTeX/BibTeX, and summary artifacts.
+- `/peer-review [paper]` — parallel methods, writing, impact, and meta review; `/review` remains code review.
+- `/autopaper [topic]` — resumable survey → ideation → autoresearch → verification → writing → review.
 
-### Primitives
-
-An extension is a TypeScript module. Same tool API, same slash-command registry, same hotkey table, same TUI primitives the built-ins use. Nothing is reserved.
-
-### Discovery
-
-On first run reactor inherits whatever is already on disk: rules, skills, and MCP servers from `.claude`, `.cursor`, `.windsurf`, `.gemini`, `.codex`, `.cline`, `.github/copilot`, and `.vscode`. No migration script.
-
-### Extensibility
-
-Ask reactor to write the piece you're missing, then `/reload-plugins`. Keep it local, ship it in a `marketplace`, or publish it to npm.
+State lives in project-keyed SQLite under `~/.reactor/research/`; artifacts stay in `surveys/`, `papers/`, and `reviews/`. See [docs/research-workflows.md](docs/research-workflows.md) for phases, branch safety, and optional Lean/PDF dependencies.
 
 ## Philosophy
 
@@ -592,6 +584,3 @@ _made for terminals that stay open_
 - [GitHub Releases](https://github.com/KNN-07/ReActor/releases)
 - [Discord](https://discord.gg/4NMW9cdXZa)
 - [MIT](https://github.com/KNN-07/ReActor/blob/main/LICENSE)
-## Research workflows
-
-Built-in `/survey`, `/peer-review`, and resumable `/autopaper` workflows produce verified literature and manuscript artifacts. See [docs/research-workflows.md](docs/research-workflows.md). `/review` remains the code/PR review command.
