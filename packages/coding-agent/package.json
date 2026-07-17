@@ -143,6 +143,14 @@
       "types": "./src/autoresearch/tools/*.ts",
       "import": "./src/autoresearch/tools/*.ts"
     },
+    "./research": {
+      "types": "./src/research/index.ts",
+      "import": "./src/research/index.ts"
+    },
+    "./research/*": {
+      "types": "./src/research/*.ts",
+      "import": "./src/research/*.ts"
+    },
     "./capability": {
       "types": "./src/capability/index.ts",
       "import": "./src/capability/index.ts"

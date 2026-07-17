@@ -592,3 +592,6 @@ _made for terminals that stay open_
 - [GitHub Releases](https://github.com/KNN-07/ReActor/releases)
 - [Discord](https://discord.gg/4NMW9cdXZa)
 - [MIT](https://github.com/KNN-07/ReActor/blob/main/LICENSE)
+## Research workflows
+
+Built-in `/survey`, `/peer-review`, and resumable `/autopaper` workflows produce verified literature and manuscript artifacts. See [docs/research-workflows.md](docs/research-workflows.md). `/review` remains the code/PR review command.

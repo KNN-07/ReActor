@@ -1908,6 +1908,7 @@ export async function createAgentSession(options: CreateAgentSessionOptions = {}
 
 		const inlineExtensions: ExtensionFactory[] = options.extensions ? [...options.extensions] : [];
 		inlineExtensions.push((await import("./autoresearch")).createAutoresearchExtension);
+		inlineExtensions.push((await import("./research/extension")).createResearchExtension);
 		if (customTools.length > 0) {
 			inlineExtensions.push(createCustomToolsExtension(customTools));
 		}

@@ -6,7 +6,7 @@ import type { ToolDefinition } from "../../extensibility/extensions";
 import type { Theme } from "../../modes/theme/theme";
 import { replaceTabs, truncateToWidth } from "../../tools/render-utils";
 import * as git from "../../utils/git";
-import { parseWorkDirDirtyPaths } from "../git";
+import { isManagedResearchBranch, parseWorkDirDirtyPaths } from "../git";
 import { dedupeStrings, normalizePathSpec } from "../helpers";
 import { buildExperimentState } from "../state";
 import { openAutoresearchStorage, type SessionRow } from "../storage";
@@ -65,7 +65,7 @@ export function createInitExperimentTool(
 					? Math.floor(params.max_iterations)
 					: null;
 			const branch = (await git.branch.current(ctx.cwd)) ?? null;
-			const onAutoresearchBranch = branch?.startsWith("autoresearch/") ?? false;
+			const onAutoresearchBranch = isManagedResearchBranch(branch);
 
 			const existing = storage.getActiveSessionForBranch(branch);
 			const isNewSegmentInit = existing !== null && params.new_segment === true;

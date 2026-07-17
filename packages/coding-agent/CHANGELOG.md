@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added built-in `/survey`, `/peer-review`, and resumable `/autopaper` research workflows with SQLite checkpoints and verified artifact validation.
+
 ## [17.0.2] - 2026-07-17
 
 ### Added

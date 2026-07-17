@@ -6,6 +6,10 @@ import { normalizePathSpec } from "./helpers";
 const AUTORESEARCH_BRANCH_PREFIX = "autoresearch/";
 const BRANCH_NAME_MAX_LENGTH = 48;
 
+export function isManagedResearchBranch(branchName: string | null | undefined): boolean {
+	return branchName?.startsWith(AUTORESEARCH_BRANCH_PREFIX) === true || branchName?.startsWith("autopaper/") === true;
+}
+
 export interface EnsureAutoresearchBranchFailure {
 	error: string;
 	ok: false;
@@ -22,7 +26,7 @@ export type EnsureAutoresearchBranchResult = EnsureAutoresearchBranchFailure | E
 
 export async function getCurrentAutoresearchBranch(_api: ExtensionAPI, workDir: string): Promise<string | null> {
 	const currentBranch = (await git.branch.current(workDir)) ?? "";
-	return currentBranch.startsWith(AUTORESEARCH_BRANCH_PREFIX) ? currentBranch : null;
+	return isManagedResearchBranch(currentBranch) ? currentBranch : null;
 }
 
 /**

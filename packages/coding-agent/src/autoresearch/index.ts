@@ -6,7 +6,7 @@ import type { ExtensionContext, ExtensionFactory } from "../extensibility/extens
 import * as git from "../utils/git";
 import commandResumeTemplate from "./command-resume.md" with { type: "text" };
 import { createDashboardController } from "./dashboard";
-import { ensureAutoresearchBranch } from "./git";
+import { ensureAutoresearchBranch, isManagedResearchBranch } from "./git";
 import { formatNum } from "./helpers";
 import promptTemplate from "./prompt.md" with { type: "text" };
 import setupPromptTemplate from "./prompt-setup.md" with { type: "text" };
@@ -27,6 +27,8 @@ import { createLogExperimentTool } from "./tools/log-experiment";
 import { createRunExperimentTool } from "./tools/run-experiment";
 import { createUpdateNotesTool } from "./tools/update-notes";
 import type { AutoresearchRuntime, ExperimentResult, PendingRunSummary } from "./types";
+
+export * from "./controller";
 
 const EXPERIMENT_TOOL_NAMES = ["init_experiment", "run_experiment", "log_experiment", "update_notes"];
 
@@ -356,7 +358,7 @@ export const createAutoresearchExtension: ExtensionFactory = api => {
 			}));
 		if (!session) {
 			const currentBranch = await tryReadBranch(ctx.cwd);
-			const onAutoresearchBranch = currentBranch?.startsWith("autoresearch/") ?? false;
+			const onAutoresearchBranch = isManagedResearchBranch(currentBranch);
 			const baselineWarning = onAutoresearchBranch
 				? null
 				: "Heads up: you are not on a dedicated `autoresearch/*` branch. `log_experiment discard` will only revert run-modified files, not reset to baseline — so harness files written before `init_experiment` may not survive a discard. Clean the worktree and re-run `/autoresearch` if you want full revert safety.";
@@ -424,7 +426,7 @@ export const createAutoresearchExtension: ExtensionFactory = api => {
 		const storage = await openAutoresearchStorage(ctx.cwd);
 		const session = storage.getActiveSession();
 		const branchName = await tryReadBranch(ctx.cwd);
-		const onAutoresearchBranch = branchName?.startsWith("autoresearch/") ?? false;
+		const onAutoresearchBranch = isManagedResearchBranch(branchName);
 		const shouldResetTree = !opts.keepTree && (onAutoresearchBranch || opts.resetTreeForce);
 		if (shouldResetTree && session?.baselineCommit) {
 			try {

@@ -10,6 +10,10 @@ import designerMd from "../prompts/agents/designer.md" with { type: "text" };
 // Embed agent markdown files at build time
 import agentFrontmatterTemplate from "../prompts/agents/frontmatter.md" with { type: "text" };
 import librarianMd from "../prompts/agents/librarian.md" with { type: "text" };
+import paperReviewImpactMd from "../prompts/agents/paper-review-impact.md" with { type: "text" };
+import paperReviewMetaMd from "../prompts/agents/paper-review-meta.md" with { type: "text" };
+import paperReviewMethodsMd from "../prompts/agents/paper-review-methods.md" with { type: "text" };
+import paperReviewWritingMd from "../prompts/agents/paper-review-writing.md" with { type: "text" };
 import reviewerMd from "../prompts/agents/reviewer.md" with { type: "text" };
 import scoutMd from "../prompts/agents/scout.md" with { type: "text" };
 import taskMd from "../prompts/agents/task.md" with { type: "text" };
@@ -45,6 +49,10 @@ const EMBEDDED_AGENT_DEFS: EmbeddedAgentDef[] = [
 	{ fileName: "designer.md", template: designerMd },
 	{ fileName: "reviewer.md", template: reviewerMd },
 	{ fileName: "librarian.md", template: librarianMd },
+	{ fileName: "paper-review-methods.md", template: paperReviewMethodsMd },
+	{ fileName: "paper-review-writing.md", template: paperReviewWritingMd },
+	{ fileName: "paper-review-impact.md", template: paperReviewImpactMd },
+	{ fileName: "paper-review-meta.md", template: paperReviewMetaMd },
 	{
 		fileName: "task.md",
 		frontmatter: {
