@@ -19,8 +19,8 @@
 </p>
 
 <p align="center">
-  <strong>ReActor is Norman's fork of <a href="https://github.com/can1357/oh-my-pi">oh-my-pi</a>.</strong><br>
-  Maintained by <a href="https://github.com/KNN-07">Norman (KNN-07)</a> · upstream pinned at <a href="https://github.com/can1357/oh-my-pi/commit/0f9fceeea483caad531a32b050ac38558516cb5c"><code>0f9fceee</code></a>
+  <strong>ReActor is norman's fork of <a href="https://github.com/can1357/oh-my-pi">oh-my-pi</a>.</strong><br>
+  Maintained by <a href="https://github.com/KNN-07">norman (KNN-07)</a> · upstream pinned at <a href="https://github.com/can1357/oh-my-pi/commit/0f9fceeea483caad531a32b050ac38558516cb5c"><code>0f9fceee</code></a>
 </p>
 
 The most capable agent surface that ships. Continuously tuned by real-world use — complete out of the box, open all the way down.
@@ -482,7 +482,7 @@ Full reference: [reactor.sh/docs/sdk](https://reactor.sh/docs/sdk).
 
 Pick it up at **[reactor.sh](https://reactor.sh)**.
 
-ReActor is Norman's fork of [oh-my-pi](https://github.com/can1357/oh-my-pi), itself built on [Pi](https://github.com/badlogic/pi-mono) by [Mario Zechner](https://github.com/mariozechner). Norman is evolving it as a coding-first surface: sessions, subagents, slash commands, extensions, and bounded autonomy — all TypeScript, all MIT, all on [GitHub](https://github.com/KNN-07/ReActor). Shape it from config, hook it from outside, or read the source when you need to.
+ReActor is norman's fork of [oh-my-pi](https://github.com/can1357/oh-my-pi), itself built on [Pi](https://github.com/badlogic/pi-mono) by [Mario Zechner](https://github.com/mariozechner). norman is evolving it as a coding-first surface: sessions, subagents, slash commands, extensions, and bounded autonomy — all TypeScript, all MIT, all on [GitHub](https://github.com/KNN-07/ReActor). Shape it from config, hook it from outside, or read the source when you need to.
 
 ### Primitives
 
@@ -498,7 +498,7 @@ Ask reactor to write the piece you're missing, then `/reload-plugins`. Keep it l
 
 ## Philosophy
 
-ReActor is Norman's fork of [oh-my-pi](https://github.com/can1357/oh-my-pi), extended with a batteries-included coding workflow and maintained as a public fork by [KNN-07](https://github.com/KNN-07).
+ReActor is norman's fork of [oh-my-pi](https://github.com/can1357/oh-my-pi), extended with a batteries-included coding workflow and maintained as a public fork by [KNN-07](https://github.com/KNN-07).
 
 Key ideas:
 
@@ -582,7 +582,7 @@ MIT. See [LICENSE](LICENSE).
 
 © 2025 Mario Zechner  
 © 2025-2026 Can Bölük
-© 2026 Norman (KNN-07)
+© 2026 norman (KNN-07)
 
 _made for terminals that stay open_
 
