@@ -1,4 +1,4 @@
-/* Design tokens — reactor brand palette: deep-purple surfaces, pink accent, cyan
+/* Design tokens — reactor brand palette: charcoal/teal surfaces, ion lime accent, cyan
  * focus ring. Dark is the default; `[data-theme="light"]` and the
  * prefers-color-scheme light fallback flip to light surfaces.
  * The ONLY file allowed to contain raw color values. */
@@ -16,13 +16,13 @@
 	--fg-muted: oklch(0.71 0.016 307);
 	--fg-faint: oklch(0.53 0.018 307);
 
-	/* one accent: brand pink (#ed4abf) */
-	--accent: oklch(0.674 0.23 341);
-	--accent-fg: oklch(0.2 0.07 341);
-	--accent-muted: oklch(0.674 0.23 341 / 18%);
+	/* one accent: ion lime (#D8FF4F) */
+	--accent: oklch(0.93 0.23 110);
+	--accent-fg: oklch(0.2 0.03 110);
+	--accent-muted: oklch(0.93 0.23 110 / 18%);
 
 	/* brand lockup */
-	--brand-mark-gradient: linear-gradient(135deg, #ed4abf 0%, #9b4dff 50%, #5ad8e6 100%);
+	--brand-mark-gradient: linear-gradient(135deg, #D8FF4F 0%, #A8E86A 50%, #54D7C7 100%);
 
 	/* status — used sparingly */
 	--ok: oklch(0.76 0.14 150);
@@ -32,8 +32,8 @@
 	/* hairlines */
 	--border: oklch(1 0 0 / 9%);
 	--border-strong: oklch(1 0 0 / 13%);
-	/* focus ring: brand cyan (#5ad8e6) — distinct from the accent */
-	--ring: oklch(0.817 0.112 205 / 70%);
+	/* focus ring: reactor teal (#54D7C7) — distinct from the accent */
+	--ring: oklch(0.79 0.13 180 / 70%);
 
 	/* type — system stacks only */
 	--font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", sans-serif;
@@ -63,9 +63,9 @@
 	--fg-muted: oklch(0.46 0.03 307);
 	--fg-faint: oklch(0.58 0.025 307);
 
-	--accent: oklch(0.62 0.23 341);
-	--accent-fg: oklch(0.99 0.01 341);
-	--accent-muted: oklch(0.62 0.23 341 / 14%);
+	--accent: oklch(0.78 0.18 110);
+	--accent-fg: oklch(0.16 0.03 110);
+	--accent-muted: oklch(0.78 0.18 110 / 14%);
 
 	--ok: oklch(0.55 0.13 150);
 	--warn: oklch(0.6 0.13 85);
@@ -73,7 +73,7 @@
 
 	--border: oklch(0 0 0 / 10%);
 	--border-strong: oklch(0 0 0 / 15%);
-	--ring: oklch(0.58 0.13 230 / 70%);
+	--ring: oklch(0.66 0.12 180 / 70%);
 
 	--shadow-overlay: 0 12px 32px oklch(0 0 0 / 14%), 0 2px 8px oklch(0 0 0 / 10%);
 	--rail-mobile-shadow: -4px 0 16px oklch(0 0 0 / 14%);
@@ -94,9 +94,9 @@
 		--fg-muted: oklch(0.46 0.03 307);
 		--fg-faint: oklch(0.58 0.025 307);
 
-		--accent: oklch(0.62 0.23 341);
-		--accent-fg: oklch(0.99 0.01 341);
-		--accent-muted: oklch(0.62 0.23 341 / 14%);
+		--accent: oklch(0.78 0.18 110);
+		--accent-fg: oklch(0.16 0.03 110);
+		--accent-muted: oklch(0.78 0.18 110 / 14%);
 
 		--ok: oklch(0.55 0.13 150);
 		--warn: oklch(0.6 0.13 85);
@@ -104,7 +104,7 @@
 
 		--border: oklch(0 0 0 / 10%);
 		--border-strong: oklch(0 0 0 / 15%);
-		--ring: oklch(0.58 0.13 230 / 70%);
+		--ring: oklch(0.66 0.12 180 / 70%);
 
 		--shadow-overlay: 0 12px 32px oklch(0 0 0 / 14%), 0 2px 8px oklch(0 0 0 / 10%);
 		--backdrop: oklch(0.55 0.02 307 / 28%);

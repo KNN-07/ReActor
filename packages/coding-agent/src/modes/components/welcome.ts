@@ -450,15 +450,15 @@ export class WelcomeComponent implements Component {
 	}
 }
 
-export const REACTOR_LOGO = ["▀██████████▀", " ╘██    ██  ", "  ██    ██  ", "  ██    ██  ", " ▄██▄  ▄██▄ "];
+export const REACTOR_LOGO = [" ██████▌ ", " ██   ██ ", " ██████▌ ", " ██  ██  ", " ██   ██ "];
 
 /** Multi-stop palette for the diagonal gradient. */
 const GRADIENT_STOPS: ReadonlyArray<readonly [number, number, number]> = [
-	[255, 92, 200], // hot pink
-	[200, 110, 255], // violet
-	[120, 130, 255], // periwinkle
-	[60, 200, 255], // bright cyan
-	[120, 255, 220], // mint
+	[216, 255, 79], // ion lime
+	[190, 240, 92], // reactor green
+	[138, 225, 151], // sage signal
+	[84, 215, 199], // reactor teal
+	[95, 225, 210], // return path
 ];
 
 /** 256-color ramp fallback when truecolor isn't available. */

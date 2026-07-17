@@ -53,7 +53,7 @@ export function OverviewRoute({ active, range, refreshTrigger, onRequestClick }:
 				{
 					label: "Requests",
 					data: overview.timeSeries.map(pt => pt.requests),
-					borderColor: "#5ad8e6",
+					borderColor: "#54D7C7",
 					backgroundColor: "rgba(90, 216, 230, 0.12)",
 					tension: 0.2,
 					borderWidth: 2,

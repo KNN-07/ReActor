@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">ReActor mark</title>
+  <desc id="desc">A geometric R with a controlled reaction loop.</desc>
+  <defs>
+    <linearGradient id="reactor-ion" x1="12" y1="10" x2="54" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D8FF4F" />
+      <stop offset=".58" stop-color="#A8E86A" />
+      <stop offset="1" stop-color="#54D7C7" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="#0A0F12" />
+  <path d="M18 48V16h17.5c7.1 0 11.5 3.8 11.5 9.6 0 4.6-2.7 7.8-7.1 9.1L50 48h-9.1l-8.7-12.1H25V48h-7Zm7-25.6v7.2h9.7c3.1 0 4.8-1.2 4.8-3.6 0-2.4-1.7-3.6-4.8-3.6H25Z" fill="url(#reactor-ion)" />
+  <path d="M38.5 9.5c10.2 1.3 17 8.6 17 18.1 0 6.7-3.2 12.5-8.7 16.1" fill="none" stroke="#54D7C7" stroke-width="3" stroke-linecap="round" />
+  <path d="m45.1 41.8 1.7 5.2 5.4-1.2" fill="none" stroke="#54D7C7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="39.5" cy="9.8" r="2.5" fill="#D8FF4F" />
+</svg>

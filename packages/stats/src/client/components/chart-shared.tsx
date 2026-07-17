@@ -7,15 +7,15 @@
 
 import { format } from "date-fns";
 
-// ReActor brand palette (packages/collab-web/src/styles/tokens.css): pink/purple/cyan.
-// Categorical series lead with the brand gradient hues (pink -> purple -> cyan).
+// ReActor brand palette (packages/collab-web/src/styles/tokens.css): lime/sage/teal.
+// Categorical series lead with the brand gradient hues (lime -> sage -> teal).
 export const MODEL_COLORS = [
-	"#ed4abf", // brand pink (accent)
-	"#9b4dff", // brand violet
-	"#5ad8e6", // brand cyan
+	"#D8FF4F", // brand pink (accent)
+	"#A8E86A", // brand violet
+	"#54D7C7", // brand cyan
 	"#62d394", // green
-	"#c77dff", // light purple
-	"#ff8fd1", // light pink
+	"#B7C87D", // light purple
+	"#EAF5B7", // light pink
 	"#f5c14b", // amber
 	"#ff6b7d", // rose
 ];

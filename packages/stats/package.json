@@ -3,7 +3,7 @@
   "name": "@reactor/stats",
 	"private": true,
   "version": "0.1.0",
-  "description": "Local observability dashboard for pi AI usage statistics",
+  "description": "Local observability dashboard for ReActor AI usage statistics",
   "homepage": "https://reactor.sh",
   "author": "Can Boluk",
   "license": "MIT",

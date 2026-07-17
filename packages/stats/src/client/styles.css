@@ -5,8 +5,7 @@
    ========================================================================== */
 :root {
   color-scheme: dark;
-  /* ReActor brand palette — packages/collab-web/src/styles/tokens.css:
-     deep-purple surfaces (hue 307), pink accent #ed4abf, cyan focus ring #5ad8e6. */
+  /* ReActor brand palette — charcoal surfaces, ion lime action, reactor teal return path. */
   --page: oklch(0.16 0.02 307);
   --surface: oklch(0.19 0.022 307);
   --surface-2: oklch(0.235 0.026 307);
@@ -15,10 +14,10 @@
   --text: oklch(0.92 0.01 307);
   --muted: oklch(0.71 0.016 307);
   --dim: oklch(0.53 0.018 307);
-  --accent: oklch(0.674 0.23 341);          /* brand pink #ed4abf */
-  --accent-fg: oklch(0.2 0.07 341);         /* ink on accent fills */
-  --accent-muted: oklch(0.674 0.23 341 / 18%);
-  --link: oklch(0.817 0.112 205);           /* brand cyan #5ad8e6 */
+  --accent: oklch(0.93 0.23 110);           /* ion lime */
+  --accent-fg: oklch(0.2 0.03 110);         /* ink on accent fills */
+  --accent-muted: oklch(0.93 0.23 110 / 18%);
+  --link: oklch(0.79 0.13 180);              /* reactor teal */
   --success: oklch(0.76 0.14 150);
   --danger: oklch(0.66 0.19 25);
   --warning: oklch(0.79 0.14 85);
@@ -54,10 +53,10 @@
     --text: oklch(0.26 0.03 307);
     --muted: oklch(0.46 0.03 307);
     --dim: oklch(0.58 0.025 307);
-    --accent: oklch(0.62 0.23 341);
-    --accent-fg: oklch(0.99 0.01 341);
-    --accent-muted: oklch(0.62 0.23 341 / 14%);
-    --link: oklch(0.58 0.13 230);
+    --accent: oklch(0.78 0.18 110);
+    --accent-fg: oklch(0.16 0.03 110);
+    --accent-muted: oklch(0.78 0.18 110 / 14%);
+    --link: oklch(0.66 0.12 180);
     --success: oklch(0.55 0.13 150);
     --danger: oklch(0.55 0.19 25);
     --warning: oklch(0.6 0.13 85);
@@ -75,10 +74,10 @@
   --text: oklch(0.26 0.03 307);
   --muted: oklch(0.46 0.03 307);
   --dim: oklch(0.58 0.025 307);
-  --accent: oklch(0.62 0.23 341);
-  --accent-fg: oklch(0.99 0.01 341);
-  --accent-muted: oklch(0.62 0.23 341 / 14%);
-  --link: oklch(0.58 0.13 230);
+  --accent: oklch(0.78 0.18 110);
+  --accent-fg: oklch(0.16 0.03 110);
+  --accent-muted: oklch(0.78 0.18 110 / 14%);
+  --link: oklch(0.66 0.12 180);
   --success: oklch(0.55 0.13 150);
   --danger: oklch(0.55 0.19 25);
   --warning: oklch(0.6 0.13 85);
@@ -1248,7 +1247,7 @@
   width: 16px;
   height: 16px;
   border-radius: 4px;
-  background: linear-gradient(135deg, #ed4abf 0%, #9b4dff 50%, #5ad8e6 100%); /* ReActor brand gradient mark */
+  background: linear-gradient(135deg, #D8FF4F 0%, #A8E86A 50%, #54D7C7 100%); /* ReActor brand gradient mark */
 }
 
 .stats-logo-text,

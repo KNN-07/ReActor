@@ -9,9 +9,9 @@ import type { AgentType, AgentTypeStats } from "../types";
  * both themes without per-theme overrides.
  */
 const AGENT_META: Record<AgentType, { label: string; color: string }> = {
-	main: { label: "Main agent", color: "#ed4abf" },
-	subagent: { label: "Subagents", color: "#9b4dff" },
-	advisor: { label: "Advisor", color: "#5ad8e6" },
+	main: { label: "Main agent", color: "#D8FF4F" },
+	subagent: { label: "Subagents", color: "#A8E86A" },
+	advisor: { label: "Advisor", color: "#54D7C7" },
 };
 
 export interface AgentTokenShareProps {

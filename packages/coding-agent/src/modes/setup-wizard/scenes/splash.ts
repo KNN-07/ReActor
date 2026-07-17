@@ -117,7 +117,7 @@ function waterAmplitude(
 }
 
 /**
- * Animated setup splash, in the spirit of the reactor landing page: the brand π
+ * Animated setup splash, in the spirit of the ReActor landing page: the reaction-loop
  * mark rendered with the live diagonal gradient + shine sweep, rising out of a
  * rippling, gradient-lit water surface, under a faint twinkling starfield. The
  * mark and water share one continuous gradient so the sweep reads across the
@@ -189,7 +189,7 @@ export function renderSetupSplash(width: number, height: number, elapsedMs: numb
 /** Centered fallback for windows too small to hold the full scene. */
 function renderCompactSplash(width: number, height: number, phase: number, shine: ShineConfig): string[] {
 	const art = height >= 14 ? LARGE_LOGO : REACTOR_LOGO;
-	const content = [...gradientLogo(art, phase, shine), "", theme.bold("O h   M y   P i")];
+	const content = [...gradientLogo(art, phase, shine), "", theme.bold("r e a c t o r")];
 	const start = Math.max(0, Math.floor((height - content.length) / 2));
 	const lines: string[] = [];
 	for (let y = 0; y < height; y++) {
