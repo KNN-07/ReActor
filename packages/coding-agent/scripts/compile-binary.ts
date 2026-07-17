@@ -37,9 +37,9 @@ export async function compileCodingAgent(options: CodingAgentCompileOptions): Pr
 			root: options.repoRoot,
 			external: [...COMPILED_EXTERNAL_DEPENDENCIES],
 			define: {
-				"process.env.PI_COMPILED": JSON.stringify("true"),
-				"process.env.PI_TINY_TRANSFORMERS_VERSION": JSON.stringify(options.transformersVersion),
-				"process.env.PI_DOCS_EMBED": JSON.stringify((await buildDocsIndexPayload()).payload),
+				"process.env.REACTOR_COMPILED": JSON.stringify("true"),
+				"process.env.REACTOR_TINY_TRANSFORMERS_VERSION": JSON.stringify(options.transformersVersion),
+				"process.env.REACTOR_DOCS_EMBED": JSON.stringify((await buildDocsIndexPayload()).payload),
 			},
 			minify: {
 				identifiers: options.minifyIdentifiers ?? false,

@@ -7,10 +7,10 @@
 
 // pi-uutils: vendored from uutils/coreutils 0.8.0 and patched to run in-process
 // as a shell builtin. Every filesystem syscall resolves its path operand
-// against the shell working directory via `pi_uutils_ctx::resolve` AT THE CALL
+// against the shell working directory via `reactor_uutils_ctx::resolve` AT THE CALL
 // SITE, while the original operands are kept for display/error messages (GNU
 // prints operands as typed). All process-global stdio is routed through
-// `pi_uutils_ctx`, `translate!` strings are literalized, per-file errors are
+// `reactor_uutils_ctx`, `translate!` strings are literalized, per-file errors are
 // reported through the context stderr with `set_exit_code` (continue-on-error
 // like GNU truncate), and the entry point no longer calls `std::process::exit`.
 
@@ -23,7 +23,7 @@ use std::{
 };
 
 use clap::{Arg, ArgAction, ArgMatches, Command};
-use pi_uutils_ctx::format_usage;
+use reactor_uutils_ctx::format_usage;
 use uucore::{
 	display::Quotable,
 	error::{FromIo, UResult, USimpleError, UUsageError},
@@ -94,22 +94,22 @@ pub fn run(argv: Vec<OsString>) -> i32 {
 		Err(err) => {
 			let rendered = err.to_string();
 			if err.use_stderr() {
-				let _ = write!(pi_uutils_ctx::stderr(), "{rendered}");
+				let _ = write!(reactor_uutils_ctx::stderr(), "{rendered}");
 				return 1;
 			}
-			let _ = write!(pi_uutils_ctx::stdout(), "{rendered}");
+			let _ = write!(reactor_uutils_ctx::stdout(), "{rendered}");
 			return 0;
 		},
 	};
 	match truncate_main(&matches) {
-		Ok(()) => pi_uutils_ctx::exit_code(),
+		Ok(()) => reactor_uutils_ctx::exit_code(),
 		Err(err) => {
 			let code = err.code();
 			// pi-uutils: don't emit a dangling "truncate: " prefix when the
 			// error renders to an empty message.
 			let msg = err.to_string();
 			if !msg.is_empty() {
-				let _ = writeln!(pi_uutils_ctx::stderr(), "truncate: {msg}");
+				let _ = writeln!(reactor_uutils_ctx::stderr(), "truncate: {msg}");
 			}
 			if code == 0 { 1 } else { code }
 		},
@@ -214,7 +214,7 @@ pub fn uu_app() -> Command {
 fn do_file_truncate(filename: &OsString, create: bool, size: u64) -> UResult<()> {
 	// pi-uutils: resolve the operand against the shell working directory at
 	// the open site; `filename` is kept for the error message.
-	let resolved = pi_uutils_ctx::resolve(filename);
+	let resolved = reactor_uutils_ctx::resolve(filename);
 
 	match OpenOptions::new()
 		.write(true)
@@ -236,7 +236,7 @@ fn file_truncate(
 ) -> UResult<()> {
 	// pi-uutils: resolve the operand against the shell working directory at
 	// the metadata site; `filename` is kept for the error message.
-	let resolved = pi_uutils_ctx::resolve(filename);
+	let resolved = reactor_uutils_ctx::resolve(filename);
 
 	// Get the length of the file.
 	let file_size = match metadata(&resolved) {
@@ -282,7 +282,7 @@ fn truncate(
 			// pi-uutils: resolve the reference operand against the shell
 			// working directory; `reference_path` is kept for the message.
 			let reference_metadata =
-				metadata(pi_uutils_ctx::resolve(&reference_path)).map_err(|error| {
+				metadata(reactor_uutils_ctx::resolve(&reference_path)).map_err(|error| {
 					match error.kind() {
 						ErrorKind::NotFound => USimpleError::new(
 							1,
@@ -325,9 +325,9 @@ fn truncate(
 		if let Err(err) = file_truncate(no_create, reference_size, &mode, filename) {
 			let msg = err.to_string();
 			if !msg.is_empty() {
-				let _ = writeln!(pi_uutils_ctx::stderr(), "truncate: {msg}");
+				let _ = writeln!(reactor_uutils_ctx::stderr(), "truncate: {msg}");
 			}
-			pi_uutils_ctx::set_exit_code(if err.code() == 0 { 1 } else { err.code() });
+			reactor_uutils_ctx::set_exit_code(if err.code() == 0 { 1 } else { err.code() });
 		}
 	}
 
@@ -380,7 +380,7 @@ mod tests {
 	use std::{collections::HashMap, fs, path::PathBuf, sync::Arc};
 
 	use parking_lot::Mutex;
-	use pi_uutils_ctx::ScopeIo;
+	use reactor_uutils_ctx::ScopeIo;
 
 	use super::*;
 
@@ -418,7 +418,7 @@ mod tests {
 			.map(OsString::from)
 			.collect();
 
-		let code = pi_uutils_ctx::scope(io, || run(argv));
+		let code = reactor_uutils_ctx::scope(io, || run(argv));
 
 		let out_str = String::from_utf8(stdout_buf.lock().clone()).unwrap();
 		let err_str = String::from_utf8(stderr_buf.lock().clone()).unwrap();
@@ -443,7 +443,7 @@ mod tests {
 		fs::write(root.join("f"), b"12345678").unwrap();
 
 		// Relative operand + scope cwd differing from the process cwd: only the
-		// call-site `pi_uutils_ctx::resolve` patch makes this find the file.
+		// call-site `reactor_uutils_ctx::resolve` patch makes this find the file.
 		let (code, stdout, stderr) = run_in(root.clone(), vec!["-s", "5", "f"]);
 		assert_eq!((code, stdout.as_str(), stderr.as_str()), (0, "", ""));
 		assert_eq!(len(&root.join("f")), 5);

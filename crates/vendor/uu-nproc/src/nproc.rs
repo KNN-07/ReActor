@@ -6,8 +6,8 @@
 // spell-checker:ignore (ToDO) NPROCESSORS nprocs numstr sysconf
 
 // pi-uutils: vendored from uutils/coreutils 0.8.0 and patched to run in-process
-// as a shell builtin. The OMP_NUM_THREADS and OMP_THREAD_LIMIT environment
-// variables are read from the scope environment via `pi_uutils_ctx::var` (the
+// as a shell builtin. The REACTOR_NUM_THREADS and REACTOR_THREAD_LIMIT environment
+// variables are read from the scope environment via `reactor_uutils_ctx::var` (the
 // shell's exported variables), not the host process environment. All output is
 // routed through the context stdout, `translate!` strings are literalized, and
 // the entry point no longer calls `std::process::exit`.
@@ -15,7 +15,7 @@
 use std::{ffi::OsString, io::Write, thread};
 
 use clap::{Arg, ArgAction, ArgMatches, Command};
-use pi_uutils_ctx::format_usage;
+use reactor_uutils_ctx::format_usage;
 use uucore::{
 	display::Quotable,
 	error::{UResult, USimpleError},
@@ -35,20 +35,20 @@ pub fn run(argv: Vec<OsString>) -> i32 {
 		Err(err) => {
 			let rendered = err.to_string();
 			if err.use_stderr() {
-				let _ = write!(pi_uutils_ctx::stderr(), "{rendered}");
+				let _ = write!(reactor_uutils_ctx::stderr(), "{rendered}");
 				return 1;
 			}
-			let _ = write!(pi_uutils_ctx::stdout(), "{rendered}");
+			let _ = write!(reactor_uutils_ctx::stdout(), "{rendered}");
 			return 0;
 		},
 	};
 	match nproc_main(&matches) {
-		Ok(()) => pi_uutils_ctx::exit_code(),
+		Ok(()) => reactor_uutils_ctx::exit_code(),
 		Err(err) => {
 			let code = err.code();
 			let msg = err.to_string();
 			if !msg.is_empty() {
-				let _ = writeln!(pi_uutils_ctx::stderr(), "nproc: {msg}");
+				let _ = writeln!(reactor_uutils_ctx::stderr(), "nproc: {msg}");
 			}
 			if code == 0 { 1 } else { code }
 		},
@@ -70,17 +70,17 @@ fn nproc_main(matches: &ArgMatches) -> UResult<()> {
 		None => 0,
 	};
 
-	// pi-uutils: OMP_THREAD_LIMIT comes from the scope environment (the
+	// pi-uutils: REACTOR_THREAD_LIMIT comes from the scope environment (the
 	// shell's exported variables), not the host process environment.
-	let limit = match pi_uutils_ctx::var("OMP_THREAD_LIMIT") {
+	let limit = match reactor_uutils_ctx::var("REACTOR_THREAD_LIMIT") {
 		// Uses the OpenMP variable to limit the number of threads
 		// If the parsing fails, returns the max size (so, no impact)
-		// If OMP_THREAD_LIMIT=0, rejects the value
+		// If REACTOR_THREAD_LIMIT=0, rejects the value
 		Some(threads) => match threads.parse() {
 			Ok(0) | Err(_) => usize::MAX,
 			Ok(n) => n,
 		},
-		// the variable 'OMP_THREAD_LIMIT' doesn't exist
+		// the variable 'REACTOR_THREAD_LIMIT' doesn't exist
 		// fallback to the max
 		None => usize::MAX,
 	};
@@ -88,15 +88,15 @@ fn nproc_main(matches: &ArgMatches) -> UResult<()> {
 	let mut cores = if matches.get_flag(OPT_ALL) {
 		num_cpus_all()
 	} else {
-		// OMP_NUM_THREADS doesn't have an impact on --all
-		// pi-uutils: OMP_NUM_THREADS comes from the scope environment.
-		match pi_uutils_ctx::var("OMP_NUM_THREADS") {
+		// REACTOR_NUM_THREADS doesn't have an impact on --all
+		// pi-uutils: REACTOR_NUM_THREADS comes from the scope environment.
+		match reactor_uutils_ctx::var("REACTOR_NUM_THREADS") {
 			// Uses the OpenMP variable to force the number of threads
 			// If the parsing fails, returns the number of CPU
 			Some(threads) => {
-				// In some cases, OMP_NUM_THREADS can be "x,y,z"
+				// In some cases, REACTOR_NUM_THREADS can be "x,y,z"
 				// In this case, only take the first one (like GNU)
-				// If OMP_NUM_THREADS=0, rejects the value
+				// If REACTOR_NUM_THREADS=0, rejects the value
 				match threads.split_terminator(',').next() {
 					None => available_parallelism(),
 					Some(s) => match s.trim().parse() {
@@ -105,7 +105,7 @@ fn nproc_main(matches: &ArgMatches) -> UResult<()> {
 					},
 				}
 			},
-			// the variable 'OMP_NUM_THREADS' doesn't exist
+			// the variable 'REACTOR_NUM_THREADS' doesn't exist
 			// fallback to the regular CPU detection
 			None => available_parallelism(),
 		}
@@ -118,7 +118,7 @@ fn nproc_main(matches: &ArgMatches) -> UResult<()> {
 		cores -= ignore;
 	}
 	// pi-uutils: write to the context stdout instead of the process stdout.
-	pi_uutils_ctx::stdout()
+	reactor_uutils_ctx::stdout()
 		.write_all(format!("{cores}\n").as_bytes())
 		.map_err(|e| USimpleError::new(1, e.to_string()))?;
 	Ok(())
@@ -128,8 +128,8 @@ pub fn uu_app() -> Command {
 	Command::new("nproc")
 		.version(uucore::crate_version!())
 		.about(
-			"Print the number of cores available to the current process.\nIf the OMP_NUM_THREADS or \
-			 OMP_THREAD_LIMIT environment variables are set, then\nthey will determine the minimum \
+			"Print the number of cores available to the current process.\nIf the REACTOR_NUM_THREADS or \
+			 REACTOR_THREAD_LIMIT environment variables are set, then\nthey will determine the minimum \
 			 and maximum returned value respectively.",
 		)
 		.override_usage(format_usage("nproc [OPTIONS]..."))
@@ -176,7 +176,7 @@ mod tests {
 	use std::{collections::HashMap, io::Write, path::PathBuf, sync::Arc};
 
 	use parking_lot::Mutex;
-	use pi_uutils_ctx::ScopeIo;
+	use reactor_uutils_ctx::ScopeIo;
 
 	use super::*;
 
@@ -214,7 +214,7 @@ mod tests {
 			.map(OsString::from)
 			.collect();
 
-		let code = pi_uutils_ctx::scope(io, || run(argv));
+		let code = reactor_uutils_ctx::scope(io, || run(argv));
 
 		let out_str = String::from_utf8(stdout_buf.lock().clone()).unwrap();
 		let err_str = String::from_utf8(stderr_buf.lock().clone()).unwrap();
@@ -223,26 +223,26 @@ mod tests {
 	}
 
 	#[test]
-	fn scope_env_omp_num_threads_forces_count() {
-		let env = HashMap::from([("OMP_NUM_THREADS".to_string(), "3".to_string())]);
+	fn scope_env_reactor_num_threads_forces_count() {
+		let env = HashMap::from([("REACTOR_NUM_THREADS".to_string(), "3".to_string())]);
 		let (code, stdout, stderr) = run_in(env, vec![]);
 		assert_eq!((code, stdout.as_str(), stderr.as_str()), (0, "3\n", ""));
 	}
 
 	#[test]
-	fn omp_thread_limit_caps_omp_num_threads() {
+	fn reactor_thread_limit_caps_reactor_num_threads() {
 		let env = HashMap::from([
-			("OMP_NUM_THREADS".to_string(), "64".to_string()),
-			("OMP_THREAD_LIMIT".to_string(), "2".to_string()),
+			("REACTOR_NUM_THREADS".to_string(), "64".to_string()),
+			("REACTOR_THREAD_LIMIT".to_string(), "2".to_string()),
 		]);
 		let (code, stdout, stderr) = run_in(env, vec![]);
 		assert_eq!((code, stdout.as_str(), stderr.as_str()), (0, "2\n", ""));
 	}
 
 	#[test]
-	fn all_prints_positive_integer_and_ignores_omp_num_threads() {
-		// --all reports hardware CPUs; OMP_NUM_THREADS must not force it.
-		let env = HashMap::from([("OMP_NUM_THREADS".to_string(), "0".to_string())]);
+	fn all_prints_positive_integer_and_ignores_reactor_num_threads() {
+		// --all reports hardware CPUs; REACTOR_NUM_THREADS must not force it.
+		let env = HashMap::from([("REACTOR_NUM_THREADS".to_string(), "0".to_string())]);
 		let (code, stdout, stderr) = run_in(env, vec!["--all"]);
 		assert_eq!(code, 0);
 		assert_eq!(stderr, "");
@@ -257,9 +257,9 @@ mod tests {
 	fn process_environment_is_not_consulted() {
 		// The variable exists only in the host process environment, not the
 		// scope map: only the un-patched `std::env::var` path would see it.
-		unsafe { std::env::set_var("OMP_NUM_THREADS", "1234") };
+		unsafe { std::env::set_var("REACTOR_NUM_THREADS", "1234") };
 		let (code, stdout, stderr) = run_in(HashMap::new(), vec![]);
-		unsafe { std::env::remove_var("OMP_NUM_THREADS") };
+		unsafe { std::env::remove_var("REACTOR_NUM_THREADS") };
 		assert_eq!((code, stderr.as_str()), (0, ""));
 		assert_ne!(stdout, "1234\n");
 		let n: usize = stdout.trim_end().parse().expect("output is an integer");
@@ -268,11 +268,11 @@ mod tests {
 
 	#[test]
 	fn ignore_subtracts_and_floors_at_one() {
-		let env = HashMap::from([("OMP_NUM_THREADS".to_string(), "8".to_string())]);
+		let env = HashMap::from([("REACTOR_NUM_THREADS".to_string(), "8".to_string())]);
 		let (code, stdout, _) = run_in(env, vec!["--ignore=3"]);
 		assert_eq!((code, stdout.as_str()), (0, "5\n"));
 
-		let env = HashMap::from([("OMP_NUM_THREADS".to_string(), "2".to_string())]);
+		let env = HashMap::from([("REACTOR_NUM_THREADS".to_string(), "2".to_string())]);
 		let (code, stdout, _) = run_in(env, vec!["--ignore=5"]);
 		assert_eq!((code, stdout.as_str()), (0, "1\n"));
 	}

@@ -1,6 +1,6 @@
-import type { AgentTool, AgentToolContext, AgentToolResult, AgentToolUpdateCallback } from "@oh-my-pi/pi-agent-core";
-import type { ImageContent, ToolExample } from "@oh-my-pi/pi-ai";
-import { prompt } from "@oh-my-pi/pi-utils";
+import type { AgentTool, AgentToolContext, AgentToolResult, AgentToolUpdateCallback } from "@reactor/agent-core";
+import type { ImageContent, ToolExample } from "@reactor/ai";
+import { prompt } from "@reactor/utils";
 import { type } from "arktype";
 import { jsBackend, juliaBackend, pythonBackend, rubyBackend } from "../eval";
 import type { ExecutorBackend, ExecutorBackendResult } from "../eval/backend";
@@ -229,7 +229,7 @@ async function resolveBackend(session: ToolSession, language: EvalLanguage): Pro
 	const allowJl = backends.julia;
 
 	if (language === "python") {
-		if (!allowPy) throw new ToolError("Python backend is disabled (PI_PY=0 or eval.py = false).");
+		if (!allowPy) throw new ToolError("Python backend is disabled (REACTOR_PY=0 or eval.py = false).");
 		if (!(await pythonBackend.isAvailable(session))) {
 			const alternatives = [allowJs ? '"js"' : null, allowRb ? '"rb"' : null, allowJl ? '"jl"' : null].filter(
 				Boolean,
@@ -243,7 +243,7 @@ async function resolveBackend(session: ToolSession, language: EvalLanguage): Pro
 		return { backend: pythonBackend };
 	}
 	if (language === "ruby") {
-		if (!allowRb) throw new ToolError("Ruby backend is disabled (PI_RB=0 or eval.rb = false).");
+		if (!allowRb) throw new ToolError("Ruby backend is disabled (REACTOR_RB=0 or eval.rb = false).");
 		if (!(await rubyBackend.isAvailable(session))) {
 			const alternatives = [allowJs ? '"js"' : null, allowPy ? '"py"' : null, allowJl ? '"jl"' : null].filter(
 				Boolean,
@@ -257,7 +257,7 @@ async function resolveBackend(session: ToolSession, language: EvalLanguage): Pro
 		return { backend: rubyBackend };
 	}
 	if (language === "julia") {
-		if (!allowJl) throw new ToolError("Julia backend is disabled (PI_JL=0 or eval.jl = false).");
+		if (!allowJl) throw new ToolError("Julia backend is disabled (REACTOR_JL=0 or eval.jl = false).");
 		if (!(await juliaBackend.isAvailable(session))) {
 			const alternatives = [allowJs ? '"js"' : null, allowPy ? '"py"' : null, allowRb ? '"rb"' : null].filter(
 				Boolean,
@@ -270,7 +270,7 @@ async function resolveBackend(session: ToolSession, language: EvalLanguage): Pro
 		}
 		return { backend: juliaBackend };
 	}
-	if (!allowJs) throw new ToolError("JavaScript backend is disabled (PI_JS=0 or eval.js = false).");
+	if (!allowJs) throw new ToolError("JavaScript backend is disabled (REACTOR_JS=0 or eval.js = false).");
 	return { backend: jsBackend };
 }
 function formatEvalInputLanguage(value: string): string {

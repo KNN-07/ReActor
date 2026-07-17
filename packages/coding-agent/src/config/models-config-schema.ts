@@ -271,13 +271,13 @@ const ProviderConfigSchema = type({
 	"modelOverrides?": { "[string]": ModelOverrideSchema },
 	"disableStrictTools?": "boolean",
 	/**
-	 * Streaming transport override. When set to `"pi-native"`, omp dispatches
+	 * Streaming transport override. When set to `"reactor-native"`, reactor dispatches
 	 * every model under this provider via the auth-gateway's
 	 * `POST /v1/pi/stream` endpoint instead of the per-provider SDK. The
-	 * provider's `baseUrl` must point at a compatible `omp auth-gateway`
+	 * provider's `baseUrl` must point at a compatible `reactor auth-gateway`
 	 * and `apiKey` must carry the gateway bearer.
 	 */
-	"transport?": '"pi-native"',
+	"transport?": '"reactor-native"',
 }).narrow((value, ctx) => {
 	if (value.baseUrl !== undefined && typeof value.baseUrl === "string" && value.baseUrl.length === 0) {
 		return ctx.mustBe("baseUrl a non-empty string");

@@ -1,16 +1,16 @@
 import { describe, expect, it, vi } from "bun:test";
 import * as path from "node:path";
-import { Agent } from "@oh-my-pi/pi-agent-core";
-import type { ImageContent } from "@oh-my-pi/pi-ai";
-import { getBundledModel } from "@oh-my-pi/pi-catalog/models";
-import { ModelRegistry } from "@oh-my-pi/pi-coding-agent/config/model-registry";
-import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { InputController } from "@oh-my-pi/pi-coding-agent/modes/controllers/input-controller";
-import type { InteractiveModeContext } from "@oh-my-pi/pi-coding-agent/modes/types";
-import { AgentSession } from "@oh-my-pi/pi-coding-agent/session/agent-session";
-import { AuthStorage } from "@oh-my-pi/pi-coding-agent/session/auth-storage";
-import { SessionManager } from "@oh-my-pi/pi-coding-agent/session/session-manager";
-import { TempDir } from "@oh-my-pi/pi-utils";
+import { Agent } from "@reactor/agent-core";
+import type { ImageContent } from "@reactor/ai";
+import { getBundledModel } from "@reactor/catalog/models";
+import { ModelRegistry } from "@reactor/coding-agent/config/model-registry";
+import { Settings } from "@reactor/coding-agent/config/settings";
+import { InputController } from "@reactor/coding-agent/modes/controllers/input-controller";
+import type { InteractiveModeContext } from "@reactor/coding-agent/modes/types";
+import { AgentSession } from "@reactor/coding-agent/session/agent-session";
+import { AuthStorage } from "@reactor/coding-agent/session/auth-storage";
+import { SessionManager } from "@reactor/coding-agent/session/session-manager";
+import { TempDir } from "@reactor/utils";
 
 /**
  * Regression: a submission arriving while the main loop has no input waiter

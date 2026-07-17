@@ -1,8 +1,8 @@
 import { describe, expect, it } from "bun:test";
-import { agentLoop } from "@oh-my-pi/pi-agent-core/agent-loop";
-import type { AgentContext, AgentLoopConfig, AgentMessage, AgentTool } from "@oh-my-pi/pi-agent-core/types";
-import type { AssistantMessage, Context, Message, TextContent, ToolResultMessage } from "@oh-my-pi/pi-ai";
-import { createMockModel } from "@oh-my-pi/pi-ai/providers/mock";
+import { agentLoop } from "@reactor/agent-core/agent-loop";
+import type { AgentContext, AgentLoopConfig, AgentMessage, AgentTool } from "@reactor/agent-core/types";
+import type { AssistantMessage, Context, Message, TextContent, ToolResultMessage } from "@reactor/ai";
+import { createMockModel } from "@reactor/ai/providers/mock";
 import { type } from "arktype";
 import { createUserMessage } from "./helpers";
 
@@ -219,9 +219,9 @@ describe("agentLoop with owned in-band tool calls", () => {
 		expect(resultsText).toContain("echoed:hi");
 	});
 
-	it("uses PI_DIALECT=minimax when config.dialect is unset", async () => {
-		const before = Bun.env.PI_DIALECT;
-		Bun.env.PI_DIALECT = "minimax";
+	it("uses REACTOR_DIALECT=minimax when config.dialect is unset", async () => {
+		const before = Bun.env.REACTOR_DIALECT;
+		Bun.env.REACTOR_DIALECT = "minimax";
 		try {
 			const echoArgs: Array<{ msg: string }> = [];
 			const toolSchema = type({ msg: "string" });
@@ -263,8 +263,8 @@ describe("agentLoop with owned in-band tool calls", () => {
 			expect(captured[0].tools).toBeUndefined();
 			expect((captured[0].systemPrompt ?? []).join("\n")).toContain("<minimax:tool_call>");
 		} finally {
-			if (before === undefined) delete Bun.env.PI_DIALECT;
-			else Bun.env.PI_DIALECT = before;
+			if (before === undefined) delete Bun.env.REACTOR_DIALECT;
+			else Bun.env.REACTOR_DIALECT = before;
 		}
 	});
 });

@@ -1,11 +1,11 @@
 import { describe, expect, it } from "bun:test";
-import { streamAzureOpenAIResponses } from "@oh-my-pi/pi-ai/providers/azure-openai-responses";
-import { streamOpenAICompletions } from "@oh-my-pi/pi-ai/providers/openai-completions";
-import { streamOpenAIResponses } from "@oh-my-pi/pi-ai/providers/openai-responses";
-import { streamSimple } from "@oh-my-pi/pi-ai/stream";
-import type { Context, FetchImpl, Model, TextContent } from "@oh-my-pi/pi-ai/types";
-import { buildModel } from "@oh-my-pi/pi-catalog/build";
-import { getBundledModel } from "@oh-my-pi/pi-catalog/models";
+import { streamAzureOpenAIResponses } from "@reactor/ai/providers/azure-openai-responses";
+import { streamOpenAICompletions } from "@reactor/ai/providers/openai-completions";
+import { streamOpenAIResponses } from "@reactor/ai/providers/openai-responses";
+import { streamSimple } from "@reactor/ai/stream";
+import type { Context, FetchImpl, Model, TextContent } from "@reactor/ai/types";
+import { buildModel } from "@reactor/catalog/build";
+import { getBundledModel } from "@reactor/catalog/models";
 import { waitForDelayOrAbort } from "./helpers";
 
 const openAIResponsesModel = getBundledModel("openai", "gpt-5-mini") as Model<"openai-responses">;
@@ -356,12 +356,12 @@ describe("OpenAI-family first-event timeouts", () => {
 		);
 	});
 
-	it("lets PI_OPENAI_STREAM_IDLE_TIMEOUT_MS widen OpenAI responses first-event request setup", async () => {
-		const previousOpenAIIdleTimeout = Bun.env.PI_OPENAI_STREAM_IDLE_TIMEOUT_MS;
-		const previousGenericFirstEventTimeout = Bun.env.PI_STREAM_FIRST_EVENT_TIMEOUT_MS;
+	it("lets REACTOR_OPENAI_STREAM_IDLE_TIMEOUT_MS widen OpenAI responses first-event request setup", async () => {
+		const previousOpenAIIdleTimeout = Bun.env.REACTOR_OPENAI_STREAM_IDLE_TIMEOUT_MS;
+		const previousGenericFirstEventTimeout = Bun.env.REACTOR_STREAM_FIRST_EVENT_TIMEOUT_MS;
 		const timeoutHeaders: string[] = [];
-		Bun.env.PI_OPENAI_STREAM_IDLE_TIMEOUT_MS = "1500";
-		Bun.env.PI_STREAM_FIRST_EVENT_TIMEOUT_MS = "20";
+		Bun.env.REACTOR_OPENAI_STREAM_IDLE_TIMEOUT_MS = "1500";
+		Bun.env.REACTOR_STREAM_FIRST_EVENT_TIMEOUT_MS = "20";
 		const fetchMock = createDelayedFetch(30, createOpenAIResponsesSuccessResponse, (input, init) => {
 			timeoutHeaders.push(getRequestHeader(input, init, "X-Stainless-Timeout") ?? "");
 		});
@@ -377,23 +377,23 @@ describe("OpenAI-family first-event timeouts", () => {
 			expect(timeoutHeaders).toContain("1");
 		} finally {
 			if (previousOpenAIIdleTimeout === undefined) {
-				delete Bun.env.PI_OPENAI_STREAM_IDLE_TIMEOUT_MS;
+				delete Bun.env.REACTOR_OPENAI_STREAM_IDLE_TIMEOUT_MS;
 			} else {
-				Bun.env.PI_OPENAI_STREAM_IDLE_TIMEOUT_MS = previousOpenAIIdleTimeout;
+				Bun.env.REACTOR_OPENAI_STREAM_IDLE_TIMEOUT_MS = previousOpenAIIdleTimeout;
 			}
 			if (previousGenericFirstEventTimeout === undefined) {
-				delete Bun.env.PI_STREAM_FIRST_EVENT_TIMEOUT_MS;
+				delete Bun.env.REACTOR_STREAM_FIRST_EVENT_TIMEOUT_MS;
 			} else {
-				Bun.env.PI_STREAM_FIRST_EVENT_TIMEOUT_MS = previousGenericFirstEventTimeout;
+				Bun.env.REACTOR_STREAM_FIRST_EVENT_TIMEOUT_MS = previousGenericFirstEventTimeout;
 			}
 		}
 	});
 
-	it("lets PI_OPENAI_STREAM_IDLE_TIMEOUT_MS widen native Ollama first-event request setup", async () => {
-		const previousOpenAIIdleTimeout = Bun.env.PI_OPENAI_STREAM_IDLE_TIMEOUT_MS;
-		const previousGenericFirstEventTimeout = Bun.env.PI_STREAM_FIRST_EVENT_TIMEOUT_MS;
-		Bun.env.PI_OPENAI_STREAM_IDLE_TIMEOUT_MS = "1500";
-		Bun.env.PI_STREAM_FIRST_EVENT_TIMEOUT_MS = "20";
+	it("lets REACTOR_OPENAI_STREAM_IDLE_TIMEOUT_MS widen native Ollama first-event request setup", async () => {
+		const previousOpenAIIdleTimeout = Bun.env.REACTOR_OPENAI_STREAM_IDLE_TIMEOUT_MS;
+		const previousGenericFirstEventTimeout = Bun.env.REACTOR_STREAM_FIRST_EVENT_TIMEOUT_MS;
+		Bun.env.REACTOR_OPENAI_STREAM_IDLE_TIMEOUT_MS = "1500";
+		Bun.env.REACTOR_STREAM_FIRST_EVENT_TIMEOUT_MS = "20";
 		const fetchMock = createDelayedFetch(30, createOllamaChatSuccessResponse);
 
 		try {
@@ -406,24 +406,24 @@ describe("OpenAI-family first-event timeouts", () => {
 			expect(getFirstTextContent(result)).toMatchObject({ type: "text", text: "Hello delayed" });
 		} finally {
 			if (previousOpenAIIdleTimeout === undefined) {
-				delete Bun.env.PI_OPENAI_STREAM_IDLE_TIMEOUT_MS;
+				delete Bun.env.REACTOR_OPENAI_STREAM_IDLE_TIMEOUT_MS;
 			} else {
-				Bun.env.PI_OPENAI_STREAM_IDLE_TIMEOUT_MS = previousOpenAIIdleTimeout;
+				Bun.env.REACTOR_OPENAI_STREAM_IDLE_TIMEOUT_MS = previousOpenAIIdleTimeout;
 			}
 			if (previousGenericFirstEventTimeout === undefined) {
-				delete Bun.env.PI_STREAM_FIRST_EVENT_TIMEOUT_MS;
+				delete Bun.env.REACTOR_STREAM_FIRST_EVENT_TIMEOUT_MS;
 			} else {
-				Bun.env.PI_STREAM_FIRST_EVENT_TIMEOUT_MS = previousGenericFirstEventTimeout;
+				Bun.env.REACTOR_STREAM_FIRST_EVENT_TIMEOUT_MS = previousGenericFirstEventTimeout;
 			}
 		}
 	});
 
-	it("honors PI_OPENAI_STREAM_FIRST_EVENT_TIMEOUT_MS even when caller pins streamIdleTimeoutMs", async () => {
-		const previousOpenAIFirstEventTimeout = Bun.env.PI_OPENAI_STREAM_FIRST_EVENT_TIMEOUT_MS;
-		const previousGenericFirstEventTimeout = Bun.env.PI_STREAM_FIRST_EVENT_TIMEOUT_MS;
+	it("honors REACTOR_OPENAI_STREAM_FIRST_EVENT_TIMEOUT_MS even when caller pins streamIdleTimeoutMs", async () => {
+		const previousOpenAIFirstEventTimeout = Bun.env.REACTOR_OPENAI_STREAM_FIRST_EVENT_TIMEOUT_MS;
+		const previousGenericFirstEventTimeout = Bun.env.REACTOR_STREAM_FIRST_EVENT_TIMEOUT_MS;
 		const timeoutHeaders: string[] = [];
-		Bun.env.PI_OPENAI_STREAM_FIRST_EVENT_TIMEOUT_MS = "1500";
-		Bun.env.PI_STREAM_FIRST_EVENT_TIMEOUT_MS = "20";
+		Bun.env.REACTOR_OPENAI_STREAM_FIRST_EVENT_TIMEOUT_MS = "1500";
+		Bun.env.REACTOR_STREAM_FIRST_EVENT_TIMEOUT_MS = "20";
 		const fetchMock = createDelayedFetch(30, createOpenAIResponsesSuccessResponse, (input, init) => {
 			timeoutHeaders.push(getRequestHeader(input, init, "X-Stainless-Timeout") ?? "");
 		});
@@ -440,14 +440,14 @@ describe("OpenAI-family first-event timeouts", () => {
 			expect(timeoutHeaders).toContain("1");
 		} finally {
 			if (previousOpenAIFirstEventTimeout === undefined) {
-				delete Bun.env.PI_OPENAI_STREAM_FIRST_EVENT_TIMEOUT_MS;
+				delete Bun.env.REACTOR_OPENAI_STREAM_FIRST_EVENT_TIMEOUT_MS;
 			} else {
-				Bun.env.PI_OPENAI_STREAM_FIRST_EVENT_TIMEOUT_MS = previousOpenAIFirstEventTimeout;
+				Bun.env.REACTOR_OPENAI_STREAM_FIRST_EVENT_TIMEOUT_MS = previousOpenAIFirstEventTimeout;
 			}
 			if (previousGenericFirstEventTimeout === undefined) {
-				delete Bun.env.PI_STREAM_FIRST_EVENT_TIMEOUT_MS;
+				delete Bun.env.REACTOR_STREAM_FIRST_EVENT_TIMEOUT_MS;
 			} else {
-				Bun.env.PI_STREAM_FIRST_EVENT_TIMEOUT_MS = previousGenericFirstEventTimeout;
+				Bun.env.REACTOR_STREAM_FIRST_EVENT_TIMEOUT_MS = previousGenericFirstEventTimeout;
 			}
 		}
 	});

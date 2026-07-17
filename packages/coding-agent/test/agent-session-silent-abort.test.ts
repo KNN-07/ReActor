@@ -14,18 +14,18 @@
  */
 import { afterEach, describe, expect, it, vi } from "bun:test";
 import * as path from "node:path";
-import { Agent } from "@oh-my-pi/pi-agent-core";
-import type { AssistantMessage, TextContent } from "@oh-my-pi/pi-ai";
-import * as AIError from "@oh-my-pi/pi-ai/error";
-import { getBundledModel } from "@oh-my-pi/pi-catalog/models";
-import { ModelRegistry } from "@oh-my-pi/pi-coding-agent/config/model-registry";
-import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { SecretObfuscator } from "@oh-my-pi/pi-coding-agent/secrets/obfuscator";
-import { AgentSession, type AgentSessionEvent } from "@oh-my-pi/pi-coding-agent/session/agent-session";
-import { AuthStorage } from "@oh-my-pi/pi-coding-agent/session/auth-storage";
-import { SILENT_ABORT_MARKER } from "@oh-my-pi/pi-coding-agent/session/messages";
-import { SessionManager } from "@oh-my-pi/pi-coding-agent/session/session-manager";
-import { TempDir } from "@oh-my-pi/pi-utils";
+import { Agent } from "@reactor/agent-core";
+import type { AssistantMessage, TextContent } from "@reactor/ai";
+import * as AIError from "@reactor/ai/error";
+import { getBundledModel } from "@reactor/catalog/models";
+import { ModelRegistry } from "@reactor/coding-agent/config/model-registry";
+import { Settings } from "@reactor/coding-agent/config/settings";
+import { SecretObfuscator } from "@reactor/coding-agent/secrets/obfuscator";
+import { AgentSession, type AgentSessionEvent } from "@reactor/coding-agent/session/agent-session";
+import { AuthStorage } from "@reactor/coding-agent/session/auth-storage";
+import { SILENT_ABORT_MARKER } from "@reactor/coding-agent/session/messages";
+import { SessionManager } from "@reactor/coding-agent/session/session-manager";
+import { TempDir } from "@reactor/utils";
 
 function makeAbortedAssistantMessage(text = "partial draft"): AssistantMessage {
 	return {

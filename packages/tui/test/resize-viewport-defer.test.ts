@@ -1,11 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "bun:test";
-import {
-	type Component,
-	type RenderScheduler,
-	type RenderTimer,
-	TUI,
-	type ViewportTailProvider,
-} from "@oh-my-pi/pi-tui";
+import { type Component, type RenderScheduler, type RenderTimer, TUI, type ViewportTailProvider } from "@reactor/tui";
 import { VirtualTerminal } from "./virtual-terminal";
 
 // Outside a multiplexer a resize used to erase-and-replay the whole transcript
@@ -25,7 +19,7 @@ const NO_MULTIPLEXER_ENV: Record<string, string | undefined> = {
 	// deterministic even when the suite runs inside Warp (which otherwise takes
 	// the in-place path — see the Warp describe block at the bottom).
 	TERM_PROGRAM: undefined,
-	PI_TUI_RESIZE_IN_PLACE: undefined,
+	REACTOR_TUI_RESIZE_IN_PLACE: undefined,
 };
 const ALT_SCREEN_ENTER = "\x1b[?1049h";
 const ALT_SCREEN_EXIT = "\x1b[?1049l";
@@ -549,8 +543,8 @@ describe("resize repaints in place on terminals that re-report size on alt-scree
 		});
 	});
 
-	it("PI_TUI_RESIZE_IN_PLACE=0 opts Warp back into the alt-screen fast path", async () => {
-		await withEnvPatch({ ...WARP_ENV, PI_TUI_RESIZE_IN_PLACE: "0" }, async () => {
+	it("REACTOR_TUI_RESIZE_IN_PLACE=0 opts Warp back into the alt-screen fast path", async () => {
+		await withEnvPatch({ ...WARP_ENV, REACTOR_TUI_RESIZE_IN_PLACE: "0" }, async () => {
 			const term = new VirtualTerminal(40, 10, 1000);
 			const { tui, scheduler } = makeTui(term);
 			try {
@@ -569,8 +563,8 @@ describe("resize repaints in place on terminals that re-report size on alt-scree
 		});
 	});
 
-	it("PI_TUI_RESIZE_IN_PLACE=1 forces the in-place path on an ordinary terminal", async () => {
-		await withEnvPatch({ ...NO_MULTIPLEXER_ENV, PI_TUI_RESIZE_IN_PLACE: "1" }, async () => {
+	it("REACTOR_TUI_RESIZE_IN_PLACE=1 forces the in-place path on an ordinary terminal", async () => {
+		await withEnvPatch({ ...NO_MULTIPLEXER_ENV, REACTOR_TUI_RESIZE_IN_PLACE: "1" }, async () => {
 			const term = new VirtualTerminal(40, 10, 1000);
 			const { tui, scheduler } = makeTui(term);
 			try {

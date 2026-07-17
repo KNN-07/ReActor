@@ -1,5 +1,5 @@
 /**
- * CLI handler for `omp grievances` — view, clean, and manually push reported tool issues.
+ * CLI handler for `reactor grievances` — view, clean, and manually push reported tool issues.
  */
 import chalk from "chalk";
 import { Settings } from "../config/settings";
@@ -41,7 +41,7 @@ export async function listGrievances(options: ListGrievancesOptions): Promise<vo
 			console.log("[]");
 		} else {
 			console.log(
-				chalk.dim("No grievances database found. Enable auto-QA with PI_AUTO_QA=1 or the dev.autoqa setting."),
+				chalk.dim("No grievances database found. Enable auto-QA with REACTOR_AUTO_QA=1 or the dev.autoqa setting."),
 			);
 		}
 		return;
@@ -110,7 +110,7 @@ export async function cleanGrievances(options: CleanGrievancesOptions): Promise<
 			console.log(JSON.stringify({ deleted: 0 }));
 		} else {
 			console.log(
-				chalk.dim("No grievances database found. Enable auto-QA with PI_AUTO_QA=1 or the dev.autoqa setting."),
+				chalk.dim("No grievances database found. Enable auto-QA with REACTOR_AUTO_QA=1 or the dev.autoqa setting."),
 			);
 		}
 		return;
@@ -155,7 +155,7 @@ export async function cleanGrievances(options: CleanGrievancesOptions): Promise<
 }
 
 // ───────────────────────────────────────────────────────────────────────────
-// Manual push (`omp grievances push`)
+// Manual push (`reactor grievances push`)
 // ───────────────────────────────────────────────────────────────────────────
 
 /**
@@ -195,7 +195,7 @@ function makeProgressBar(total: number, width = 30): ProgressBar {
  * ignoring the user-facing consent gate (manual push is the user's
  * explicit "yes ship these now" intent).
  *
- * Requires endpoint configuration (default `qa.omp.sh/v1/grievances`).
+ * Requires endpoint configuration (default `qa.reactor.sh/v1/grievances`).
  */
 export async function pushGrievances(options: PushGrievancesOptions): Promise<void> {
 	const db = openAutoQaDb();
@@ -230,7 +230,7 @@ export async function pushGrievances(options: PushGrievancesOptions): Promise<vo
 		if (result.skipped) {
 			console.log(
 				chalk.yellow(
-					"Push skipped — no endpoint configured. Set `dev.autoqaPush.endpoint` or `PI_AUTO_QA_PUSH_URL`.",
+					"Push skipped — no endpoint configured. Set `dev.autoqaPush.endpoint` or `REACTOR_AUTO_QA_PUSH_URL`.",
 				),
 			);
 			return;

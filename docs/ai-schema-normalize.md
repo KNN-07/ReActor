@@ -1,6 +1,6 @@
 # AI tool-schema normalization
 
-`@oh-my-pi/pi-ai` exposes one unified schema normalizer that providers consume
+`@reactor/ai` exposes one unified schema normalizer that providers consume
 before tools are sent on the wire. All walkers live in
 `packages/ai/src/utils/schema/normalize.ts`; the operational contract is
 `packages/ai/src/utils/schema/CONSTRAINTS.md`.
@@ -12,7 +12,7 @@ share the same option-driven walk.
 
 ## Entry points
 
-All exports live under `@oh-my-pi/pi-ai/utils/schema`:
+All exports live under `@reactor/ai/utils/schema`:
 
 - `normalizeSchema(value, options)` — generic option-driven walker.
 - `normalizeSchemaForGoogle(value)` — Gemini / Vertex / Gemini CLI.
@@ -30,7 +30,7 @@ All exports live under `@oh-my-pi/pi-ai/utils/schema`:
 - `adaptSchemaForStrict(schema, strict)` from `./adapt` — thin composer that
   upgrades draft-07 inputs to 2020-12 and wraps `tryEnforceStrictSchema` for
   provider call sites. `./adapt` also exports the `NO_STRICT` global-bypass
-  flag (env `PI_NO_STRICT`) honored by every provider that emits `strict: true`.
+  flag (env `REACTOR_NO_STRICT`) honored by every provider that emits `strict: true`.
 
 Removed in the unified-flow refactor:
 

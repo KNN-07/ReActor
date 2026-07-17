@@ -1,6 +1,6 @@
 import * as os from "node:os";
 import * as path from "node:path";
-import { normalizeProfileName } from "@oh-my-pi/pi-utils/dirs";
+import { normalizeProfileName } from "@reactor/utils/dirs";
 
 export type ProfileAliasShell = "bash" | "zsh" | "fish" | "powershell" | "pwsh";
 
@@ -20,10 +20,10 @@ export interface ProfileAliasCommand {
 }
 
 const DEFAULT_ALIAS_COMMAND: ProfileAliasCommand = {
-	display: "omp",
-	posix: "omp",
-	fish: "omp",
-	powerShell: "omp",
+	display: "reactor",
+	posix: "reactor",
+	fish: "reactor",
+	powerShell: "reactor",
 };
 
 export interface ProfileAliasInstallOptions {
@@ -123,7 +123,7 @@ const POWERSHELL_RESERVED_ALIAS_NAMES: ReadonlySet<string> = new Set([
 	"workflow",
 ]);
 
-// Keep local: importing the pi-utils root here would eagerly load env before
+// Keep local: importing the utils root here would eagerly load env before
 // cli.ts has applied --profile, regressing profile-specific .env loading.
 function isEnoentError(error: unknown): boolean {
 	return typeof error === "object" && error !== null && (error as { code?: unknown }).code === "ENOENT";
@@ -147,8 +147,8 @@ function validateAliasName(aliasName: string, shell: ProfileAliasShell): string 
 	if (!ALIAS_NAME_RE.test(normalized)) {
 		throw new Error(`Invalid alias "${aliasName}". Alias names must match ${ALIAS_NAME_RE.source}.`);
 	}
-	if (normalized.toLowerCase() === "omp") {
-		throw new Error('Invalid alias "omp". Refusing to shadow the base omp command.');
+	if (normalized.toLowerCase() === "reactor") {
+		throw new Error('Invalid alias "reactor". Refusing to shadow the base reactor command.');
 	}
 	if (getReservedAliasNames(shell).has(normalized.toLowerCase())) {
 		throw new Error(`Invalid alias "${aliasName}". Refusing to create a ${shell} reserved word.`);
@@ -254,7 +254,7 @@ function resolveShellConfigPath(
 			// a hard-coded ~/.config would be silently ignored when the user relocates
 			// their XDG config root, leaving the alias unsourced after a restart.
 			const configHome = env.XDG_CONFIG_HOME ? toPosix(env.XDG_CONFIG_HOME) : posixJoinUnc(posixHome, ".config");
-			return posixJoinUnc(configHome, "fish", "conf.d", "omp-profiles.fish");
+			return posixJoinUnc(configHome, "fish", "conf.d", "reactor-profiles.fish");
 		}
 		case "pwsh":
 			return platform === "win32"
@@ -272,13 +272,13 @@ function renderAliasBlock(
 	command: ProfileAliasCommand,
 ): { block: string; command: string } {
 	const profiledCommand = `${command.display} --profile=${profile}`;
-	const start = `# >>> omp profile alias: ${aliasName} >>>`;
-	const end = `# <<< omp profile alias: ${aliasName} <<<`;
+	const start = `# >>> reactor profile alias: ${aliasName} >>>`;
+	const end = `# <<< reactor profile alias: ${aliasName} <<<`;
 	let body: string;
 	switch (shell) {
 		case "fish":
 			body = [
-				`function ${aliasName} --wraps omp --description 'OMP profile ${profile}'`,
+				`function ${aliasName} --wraps reactor --description 'ReActor profile ${profile}'`,
 				`    command ${command.fish} --profile=${profile} $argv`,
 				"end",
 			].join("\n");
@@ -295,8 +295,8 @@ function renderAliasBlock(
 }
 
 function upsertBlock(content: string, aliasName: string, block: string): string {
-	const start = `# >>> omp profile alias: ${aliasName} >>>`;
-	const end = `# <<< omp profile alias: ${aliasName} <<<`;
+	const start = `# >>> reactor profile alias: ${aliasName} >>>`;
+	const end = `# <<< reactor profile alias: ${aliasName} <<<`;
 	const startIndex = content.indexOf(start);
 	if (startIndex !== -1) {
 		const endIndex = content.indexOf(end, startIndex + start.length);

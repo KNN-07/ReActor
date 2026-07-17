@@ -37,7 +37,7 @@ The tool is `concurrency = "exclusive"` for a session, so calls do not overlap.
 
 ## Kernel lifecycle
 
-Each Python kernel is a single subprocess: `<resolved-python> -u <runner.py>`. The runner is bundled with the host binary (Bun text import), written to an `omp-python-runner` cache under the OS temp directory once per script hash, and reused by subsequent spawns.
+Each Python kernel is a single subprocess: `<resolved-python> -u <runner.py>`. The runner is bundled with the host binary (Bun text import), written to an `reactor-python-runner` cache under the OS temp directory once per script hash, and reused by subsequent spawns.
 
 Kernel startup sequence:
 
@@ -75,7 +75,7 @@ Runner → host:
 {"type": "done",     "id": "<reqId>", "status": "ok"|"error", "executionCount": N, "cancelled": false}
 ```
 
-Status events the prelude emits (e.g. `_emit_status("find", count=…)`) ship inside display bundles under `application/x-omp-status` so the existing TUI status renderer keeps working.
+Status events the prelude emits (e.g. `_emit_status("find", count=…)`) ship inside display bundles under `application/x-reactor-status` so the existing TUI status renderer keeps working.
 
 ## Magics
 
@@ -135,13 +135,13 @@ If an intermediate cell fails:
 Environment is filtered before launching the runner:
 
 - Allowlist includes core vars like `PATH`, `HOME`, locale vars, `VIRTUAL_ENV`, `PYTHONPATH`, etc.
-- Allow-prefixes: `LC_`, `XDG_`, `PI_`
+- Allow-prefixes: `LC_`, `XDG_`, `REACTOR_`
 - Denylist strips common API keys (OpenAI/Anthropic/Gemini/etc.)
 
 Runtime selection order (skipped entirely when the `python.interpreter` setting names an explicit executable):
 
 1. Active/located venv (`VIRTUAL_ENV`, then `CONDA_PREFIX`, then `<cwd>/.venv`, `<cwd>/venv`)
-2. Managed venv at `~/.omp/python-env`
+2. Managed venv at `~/.reactor/python-env`
 3. `python` or `python3` on PATH
 
 When a venv is selected, its bin/Scripts path is prepended to `PATH`.
@@ -150,13 +150,13 @@ The runner additionally receives `PYTHONUNBUFFERED=1` and `PYTHONIOENCODING=utf-
 
 ## Tool availability and mode selection
 
-`eval.py` / `eval.js` (both default `true`) plus optional boolean env flags `PI_PY` / `PI_JS` control eval backend exposure:
+`eval.py` / `eval.js` (both default `true`) plus optional boolean env flags `REACTOR_PY` / `REACTOR_JS` control eval backend exposure:
 
-- Python backend only (`eval.py=true`, `eval.js=false`, or `PI_PY=1 PI_JS=0`)
-- JavaScript backend only (`eval.py=false`, `eval.js=true`, or `PI_PY=0 PI_JS=1`)
-- both backends (`eval.py=true`, `eval.js=true`, or `PI_PY=1 PI_JS=1`)
+- Python backend only (`eval.py=true`, `eval.js=false`, or `REACTOR_PY=1 REACTOR_JS=0`)
+- JavaScript backend only (`eval.py=false`, `eval.js=true`, or `REACTOR_PY=0 REACTOR_JS=1`)
+- both backends (`eval.py=true`, `eval.js=true`, or `REACTOR_PY=1 REACTOR_JS=1`)
 
-`PI_PY` and `PI_JS` use normal boolean flag parsing. Each flag, when set, overrides only its own setting; an unset flag falls back to its setting (`eval.py` / `eval.js`, both default `true`).
+`REACTOR_PY` and `REACTOR_JS` use normal boolean flag parsing. Each flag, when set, overrides only its own setting; an unset flag falls back to its setting (`eval.py` / `eval.js`, both default `true`).
 
 If Python preflight fails and `eval.js` is enabled, `eval` remains available for `js` cells; `py` cells fail with a Python-backend availability error.
 
@@ -194,7 +194,7 @@ From runner frames:
 - `stdout` / `stderr` → plain text chunks
 - `display` / `result` → rich display handling (MIME bundle)
 - `error` → traceback text
-- `application/x-omp-status` MIME inside `display` → structured status events
+- `application/x-reactor-status` MIME inside `display` → structured status events
 
 Display MIME precedence:
 
@@ -206,7 +206,7 @@ Additionally captured as structured outputs:
 
 - `application/json` → JSON tree data
 - `image/png` / `image/jpeg` → image payloads
-- `application/x-omp-status` → status events
+- `application/x-reactor-status` → status events
 
 ### Matplotlib
 
@@ -230,15 +230,15 @@ Output is streamed through `OutputSink` and may be persisted to artifact storage
 
 ## Operational troubleshooting
 
-- **Python backend not available** — Check `eval.py`, `PI_PY`, and that `python`/`python3` is on PATH. If preflight fails and `eval.js` is enabled, use a `js` cell.
-- **No Python on PATH** — Install a system Python 3.8+ or place a venv at `~/.omp/python-env`. `omp setup python --check` reports the resolved interpreter.
+- **Python backend not available** — Check `eval.py`, `REACTOR_PY`, and that `python`/`python3` is on PATH. If preflight fails and `eval.js` is enabled, use a `js` cell.
+- **No Python on PATH** — Install a system Python 3.8+ or place a venv at `~/.reactor/python-env`. `reactor setup python --check` reports the resolved interpreter.
 - **Execution hangs then times out** — Increase tool `timeout` (max 3600s) if workload is legitimate. For stuck native code, cancellation triggers `SIGINT` first then escalates; the session restarts on the next request.
 - **stdin/input prompts in Python code** — `input()` is not supported; pass data programmatically.
 - **Working directory errors** — Tool validates `cwd` exists and is a directory before execution.
 
 ## Relevant environment variables
 
-- `PI_PY` / `PI_JS` — eval backend exposure overrides
-- `PI_PYTHON_SKIP_CHECK=1` — bypass Python preflight/warm checks
-- `PI_PYTHON_INTEGRATION=1` — enable gated integration tests that spawn a real Python
-- `PI_PYTHON_IPC_TRACE=1` — log NDJSON frames exchanged with the runner subprocess
+- `REACTOR_PY` / `REACTOR_JS` — eval backend exposure overrides
+- `REACTOR_PYTHON_SKIP_CHECK=1` — bypass Python preflight/warm checks
+- `REACTOR_PYTHON_INTEGRATION=1` — enable gated integration tests that spawn a real Python
+- `REACTOR_PYTHON_IPC_TRACE=1` — log NDJSON frames exchanged with the runner subprocess

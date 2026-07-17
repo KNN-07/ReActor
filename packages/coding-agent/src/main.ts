@@ -7,8 +7,8 @@
 import * as fsSync from "node:fs";
 import * as os from "node:os";
 import { createInterface } from "node:readline/promises";
-import { EventLoopKeepalive } from "@oh-my-pi/pi-agent-core";
-import type { ImageContent } from "@oh-my-pi/pi-ai";
+import { EventLoopKeepalive } from "@reactor/agent-core";
+import type { ImageContent } from "@reactor/ai";
 import {
 	$env,
 	directoryExists,
@@ -19,8 +19,9 @@ import {
 	postmortem,
 	setProjectDir,
 	VERSION,
-} from "@oh-my-pi/pi-utils";
+} from "@reactor/utils";
 import chalk from "chalk";
+import { type AutonomyLaunchOptions, AutonomySessionRuntime } from "./autonomy/session-runtime";
 import { reset as resetCapabilities } from "./capability";
 import { type Args, reportUnrecognizedFlags } from "./cli/args";
 import { applyExtensionFlags, type ExtensionFlagSink } from "./cli/extension-flags";
@@ -48,7 +49,7 @@ import {
 	preloadPluginRoots,
 	resolveActiveProjectRegistryPath,
 } from "./discovery/helpers";
-import { injectOmpExtensionCliRoots } from "./discovery/omp-extension-roots";
+import { injectOmpExtensionCliRoots } from "./discovery/reactor-extension-roots";
 import { ExtensionRunner } from "./extensibility/extensions/runner";
 import type { ExtensionUIContext } from "./extensibility/extensions/types";
 import { scheduleMarketplaceAutoUpdate } from "./extensibility/plugins/marketplace-auto-update";
@@ -108,7 +109,7 @@ async function checkForNewVersion(currentVersion: string): Promise<string | unde
 		return;
 	}
 	try {
-		const response = await fetch("https://registry.npmjs.org/@oh-my-pi/pi-coding-agent/latest", {
+		const response = await fetch("https://registry.npmjs.org/@reactor/coding-agent/latest", {
 			signal: withTimeoutSignal(5_000),
 		});
 		if (!response.ok) return undefined;
@@ -161,7 +162,7 @@ const RPC_BACKGROUND_DEFAULTED_SETTING_PATHS: SettingPath[] = [
 ];
 
 // Protocol-mode hosts opt into a small set of paths whose host-default we
-// re-apply at startup so embedders inherit OMP's neutral defaults instead of
+// re-apply at startup so embedders inherit ReActor's neutral defaults instead of
 // the local user's globally-persisted preferences for interactive use. The
 // guard preserves any explicit configuration — caller `Settings.isolated`
 // overrides, project `.claude/settings.yml`, `--config` overlays, or global
@@ -209,7 +210,7 @@ async function readPipedInput(): Promise<string | undefined> {
 // stderr line every 10s naming the deepest in-flight startup phase. Turns
 // zero-output indefinite hangs (stuck discovery read, network wait, stdin
 // pipe) into self-diagnosing reports instead of "it just hangs" (see the
-// PI_DEBUG_STARTUP markers for the synchronous-hang counterpart).
+// REACTOR_DEBUG_STARTUP markers for the synchronous-hang counterpart).
 
 const STARTUP_WATCHDOG_INTERVAL_MS = 10_000;
 let startupWatchdogTimer: NodeJS.Timeout | undefined;
@@ -223,7 +224,7 @@ function armStartupWatchdog(): void {
 		const phase = logger.openSpanPath().join(" > ") || "module load / pre-phase work";
 		process.stderr.write(
 			`${chalk.yellow(`Still starting after ${elapsed}s`)}${chalk.dim(` — phase: ${phase}`)}\n` +
-				`${chalk.dim(`  logs: ${getLogPath()} · re-run with PI_DEBUG_STARTUP=1 for streaming phase markers`)}\n`,
+				`${chalk.dim(`  logs: ${getLogPath()} · re-run with REACTOR_DEBUG_STARTUP=1 for streaming phase markers`)}\n`,
 		);
 	}, STARTUP_WATCHDOG_INTERVAL_MS);
 	startupWatchdogTimer.unref?.();
@@ -415,6 +416,7 @@ async function runInteractiveMode(
 	initialMessage?: string,
 	initialImages?: ImageContent[],
 	joinLink?: string,
+	autonomyStart?: AutonomyLaunchOptions,
 ): Promise<void> {
 	const mode = new InteractiveMode(
 		session,
@@ -459,6 +461,12 @@ async function runInteractiveMode(
 		await setupWizard.runSetupWizard(mode, setupScenes);
 	}
 
+	if (autonomyStart) {
+		const autonomy = new AutonomySessionRuntime(session);
+		await autonomy.start(autonomyStart);
+		await mode.handleGoalModeCommand(autonomyStart.objective);
+	}
+
 	versionCheckPromise
 		.then(newVersion => {
 			if (!settings.get("startup.checkUpdate")) {
@@ -490,7 +498,7 @@ async function runInteractiveMode(
 		}
 	}
 
-	// `omp join <link>`: dispatch through the same builtin path as a typed
+	// `reactor join <link>`: dispatch through the same builtin path as a typed
 	// `/join` so collab guards and error rendering stay in one place.
 	if (joinLink !== undefined) {
 		await executeBuiltinSlashCommand(`/join ${joinLink}`, { ctx: mode });
@@ -680,7 +688,7 @@ export async function createSessionManager(
 		if (!match) {
 			throw new SessionResolutionError(
 				`Session "${forkSource}" not found.`,
-				"Run `omp --resume` without an argument to pick from recent sessions, or `omp` to start a new one.",
+				"Run `reactor --resume` without an argument to pick from recent sessions, or `reactor` to start a new one.",
 			);
 		}
 		return await SessionManager.forkFrom(match.session.path, cwd, parsed.sessionDir);
@@ -700,7 +708,7 @@ export async function createSessionManager(
 		if (!match) {
 			throw new SessionResolutionError(
 				`Session "${sessionArg}" not found.`,
-				"Run `omp --resume` without an argument to pick from recent sessions, or `omp` to start a new one.",
+				"Run `reactor --resume` without an argument to pick from recent sessions, or `reactor` to start a new one.",
 			);
 		}
 		if (match.scope === "local") {
@@ -777,7 +785,7 @@ export async function createSessionManager(
 
 /** Discover SYSTEM.md file if no CLI system prompt was provided */
 function discoverSystemPromptFile(): string | undefined {
-	// Check project-local first (.omp/SYSTEM.md, .pi/SYSTEM.md legacy)
+	// Check project-local first (.reactor/SYSTEM.md, .pi/SYSTEM.md legacy)
 	const projectPath = findConfigFile("SYSTEM.md", { user: false });
 	if (projectPath) {
 		return projectPath;
@@ -1119,7 +1127,7 @@ export async function runRootCommand(
 	pluginPreloadPromise.catch(() => {});
 
 	// Register CLI-provided extension package paths (`--extension`, `--hook`) so
-	// the `omp-plugins` discovery provider can surface their `skills/`, `hooks/`,
+	// the `reactor-plugins` discovery provider can surface their `skills/`, `hooks/`,
 	// `tools/`, `commands/`, `rules/`, `prompts/`, and `.mcp.json` sub-trees.
 	// `--no-extensions` short-circuits both the factory load and the sub-discovery.
 	if (!parsedArgs.noExtensions) {
@@ -1147,10 +1155,10 @@ export async function runRootCommand(
 		applyAcpDefaultSettingOverrides(settingsInstance);
 	}
 	if (parsedArgs.noPty || parsedArgs.mode === "rpc-ui") {
-		Bun.env.PI_NO_PTY = "1";
+		Bun.env.REACTOR_NO_PTY = "1";
 	}
 	if (parsedArgs.noTitle || parsedArgs.mode === "rpc" || parsedArgs.mode === "rpc-ui" || parsedArgs.mode === "acp") {
-		Bun.env.PI_NO_TITLE = "1";
+		Bun.env.REACTOR_NO_TITLE = "1";
 	}
 	const mode = parsedArgs.mode || "text";
 	const isProtocolMode = mode === "rpc" || mode === "rpc-ui" || mode === "acp";
@@ -1163,9 +1171,9 @@ export async function runRootCommand(
 	logger.time("initializeWithSettings", initializeWithSettings, settingsInstance);
 
 	// Apply model role overrides from CLI args or env vars (ephemeral, not persisted)
-	const smolModel = parsedArgs.smol ?? $env.PI_SMOL_MODEL;
-	const slowModel = parsedArgs.slow ?? $env.PI_SLOW_MODEL;
-	const planModel = parsedArgs.plan ?? $env.PI_PLAN_MODEL;
+	const smolModel = parsedArgs.smol ?? $env.REACTOR_SMOL_MODEL;
+	const slowModel = parsedArgs.slow ?? $env.REACTOR_SLOW_MODEL;
+	const planModel = parsedArgs.plan ?? $env.REACTOR_PLAN_MODEL;
 	if (smolModel || slowModel || planModel) {
 		settingsInstance.overrideModelRoles({
 			smol: smolModel,
@@ -1420,7 +1428,7 @@ export async function runRootCommand(
 		};
 		const initialArgs = applyExtensionFlags(extensionFlagSink, rawArgs) ?? parsedArgs;
 		normalizeContinueSessionArgs(initialArgs, rawArgs);
-		// Fail fast on stale/typo flags (e.g. `omp --list-models`) now that we
+		// Fail fast on stale/typo flags (e.g. `reactor --list-models`) now that we
 		// know the real extension flag set. Without this check the unrecognized
 		// token gets silently consumed and any following positional leaks as the
 		// initial prompt — kicking off a real LLM session, MCP connection, and
@@ -1449,7 +1457,7 @@ export async function runRootCommand(
 			isInteractive,
 			resuming: Boolean(parsedArgs.continue || parsedArgs.resume || parsedArgs.fork),
 			quiet: settingsInstance.get("startup.quiet"),
-			timing: Boolean($env.PI_TIMING),
+			timing: Boolean($env.REACTOR_TIMING),
 			stdinIsTTY: process.stdin.isTTY,
 			stdoutIsTTY: process.stdout.isTTY,
 		});
@@ -1525,7 +1533,7 @@ export async function runRootCommand(
 				notifs.push(modelScopeNotification);
 			}
 
-			if ($env.PI_TIMING) {
+			if ($env.REACTOR_TIMING) {
 				logger.printTimings();
 				if (logger.shouldExitAfterTimings()) {
 					process.exit(0);
@@ -1551,19 +1559,30 @@ export async function runRootCommand(
 				initialMessage,
 				initialImages,
 				parsedArgs.join,
+				parsedArgs.autonomyStart,
 			);
 		} else {
 			// Branch-only single-shot runner: keep print-mode code out of normal interactive startup.
 			stopStartupWatchdog();
 			const runPrintMode: RunPrintMode = (await import("./modes/print-mode")).runPrintMode;
+			if (parsedArgs.autonomyStart) {
+				const autonomy = new AutonomySessionRuntime(session);
+				await autonomy.start(parsedArgs.autonomyStart);
+				const state = await session.goalRuntime.createGoal({
+					objective: parsedArgs.autonomyStart.objective,
+					tokenBudget: parsedArgs.autonomyStart.tokenBudget,
+				});
+				session.setGoalModeState(state);
+				await session.setActiveToolsByName([...new Set([...session.getEnabledToolNames(), "goal"])]);
+			}
 			await runPrintMode(session, {
 				mode,
 				messages: initialArgs.messages,
-				initialMessage,
+				initialMessage: parsedArgs.autonomyStart?.objective ?? initialMessage,
 				initialImages,
 				printThoughts: initialArgs.printThoughts,
 			});
-			if ($env.PI_TIMING) {
+			if ($env.REACTOR_TIMING) {
 				logger.printTimings();
 			}
 			await session.dispose();

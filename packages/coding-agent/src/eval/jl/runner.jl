@@ -1,4 +1,4 @@
-# OMP Julia runner — subprocess wrapper used by the coding-agent host.
+# ReActor Julia runner — subprocess wrapper used by the coding-agent host.
 # Persistent Julia process that speaks NDJSON over stdout and a custom TSV protocol on stdin.
 
 using Base64
@@ -392,7 +392,7 @@ end
 
 function next_drain_marker()
     drain_marker_counter[] += UInt(1)
-    return Vector{UInt8}(codeunits("\0__OMP_DRAIN__:" * string(drain_marker_counter[]) * ":" * string(time_ns()) * "\0"))
+    return Vector{UInt8}(codeunits("\0__REACTOR_DRAIN__:" * string(drain_marker_counter[]) * ":" * string(time_ns()) * "\0"))
 end
 
 function await_stream_drains()
@@ -570,12 +570,12 @@ function apply_request_runtime(cwd, env_pairs)
     end
     
     managed_env_keys = [
-        "PI_SESSION_FILE",
-        "PI_ARTIFACTS_DIR",
-        "PI_TOOL_BRIDGE_URL",
-        "PI_TOOL_BRIDGE_TOKEN",
-        "PI_TOOL_BRIDGE_SESSION",
-        "PI_EVAL_LOCAL_ROOTS"
+        "REACTOR_SESSION_FILE",
+        "REACTOR_ARTIFACTS_DIR",
+        "REACTOR_TOOL_BRIDGE_URL",
+        "REACTOR_TOOL_BRIDGE_TOKEN",
+        "REACTOR_TOOL_BRIDGE_SESSION",
+        "REACTOR_EVAL_LOCAL_ROOTS"
     ]
     for k in managed_env_keys
         delete!(ENV, k)

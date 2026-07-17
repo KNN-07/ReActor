@@ -1,6 +1,6 @@
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { hostMatchesUrl } from "@oh-my-pi/pi-catalog/hosts";
+import { hostMatchesUrl } from "@reactor/catalog/hosts";
 import {
 	type Env,
 	envBool,
@@ -58,7 +58,7 @@ export const VERACITY_WEIGHT_DEFAULTS = {
 } as const;
 
 export function dataDir(env: Env = process.env): string {
-	return envOptionalString("MNEMOPI_DATA_DIR", env) ?? DEFAULT_DATA_DIR;
+	return envOptionalString("REACTOR_MNEMOPI_DATA_DIR", env) ?? DEFAULT_DATA_DIR;
 }
 
 export function dbPath(env: Env = process.env): string {
@@ -66,37 +66,41 @@ export function dbPath(env: Env = process.env): string {
 }
 
 export function beamOptimizationsEnabled(env: Env = process.env): boolean {
-	return envTruthy("MNEMOPI_BEAM_OPTIMIZATIONS", env);
+	return envTruthy("REACTOR_MNEMOPI_BEAM_OPTIMIZATIONS", env);
 }
 
 export function embeddingModel(env: Env = process.env): string {
-	return envString("MNEMOPI_EMBEDDING_MODEL", DEFAULT_EMBEDDING_MODEL, env);
+	return envString("REACTOR_MNEMOPI_EMBEDDING_MODEL", DEFAULT_EMBEDDING_MODEL, env);
 }
 
 export function embeddingDim(env: Env = process.env): number {
-	const explicit = envInt("MNEMOPI_EMBEDDING_DIM", NaN, env);
+	const explicit = envInt("REACTOR_MNEMOPI_EMBEDDING_DIM", NaN, env);
 	if (Number.isFinite(explicit)) return explicit;
 	return EMBEDDING_DIMS[embeddingModel(env)] ?? 384;
 }
 
 export function embeddingApiKey(env: Env = process.env): string {
 	return envString(
-		"MNEMOPI_EMBEDDING_API_KEY",
+		"REACTOR_MNEMOPI_EMBEDDING_API_KEY",
 		envString("OPENROUTER_API_KEY", envString("OPENAI_API_KEY", "", env), env),
 		env,
 	);
 }
 
 export function embeddingApiUrl(env: Env = process.env): string {
-	return envString("MNEMOPI_EMBEDDING_API_URL", envString("OPENROUTER_BASE_URL", DEFAULT_EMBEDDING_API_URL, env), env);
+	return envString(
+		"REACTOR_MNEMOPI_EMBEDDING_API_URL",
+		envString("OPENROUTER_BASE_URL", DEFAULT_EMBEDDING_API_URL, env),
+		env,
+	);
 }
 
 export function embeddingsViaApi(env: Env = process.env): boolean {
-	return envTruthy("MNEMOPI_EMBEDDINGS_VIA_API", env);
+	return envTruthy("REACTOR_MNEMOPI_EMBEDDINGS_VIA_API", env);
 }
 
 export function embeddingsDisabled(env: Env = process.env): boolean {
-	return envString("MNEMOPI_NO_EMBEDDINGS", "", env) !== "";
+	return envString("REACTOR_MNEMOPI_NO_EMBEDDINGS", "", env) !== "";
 }
 
 /**
@@ -116,13 +120,13 @@ export function embeddingsDisabled(env: Env = process.env): boolean {
  * `0` disables the cap.
  */
 export function embeddingMaxInputChars(env: Env = process.env): number {
-	return Math.max(0, envInt("MNEMOPI_EMBEDDING_MAX_INPUT_CHARS", 8192, env));
+	return Math.max(0, envInt("REACTOR_MNEMOPI_EMBEDDING_MAX_INPUT_CHARS", 8192, env));
 }
 
 export function isApiEmbeddingModel(model = embeddingModel(), env: Env = process.env): boolean {
 	if (model.startsWith("openai/") || model.includes("text-embedding") || model.startsWith("text-embedding"))
 		return true;
-	const baseUrl = envString("MNEMOPI_EMBEDDING_API_URL", envString("OPENROUTER_BASE_URL", "", env), env);
+	const baseUrl = envString("REACTOR_MNEMOPI_EMBEDDING_API_URL", envString("OPENROUTER_BASE_URL", "", env), env);
 	if (baseUrl && !hostMatchesUrl(baseUrl, "openrouter")) return true;
 	return embeddingsViaApi(env);
 }
@@ -130,97 +134,97 @@ export function isApiEmbeddingModel(model = embeddingModel(), env: Env = process
 export function apiEmbeddingsAvailable(env: Env = process.env): boolean {
 	if (embeddingsDisabled(env)) return false;
 	if (!isApiEmbeddingModel(embeddingModel(env), env)) return false;
-	const baseUrl = envString("MNEMOPI_EMBEDDING_API_URL", envString("OPENROUTER_BASE_URL", "", env), env);
+	const baseUrl = envString("REACTOR_MNEMOPI_EMBEDDING_API_URL", envString("OPENROUTER_BASE_URL", "", env), env);
 	return Boolean(baseUrl && !hostMatchesUrl(baseUrl, "openrouter")) || Boolean(embeddingApiKey(env));
 }
 
 export function workingMemoryMaxItems(env: Env = process.env): number {
-	return envInt("MNEMOPI_WM_MAX_ITEMS", 10000, env);
+	return envInt("REACTOR_MNEMOPI_WM_MAX_ITEMS", 10000, env);
 }
 
 export function workingMemoryTtlHours(env: Env = process.env): number {
-	return envInt("MNEMOPI_WM_TTL_HOURS", 24, env);
+	return envInt("REACTOR_MNEMOPI_WM_TTL_HOURS", 24, env);
 }
 
 export function episodicRecallLimit(env: Env = process.env): number {
-	return envInt("MNEMOPI_EP_LIMIT", 50000, env);
+	return envInt("REACTOR_MNEMOPI_EP_LIMIT", 50000, env);
 }
 
 export function maxEpisodeChars(env: Env = process.env): number {
-	return Math.max(1, envInt("MNEMOPI_MAX_EPISODE_CHARS", 100000, env));
+	return Math.max(1, envInt("REACTOR_MNEMOPI_MAX_EPISODE_CHARS", 100000, env));
 }
 
 export function sleepBatchSize(env: Env = process.env): number {
-	return envInt("MNEMOPI_SLEEP_BATCH", 5000, env);
+	return envInt("REACTOR_MNEMOPI_SLEEP_BATCH", 5000, env);
 }
 
 export function scratchpadMaxItems(env: Env = process.env): number {
-	return envInt("MNEMOPI_SP_MAX", 1000, env);
+	return envInt("REACTOR_MNEMOPI_SP_MAX", 1000, env);
 }
 
 export function recencyHalflifeHours(env: Env = process.env): number {
-	return envFloat("MNEMOPI_RECENCY_HALFLIFE", 168, env);
+	return envFloat("REACTOR_MNEMOPI_RECENCY_HALFLIFE", 168, env);
 }
 
 export function tier2Days(env: Env = process.env): number {
-	return envInt("MNEMOPI_TIER2_DAYS", 30, env);
+	return envInt("REACTOR_MNEMOPI_TIER2_DAYS", 30, env);
 }
 
 export function tier3Days(env: Env = process.env): number {
-	return envInt("MNEMOPI_TIER3_DAYS", 180, env);
+	return envInt("REACTOR_MNEMOPI_TIER3_DAYS", 180, env);
 }
 
 export function tier1Weight(env: Env = process.env): number {
-	return envFloat("MNEMOPI_TIER1_WEIGHT", 1.0, env);
+	return envFloat("REACTOR_MNEMOPI_TIER1_WEIGHT", 1.0, env);
 }
 
 export function tier2Weight(env: Env = process.env): number {
-	return envFloat("MNEMOPI_TIER2_WEIGHT", 0.5, env);
+	return envFloat("REACTOR_MNEMOPI_TIER2_WEIGHT", 0.5, env);
 }
 
 export function tier3Weight(env: Env = process.env): number {
-	return envFloat("MNEMOPI_TIER3_WEIGHT", 0.25, env);
+	return envFloat("REACTOR_MNEMOPI_TIER3_WEIGHT", 0.25, env);
 }
 
 export function degradeBatchSize(env: Env = process.env): number {
-	return envInt("MNEMOPI_DEGRADE_BATCH", 100, env);
+	return envInt("REACTOR_MNEMOPI_DEGRADE_BATCH", 100, env);
 }
 
 export function smartCompressEnabled(env: Env = process.env): boolean {
-	return !envDisabled("MNEMOPI_SMART_COMPRESS", env);
+	return !envDisabled("REACTOR_MNEMOPI_SMART_COMPRESS", env);
 }
 
 export function tier3MaxChars(env: Env = process.env): number {
-	return envInt("MNEMOPI_TIER3_MAX_CHARS", 300, env);
+	return envInt("REACTOR_MNEMOPI_TIER3_MAX_CHARS", 300, env);
 }
 
 export function statedWeight(env: Env = process.env): number {
-	return envFloat("MNEMOPI_STATED_WEIGHT", VERACITY_WEIGHT_DEFAULTS.stated, env);
+	return envFloat("REACTOR_MNEMOPI_STATED_WEIGHT", VERACITY_WEIGHT_DEFAULTS.stated, env);
 }
 
 export function inferredWeight(env: Env = process.env): number {
-	return envFloat("MNEMOPI_INFERRED_WEIGHT", VERACITY_WEIGHT_DEFAULTS.inferred, env);
+	return envFloat("REACTOR_MNEMOPI_INFERRED_WEIGHT", VERACITY_WEIGHT_DEFAULTS.inferred, env);
 }
 
 export function toolWeight(env: Env = process.env): number {
-	return envFloat("MNEMOPI_TOOL_WEIGHT", VERACITY_WEIGHT_DEFAULTS.tool, env);
+	return envFloat("REACTOR_MNEMOPI_TOOL_WEIGHT", VERACITY_WEIGHT_DEFAULTS.tool, env);
 }
 
 export function importedWeight(env: Env = process.env): number {
-	return envFloat("MNEMOPI_IMPORTED_WEIGHT", VERACITY_WEIGHT_DEFAULTS.imported, env);
+	return envFloat("REACTOR_MNEMOPI_IMPORTED_WEIGHT", VERACITY_WEIGHT_DEFAULTS.imported, env);
 }
 
 export function unknownWeight(env: Env = process.env): number {
-	return envFloat("MNEMOPI_UNKNOWN_WEIGHT", VERACITY_WEIGHT_DEFAULTS.unknown, env);
+	return envFloat("REACTOR_MNEMOPI_UNKNOWN_WEIGHT", VERACITY_WEIGHT_DEFAULTS.unknown, env);
 }
 
 export function veracityWeightOverrides(env: Env = process.env): string[] {
 	const names = [
-		"MNEMOPI_STATED_WEIGHT",
-		"MNEMOPI_INFERRED_WEIGHT",
-		"MNEMOPI_TOOL_WEIGHT",
-		"MNEMOPI_IMPORTED_WEIGHT",
-		"MNEMOPI_UNKNOWN_WEIGHT",
+		"REACTOR_MNEMOPI_STATED_WEIGHT",
+		"REACTOR_MNEMOPI_INFERRED_WEIGHT",
+		"REACTOR_MNEMOPI_TOOL_WEIGHT",
+		"REACTOR_MNEMOPI_IMPORTED_WEIGHT",
+		"REACTOR_MNEMOPI_UNKNOWN_WEIGHT",
 	];
 	const overrides: string[] = [];
 	for (const name of names) {
@@ -230,19 +234,19 @@ export function veracityWeightOverrides(env: Env = process.env): string[] {
 }
 
 export function vecType(env: Env = process.env): VecType {
-	return envOneOf("MNEMOPI_VEC_TYPE", ["float32", "int8", "bit"] as const, "int8", env);
+	return envOneOf("REACTOR_MNEMOPI_VEC_TYPE", ["float32", "int8", "bit"] as const, "int8", env);
 }
 
 export function vectorWeight(env: Env = process.env): number {
-	return envFloat("MNEMOPI_VEC_WEIGHT", 0.5, env);
+	return envFloat("REACTOR_MNEMOPI_VEC_WEIGHT", 0.5, env);
 }
 
 export function ftsWeight(env: Env = process.env): number {
-	return envFloat("MNEMOPI_FTS_WEIGHT", 0.3, env);
+	return envFloat("REACTOR_MNEMOPI_FTS_WEIGHT", 0.3, env);
 }
 
 export function importanceWeight(env: Env = process.env): number {
-	return envFloat("MNEMOPI_IMPORTANCE_WEIGHT", 0.2, env);
+	return envFloat("REACTOR_MNEMOPI_IMPORTANCE_WEIGHT", 0.2, env);
 }
 
 export function normalizedRecallWeights(
@@ -265,7 +269,7 @@ export function normalizedRecallWeights(
 }
 
 export function autoMigrateEnabled(env: Env = process.env): boolean {
-	return envString("MNEMOPI_AUTO_MIGRATE", "1", env) !== "0";
+	return envString("REACTOR_MNEMOPI_AUTO_MIGRATE", "1", env) !== "0";
 }
 
 export interface RecallFeatureFlags {
@@ -281,8 +285,8 @@ let proactiveLinkingDefault = false;
 /**
  * Sets process-wide defaults for the env-gated recall features. Host configuration
  * (e.g. the coding-agent `mnemopi.polyphonicRecall` / `mnemopi.enhancedRecall` /
- * `mnemopi.proactiveLinking` settings) lands here; the `MNEMOPI_POLYPHONIC_RECALL` /
- * `MNEMOPI_ENHANCED_RECALL` / `MNEMOPI_PROACTIVE_LINKING` environment variables still
+ * `mnemopi.proactiveLinking` settings) lands here; the `REACTOR_MNEMOPI_POLYPHONIC_RECALL` /
+ * `REACTOR_MNEMOPI_ENHANCED_RECALL` / `REACTOR_MNEMOPI_PROACTIVE_LINKING` environment variables still
  * win whenever they are set.
  */
 export function configureRecallFeatures(flags: RecallFeatureFlags): void {
@@ -292,82 +296,82 @@ export function configureRecallFeatures(flags: RecallFeatureFlags): void {
 }
 
 export function polyphonicRecallEnabled(env: Env = process.env): boolean {
-	const value = envOptionalString("MNEMOPI_POLYPHONIC_RECALL", env);
+	const value = envOptionalString("REACTOR_MNEMOPI_POLYPHONIC_RECALL", env);
 	return value === undefined ? polyphonicRecallDefault : value === "1";
 }
 
 export function temporalHalflifeHours(env: Env = process.env): number {
-	return envFloat("MNEMOPI_TEMPORAL_HALFLIFE_HOURS", 24, env);
+	return envFloat("REACTOR_MNEMOPI_TEMPORAL_HALFLIFE_HOURS", 24, env);
 }
 
 export function enhancedRecallEnabled(env: Env = process.env): boolean {
-	const value = envOptionalString("MNEMOPI_ENHANCED_RECALL", env);
+	const value = envOptionalString("REACTOR_MNEMOPI_ENHANCED_RECALL", env);
 	return value === undefined ? enhancedRecallDefault : value === "1";
 }
 
 export function proactiveLinkingEnabled(env: Env = process.env): boolean {
-	const value = envOptionalString("MNEMOPI_PROACTIVE_LINKING", env);
+	const value = envOptionalString("REACTOR_MNEMOPI_PROACTIVE_LINKING", env);
 	return value === undefined ? proactiveLinkingDefault : value === "1";
 }
 
 export function llmEnabled(env: Env = process.env): boolean {
-	return envBool("MNEMOPI_LLM_ENABLED", true, env);
+	return envBool("REACTOR_MNEMOPI_LLM_ENABLED", true, env);
 }
 
 export function llmMaxTokens(env: Env = process.env): number {
-	return envInt("MNEMOPI_LLM_MAX_TOKENS", 2048, env);
+	return envInt("REACTOR_MNEMOPI_LLM_MAX_TOKENS", 2048, env);
 }
 
 export function llmThreads(env: Env = process.env): number {
-	return envInt("MNEMOPI_LLM_N_THREADS", 4, env);
+	return envInt("REACTOR_MNEMOPI_LLM_N_THREADS", 4, env);
 }
 
 export function llmContext(env: Env = process.env): number {
-	return envInt("MNEMOPI_LLM_N_CTX", 2048, env);
+	return envInt("REACTOR_MNEMOPI_LLM_N_CTX", 2048, env);
 }
 
 export function llmRepo(env: Env = process.env): string {
-	return envString("MNEMOPI_LLM_REPO", DEFAULT_LLM_MODEL_REPO, env);
+	return envString("REACTOR_MNEMOPI_LLM_REPO", DEFAULT_LLM_MODEL_REPO, env);
 }
 
 export function llmFile(env: Env = process.env): string {
-	return envString("MNEMOPI_LLM_FILE", DEFAULT_LLM_MODEL_FILE, env);
+	return envString("REACTOR_MNEMOPI_LLM_FILE", DEFAULT_LLM_MODEL_FILE, env);
 }
 
 export function llmModelFiles(env: Env = process.env): readonly [repo: string, file: string] {
-	const repo = envOptionalString("MNEMOPI_LLM_REPO", env);
-	const file = envOptionalString("MNEMOPI_LLM_FILE", env);
+	const repo = envOptionalString("REACTOR_MNEMOPI_LLM_REPO", env);
+	const file = envOptionalString("REACTOR_MNEMOPI_LLM_FILE", env);
 	return repo && file ? [repo, file] : [DEFAULT_LLM_MODEL_REPO, DEFAULT_LLM_MODEL_FILE];
 }
 
 export function llmBaseUrl(env: Env = process.env): string {
-	return envString("MNEMOPI_LLM_BASE_URL", "", env).replace(/\/+$/, "");
+	return envString("REACTOR_MNEMOPI_LLM_BASE_URL", "", env).replace(/\/+$/, "");
 }
 
 export function llmApiKey(env: Env = process.env): string {
-	return envString("MNEMOPI_LLM_API_KEY", "", env);
+	return envString("REACTOR_MNEMOPI_LLM_API_KEY", "", env);
 }
 
 export function llmModel(env: Env = process.env): string {
-	return envString("MNEMOPI_LLM_MODEL", "", env);
+	return envString("REACTOR_MNEMOPI_LLM_MODEL", "", env);
 }
 
 export function hostLlmEnabled(env: Env = process.env): boolean {
-	return envBool("MNEMOPI_HOST_LLM_ENABLED", false, env);
+	return envBool("REACTOR_MNEMOPI_HOST_LLM_ENABLED", false, env);
 }
 
 export function hostLlmProvider(env: Env = process.env): string | undefined {
-	return envOptionalString("MNEMOPI_HOST_LLM_PROVIDER", env);
+	return envOptionalString("REACTOR_MNEMOPI_HOST_LLM_PROVIDER", env);
 }
 
 export function hostLlmModel(env: Env = process.env): string | undefined {
-	return envOptionalString("MNEMOPI_HOST_LLM_MODEL", env);
+	return envOptionalString("REACTOR_MNEMOPI_HOST_LLM_MODEL", env);
 }
 
 export function hostLlmContext(env: Env = process.env): number {
-	return envInt("MNEMOPI_HOST_LLM_N_CTX", 32000, env);
+	return envInt("REACTOR_MNEMOPI_HOST_LLM_N_CTX", 32000, env);
 }
 
 export function sleepPrompt(env: Env = process.env): string {
-	return envString("MNEMOPI_SLEEP_PROMPT", "", env).trim();
+	return envString("REACTOR_MNEMOPI_SLEEP_PROMPT", "", env).trim();
 }

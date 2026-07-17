@@ -23,7 +23,7 @@ pub mod script_line_provider;
 use std::{collections::HashMap, ffi::OsString, path::PathBuf};
 
 use clap::{Arg, ArgMatches, Command, arg, crate_version};
-use pi_uutils_ctx::format_usage;
+use reactor_uutils_ctx::format_usage;
 use uucore::error::{UResult, UUsageError};
 
 use crate::sed::{
@@ -36,7 +36,7 @@ use crate::sed::{
 const ABOUT: &str = "Stream editor for filtering and transforming text";
 const USAGE: &str = "sed [OPTION]... [script] [file]...";
 
-// Patched for pi-uutils-ctx embedding: upstream's `#[uucore::main] uumain`
+// Patched for reactor-uutils-ctx embedding: upstream's `#[uucore::main] uumain`
 // (which printed help to the process stdout and called `std::process::exit`)
 // is replaced by this plain function; argument parsing, the no-args help
 // path, and exit-code mapping live in the crate-level `run` wrapper.

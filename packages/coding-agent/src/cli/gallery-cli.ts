@@ -1,5 +1,5 @@
 /**
- * `omp gallery` — render every built-in tool's renderer across its lifecycle.
+ * `reactor gallery` — render every built-in tool's renderer across its lifecycle.
  *
  * For each tool with a registered renderer, the gallery drives a real
  * {@link ToolExecutionComponent} through four states — streaming arguments,
@@ -7,9 +7,9 @@
  * rendered output to stdout. It exists for visual QA of tool renderers without
  * having to provoke each state through a live agent session.
  */
-import type { AgentTool } from "@oh-my-pi/pi-agent-core";
-import type { TUI } from "@oh-my-pi/pi-tui";
-import { getProjectDir } from "@oh-my-pi/pi-utils";
+import type { AgentTool } from "@reactor/agent-core";
+import type { TUI } from "@reactor/tui";
+import { getProjectDir } from "@reactor/utils";
 import { Settings } from "../config/settings";
 import { ToolExecutionComponent } from "../modes/components/tool-execution";
 import { initTheme, theme } from "../modes/theme/theme";

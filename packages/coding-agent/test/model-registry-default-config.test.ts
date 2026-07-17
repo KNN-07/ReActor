@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { TempDir } from "@oh-my-pi/pi-utils";
+import { TempDir } from "@reactor/utils";
 
 const packageRoot = path.resolve(import.meta.dir, "..");
 
@@ -161,8 +161,8 @@ function writeModelsJson(fixture: ProviderFixture): void {
 
 function loadDefaultRegistryModel(lookup: ModelLookup): ModelSnapshot | undefined {
 	const script = `
-		import { ModelRegistry } from "@oh-my-pi/pi-coding-agent/config/model-registry";
-		import { AuthStorage } from "@oh-my-pi/pi-coding-agent/session/auth-storage";
+		import { ModelRegistry } from "@reactor/coding-agent/config/model-registry";
+		import { AuthStorage } from "@reactor/coding-agent/session/auth-storage";
 
 		const authStorage = await AuthStorage.create(":memory:");
 		try {
@@ -182,7 +182,7 @@ function loadDefaultRegistryModel(lookup: ModelLookup): ModelSnapshot | undefine
 		cwd: packageRoot,
 		env: {
 			...process.env,
-			PI_CODING_AGENT_DIR: tempDir.path(),
+			REACTOR_CODING_AGENT_DIR: tempDir.path(),
 		},
 		stdout: "pipe",
 		stderr: "pipe",

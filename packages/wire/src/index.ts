@@ -1,7 +1,7 @@
 /**
- * Shared wire types for the omp collab live-session protocol.
+ * Shared wire types for the reactor collab live-session protocol.
  *
- * Dependency-free JSON shapes produced by `@oh-my-pi/pi-coding-agent`
+ * Dependency-free JSON shapes produced by `@reactor/coding-agent`
  * (`src/collab/protocol.ts` and friends). Browser and test clients import this
  * package instead of depending on the coding-agent runtime; conformance is
  * asserted type-only in `packages/coding-agent/test/collab/web-wire.types.ts`.
@@ -247,6 +247,88 @@ export interface AgentSnapshot {
 	lastActivity: number;
 }
 
+// ReActor autonomy protocol v1. These dependency-free frames are the stable
+// boundary shared by terminal, RPC, ACP, SDK, and a future desktop client.
+export type WireAutonomyStatus = "running" | "paused" | "stopped" | "completed";
+export type WireAutonomyPhase = "planning" | "implementing" | "reviewing" | "verifying" | "complete";
+export type WireAutonomyStopReason =
+	| "approval-required"
+	| "budget-exhausted"
+	| "continuation-limit"
+	| "indeterminate-tool"
+	| "manual-input-required"
+	| "repeated-failure"
+	| "restart"
+	| "time-limit"
+	| "todos-incomplete"
+	| "user-interrupt"
+	| "user-paused"
+	| "user-stopped"
+	| "verification-required";
+
+export interface WireAutonomyOptions {
+	maxContinuations: number;
+	maxMinutes: number;
+	maxConsecutiveFailures: number;
+	tokenBudget?: number;
+	requireVerification: boolean;
+}
+
+export interface WireVerificationEvidence {
+	command?: string;
+	description: string;
+	executed: boolean;
+	timestamp: number;
+}
+
+export interface WireAutonomyStateV1 {
+	version: 1;
+	goalId: string;
+	objective: string;
+	phase: WireAutonomyPhase;
+	status: WireAutonomyStatus;
+	options: WireAutonomyOptions;
+	usage: {
+		continuations: number;
+		activeMilliseconds: number;
+		tokensUsed: number;
+		consecutiveFailures: number;
+	};
+	todoSummary: { total: number; terminal: number; pending: number };
+	lastCompletedTurn?: string;
+	stopReason?: WireAutonomyStopReason;
+	verificationEvidence: WireVerificationEvidence[];
+	startedAt: number;
+	activeSince?: number;
+	updatedAt: number;
+}
+
+export interface WireToolLifecycleV1 {
+	version: 1;
+	toolCallId: string;
+	toolName: string;
+	arguments: unknown;
+	status: "started" | "completed" | "failed" | "indeterminate";
+	timestamp: number;
+	error?: string;
+}
+
+export type AutonomyRequestV1 =
+	| { version: 1; type: "autonomy.start"; objective: string; options?: Partial<WireAutonomyOptions> }
+	| { version: 1; type: "autonomy.status" }
+	| { version: 1; type: "autonomy.pause" }
+	| { version: 1; type: "autonomy.resume"; options?: Partial<WireAutonomyOptions> }
+	| { version: 1; type: "autonomy.stop" };
+
+export type AutonomyEventV1 =
+	| { version: 1; type: "autonomy.state"; state: WireAutonomyStateV1 | null }
+	| { version: 1; type: "tool.lifecycle"; lifecycle: WireToolLifecycleV1 }
+	| { version: 1; type: "approval.required"; goalId?: string; request: unknown }
+	| { version: 1; type: "user_input.required"; goalId?: string; request: unknown }
+	| { version: 1; type: "token_usage"; goalId?: string; tokensUsed: number; tokenBudget?: number }
+	| { version: 1; type: "autonomy.paused"; state: WireAutonomyStateV1 }
+	| { version: 1; type: "autonomy.resumed"; state: WireAutonomyStateV1 };
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Bus payloads (task subagent lifecycle/progress channels)
 // ═══════════════════════════════════════════════════════════════════════════
@@ -419,10 +501,10 @@ export const ROOM_KEY_BYTES = 32;
 export const WRITE_TOKEN_BYTES = 16;
 
 /** Default public relay; bare `<roomId>.<key>` links resolve against it. */
-export const DEFAULT_RELAY_URL = "wss://my.omp.sh";
+export const DEFAULT_RELAY_URL = "wss://my.reactor.sh";
 
 /** Default share viewer/upload base; `/share` links resolve against `<base>/<id>#<key>`. */
-export const DEFAULT_SHARE_URL = "https://my.omp.sh/s";
+export const DEFAULT_SHARE_URL = "https://my.reactor.sh/s";
 
 export interface ParsedCollabLink {
 	/** wss://host[:port]/r/<roomId> — no query, no fragment. */

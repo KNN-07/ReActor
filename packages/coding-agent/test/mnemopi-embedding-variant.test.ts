@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
-import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { loadMnemopiConfig } from "@oh-my-pi/pi-coding-agent/mnemopi/config";
+import { Settings } from "@reactor/coding-agent/config/settings";
+import { loadMnemopiConfig } from "@reactor/coding-agent/mnemopi/config";
 
 // `mnemopi.embeddingVariant` selects the concrete local embedding model, while an
 // explicit `mnemopi.embeddingModel` is an advanced override that wins. Scoping is
@@ -34,28 +34,28 @@ describe("loadMnemopiConfig embedding variant resolution", () => {
 		);
 	});
 
-	it("honors MNEMOPI_EMBEDDING_MODEL when no explicit model setting is present", () => {
-		const previous = Bun.env.MNEMOPI_EMBEDDING_MODEL;
-		Bun.env.MNEMOPI_EMBEDDING_MODEL = "BAAI/bge-large-en-v1.5";
+	it("honors REACTOR_MNEMOPI_EMBEDDING_MODEL when no explicit model setting is present", () => {
+		const previous = Bun.env.REACTOR_MNEMOPI_EMBEDDING_MODEL;
+		Bun.env.REACTOR_MNEMOPI_EMBEDDING_MODEL = "BAAI/bge-large-en-v1.5";
 		try {
 			// The documented env override must not be shadowed by the variant default.
 			expect(embeddingModelFor({ "mnemopi.embeddingVariant": "en" })).toBe("BAAI/bge-large-en-v1.5");
 		} finally {
-			if (previous === undefined) delete Bun.env.MNEMOPI_EMBEDDING_MODEL;
-			else Bun.env.MNEMOPI_EMBEDDING_MODEL = previous;
+			if (previous === undefined) delete Bun.env.REACTOR_MNEMOPI_EMBEDDING_MODEL;
+			else Bun.env.REACTOR_MNEMOPI_EMBEDDING_MODEL = previous;
 		}
 	});
 
 	it("lets an explicit embeddingModel setting win over the env var", () => {
-		const previous = Bun.env.MNEMOPI_EMBEDDING_MODEL;
-		Bun.env.MNEMOPI_EMBEDDING_MODEL = "BAAI/bge-large-en-v1.5";
+		const previous = Bun.env.REACTOR_MNEMOPI_EMBEDDING_MODEL;
+		Bun.env.REACTOR_MNEMOPI_EMBEDDING_MODEL = "BAAI/bge-large-en-v1.5";
 		try {
 			expect(embeddingModelFor({ "mnemopi.embeddingModel": "openai/text-embedding-3-small" })).toBe(
 				"openai/text-embedding-3-small",
 			);
 		} finally {
-			if (previous === undefined) delete Bun.env.MNEMOPI_EMBEDDING_MODEL;
-			else Bun.env.MNEMOPI_EMBEDDING_MODEL = previous;
+			if (previous === undefined) delete Bun.env.REACTOR_MNEMOPI_EMBEDDING_MODEL;
+			else Bun.env.REACTOR_MNEMOPI_EMBEDDING_MODEL = previous;
 		}
 	});
 });

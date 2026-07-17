@@ -2,12 +2,12 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { ModelRegistry } from "@oh-my-pi/pi-coding-agent/config/model-registry";
-import { resetSettingsForTest, Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { createAgentSession } from "@oh-my-pi/pi-coding-agent/sdk";
-import { AuthStorage } from "@oh-my-pi/pi-coding-agent/session/auth-storage";
-import { SessionManager } from "@oh-my-pi/pi-coding-agent/session/session-manager";
-import { removeSyncWithRetries, Snowflake } from "@oh-my-pi/pi-utils";
+import { ModelRegistry } from "@reactor/coding-agent/config/model-registry";
+import { resetSettingsForTest, Settings } from "@reactor/coding-agent/config/settings";
+import { createAgentSession } from "@reactor/coding-agent/sdk";
+import { AuthStorage } from "@reactor/coding-agent/session/auth-storage";
+import { SessionManager } from "@reactor/coding-agent/session/session-manager";
+import { removeSyncWithRetries, Snowflake } from "@reactor/utils";
 import { YAML } from "bun";
 
 /**
@@ -83,7 +83,7 @@ describe("issue #1022 — path-scoped enabledModels respected by default fallbac
 			});
 
 			try {
-				// Bug: omp falls back to anthropic Haiku here, ignoring the
+				// Bug: reactor falls back to anthropic Haiku here, ignoring the
 				// path-scoped enabledModels allow-list.
 				expect(session.model?.provider).not.toBe("anthropic");
 				expect(session.model?.provider).not.toBe("github-copilot");

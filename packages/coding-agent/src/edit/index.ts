@@ -1,9 +1,9 @@
-import { MismatchError as HashlineMismatchError } from "@oh-my-pi/hashline";
-import hashlineGrammar from "@oh-my-pi/hashline/grammar.lark" with { type: "text" };
-import hashlineDescription from "@oh-my-pi/hashline/prompt.md" with { type: "text" };
-import type { AgentTool, AgentToolContext, AgentToolResult, AgentToolUpdateCallback } from "@oh-my-pi/pi-agent-core";
-import type { ToolExample } from "@oh-my-pi/pi-ai";
-import { prompt } from "@oh-my-pi/pi-utils";
+import type { AgentTool, AgentToolContext, AgentToolResult, AgentToolUpdateCallback } from "@reactor/agent-core";
+import type { ToolExample } from "@reactor/ai";
+import { MismatchError as HashlineMismatchError } from "@reactor/hashline";
+import hashlineGrammar from "@reactor/hashline/grammar.lark" with { type: "text" };
+import hashlineDescription from "@reactor/hashline/prompt.md" with { type: "text" };
+import { prompt } from "@reactor/utils";
 import { createLspWritethrough, flushLspWritethroughBatch, type WritethroughCallback, writethroughNoop } from "../lsp";
 import { DeferredDiagnostics } from "../lsp/deferred-diagnostics";
 import { getDiagnosticsLedger } from "../lsp/diagnostics-ledger";
@@ -23,7 +23,7 @@ import { type EditToolDetails, type EditToolPerFileResult, getLspBatchRequest, t
 import { pruneOversizedEditSnapshots } from "./snapshot-details";
 import { EDIT_MODE_STRATEGIES } from "./streaming";
 
-export * from "@oh-my-pi/hashline";
+export * from "@reactor/hashline";
 export { DEFAULT_EDIT_MODE, type EditMode, normalizeEditMode } from "../utils/edit-mode";
 export * from "./apply-patch";
 export * from "./diff";
@@ -67,7 +67,7 @@ function resolveConfiguredEditMode(rawEditMode: string): EditMode | undefined {
 
 	const editMode = normalizeEditMode(rawEditMode);
 	if (!editMode) {
-		throw new Error(`Invalid PI_EDIT_VARIANT: ${rawEditMode}`);
+		throw new Error(`Invalid REACTOR_EDIT_VARIANT: ${rawEditMode}`);
 	}
 
 	return editMode;
@@ -84,7 +84,7 @@ function resolveAllowFuzzy(session: ToolSession, rawValue: string): boolean {
 		case "auto":
 			return session.settings.get("edit.fuzzyMatch");
 		default:
-			throw new Error(`Invalid PI_EDIT_FUZZY: ${rawValue}`);
+			throw new Error(`Invalid REACTOR_EDIT_FUZZY: ${rawValue}`);
 	}
 }
 
@@ -95,7 +95,7 @@ function resolveFuzzyThreshold(session: ToolSession, rawValue: string): number {
 
 	const threshold = Number.parseFloat(rawValue);
 	if (Number.isNaN(threshold) || threshold < 0 || threshold > 1) {
-		throw new Error(`Invalid PI_EDIT_FUZZY_THRESHOLD: ${rawValue}`);
+		throw new Error(`Invalid REACTOR_EDIT_FUZZY_THRESHOLD: ${rawValue}`);
 	}
 
 	return threshold;
@@ -382,9 +382,9 @@ export class EditTool implements AgentTool<TInput> {
 
 	constructor(private readonly session: ToolSession) {
 		const {
-			PI_EDIT_FUZZY: editFuzzy = "auto",
-			PI_EDIT_FUZZY_THRESHOLD: editFuzzyThreshold = "auto",
-			PI_EDIT_VARIANT: envEditVariant = "auto",
+			REACTOR_EDIT_FUZZY: editFuzzy = "auto",
+			REACTOR_EDIT_FUZZY_THRESHOLD: editFuzzyThreshold = "auto",
+			REACTOR_EDIT_VARIANT: envEditVariant = "auto",
 		} = Bun.env;
 
 		this.#editMode = resolveConfiguredEditMode(envEditVariant);

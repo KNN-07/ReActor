@@ -16,7 +16,7 @@
  * - Concurrent ensureLive/park operations coalesce per id.
  */
 
-import { logger } from "@oh-my-pi/pi-utils";
+import { logger } from "@reactor/utils";
 import type { AgentSession } from "../session/agent-session";
 import { type AgentRef, AgentRegistry, MAIN_AGENT_ID, type RegistryEvent } from "./agent-registry";
 

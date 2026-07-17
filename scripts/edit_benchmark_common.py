@@ -20,9 +20,9 @@ from pathlib import Path
 from typing import Any, Callable
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(REPO_ROOT / "python/omp-rpc/src"))
+sys.path.insert(0, str(REPO_ROOT / "python/reactor-rpc/src"))
 
-from omp_rpc import (
+from reactor_rpc import (
     MessageEndEvent,
     MessageStartEvent,
     MessageUpdateEvent,
@@ -626,23 +626,23 @@ class VerbosePrinter:
             sys.stderr.flush()
 
 
-def resolve_repo_omp_bin() -> str | None:
+def resolve_repo_reactor_bin() -> str | None:
     cli_path = REPO_ROOT / "packages/coding-agent" / "src/cli.ts"
     if not cli_path.exists():
         return None
     return str(cli_path)
 
 
-def resolve_omp_bin(raw: str | None) -> str:
+def resolve_reactor_bin(raw: str | None) -> str:
     if raw:
         return raw
-    repo_bin = resolve_repo_omp_bin()
+    repo_bin = resolve_repo_reactor_bin()
     if repo_bin:
         return repo_bin
-    found = shutil.which("omp")
+    found = shutil.which("reactor")
     if not found:
         raise SystemExit(
-            "Could not find `omp` on PATH and could not resolve the repo CLI. Set --omp-bin or OMP_BIN."
+            "Could not find `reactor` on PATH and could not resolve the repo CLI. Set --reactor-bin or REACTOR_BIN."
         )
     return found
 
@@ -730,7 +730,7 @@ def run_benchmark_for_model(
     *,
     spec: BenchmarkSpec,
     model: str,
-    omp_bin: str,
+    reactor_bin: str,
     workspace: Path,
     timeout: float,
     log_mode: str | None,
@@ -753,7 +753,7 @@ def run_benchmark_for_model(
 
     try:
         with RpcClient(
-            executable=omp_bin,
+            executable=reactor_bin,
             model=model,
             cwd=workspace,
             env={**spec.env},
@@ -841,7 +841,7 @@ def run_benchmark_for_model(
 async def run_all(
     spec: BenchmarkSpec, args: argparse.Namespace
 ) -> dict[str, dict[str, Any]]:
-    omp_bin = resolve_omp_bin(args.omp_bin)
+    reactor_bin = resolve_reactor_bin(args.reactor_bin)
 
     timestamp = time.strftime("%Y%m%d-%H%M%S")
     workspace_root = (
@@ -862,7 +862,7 @@ async def run_all(
                 run_benchmark_for_model,
                 spec=spec,
                 model=model,
-                omp_bin=omp_bin,
+                reactor_bin=reactor_bin,
                 workspace=workspace,
                 timeout=args.timeout,
                 log_mode="verbose"
@@ -910,9 +910,9 @@ async def run_all(
 def parse_args(description: str) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument(
-        "--omp-bin",
-        default=os.environ.get("OMP_BIN"),
-        help="Executable to launch. Defaults to the repo checkout CLI, then falls back to `omp` on PATH.",
+        "--reactor-bin",
+        default=os.environ.get("REACTOR_BIN"),
+        help="Executable to launch. Defaults to the repo checkout CLI, then falls back to `reactor` on PATH.",
     )
     parser.add_argument(
         "--timeout", type=float, default=60.0, help="Per-turn timeout in seconds."

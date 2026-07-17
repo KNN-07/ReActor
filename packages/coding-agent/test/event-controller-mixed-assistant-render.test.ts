@@ -1,12 +1,12 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "bun:test";
-import type { AssistantMessage, ToolCall, Usage } from "@oh-my-pi/pi-ai";
-import { resetSettingsForTest, Settings, settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { TranscriptContainer } from "@oh-my-pi/pi-coding-agent/modes/components/transcript-container";
-import { EventController } from "@oh-my-pi/pi-coding-agent/modes/controllers/event-controller";
-import { initTheme } from "@oh-my-pi/pi-coding-agent/modes/theme/theme";
-import type { InteractiveModeContext } from "@oh-my-pi/pi-coding-agent/modes/types";
-import type { AgentSessionEvent } from "@oh-my-pi/pi-coding-agent/session/agent-session";
-import type { TUI } from "@oh-my-pi/pi-tui";
+import type { AssistantMessage, ToolCall, Usage } from "@reactor/ai";
+import { resetSettingsForTest, Settings, settings } from "@reactor/coding-agent/config/settings";
+import { TranscriptContainer } from "@reactor/coding-agent/modes/components/transcript-container";
+import { EventController } from "@reactor/coding-agent/modes/controllers/event-controller";
+import { initTheme } from "@reactor/coding-agent/modes/theme/theme";
+import type { InteractiveModeContext } from "@reactor/coding-agent/modes/types";
+import type { AgentSessionEvent } from "@reactor/coding-agent/session/agent-session";
+import type { TUI } from "@reactor/tui";
 
 const TOOL_CALL_A_ID = "toolu_mixed_text_order_a";
 const TOOL_CALL_B_ID = "toolu_mixed_text_order_b";

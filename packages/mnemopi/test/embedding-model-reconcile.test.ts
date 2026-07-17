@@ -9,8 +9,8 @@
 import { Database } from "bun:sqlite";
 import { describe, expect, it } from "bun:test";
 import "./setup";
-import { initBeam } from "@oh-my-pi/pi-mnemopi/core/beam";
-import { Mnemopi } from "@oh-my-pi/pi-mnemopi/core/memory";
+import { initBeam } from "@reactor/mnemopi/core/beam";
+import { Mnemopi } from "@reactor/mnemopi/core/memory";
 
 const OLD_MODEL = "BAAI/bge-small-en-v1.5";
 const NEW_MODEL = "intfloat/multilingual-e5-large";
@@ -97,10 +97,10 @@ describe("reconcileEmbeddingModel on store open", () => {
 		}
 	});
 
-	it("does not wipe when embeddings are disabled via the MNEMOPI_NO_EMBEDDINGS env", () => {
+	it("does not wipe when embeddings are disabled via the REACTOR_MNEMOPI_NO_EMBEDDINGS env", () => {
 		const { db } = seedDb(OLD_MODEL);
-		const previous = process.env.MNEMOPI_NO_EMBEDDINGS;
-		process.env.MNEMOPI_NO_EMBEDDINGS = "1";
+		const previous = process.env.REACTOR_MNEMOPI_NO_EMBEDDINGS;
+		process.env.REACTOR_MNEMOPI_NO_EMBEDDINGS = "1";
 		let memory: Mnemopi | undefined;
 		try {
 			// The model differs, but with embeddings disabled the rebuild would
@@ -114,9 +114,9 @@ describe("reconcileEmbeddingModel on store open", () => {
 			expect(ep.v).not.toBeNull();
 		} finally {
 			if (previous === undefined) {
-				delete process.env.MNEMOPI_NO_EMBEDDINGS;
+				delete process.env.REACTOR_MNEMOPI_NO_EMBEDDINGS;
 			} else {
-				process.env.MNEMOPI_NO_EMBEDDINGS = previous;
+				process.env.REACTOR_MNEMOPI_NO_EMBEDDINGS = previous;
 			}
 			memory?.close();
 			db.close();

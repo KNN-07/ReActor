@@ -2,10 +2,10 @@ import { describe, expect, it, vi } from "bun:test";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
-import { Effort } from "@oh-my-pi/pi-catalog/effort";
-import { createModelManager } from "@oh-my-pi/pi-catalog/model-manager";
-import { getBundledModel } from "@oh-my-pi/pi-catalog/models";
-import { githubCopilotModelManagerOptions } from "@oh-my-pi/pi-catalog/provider-models/openai-compat";
+import { Effort } from "@reactor/catalog/effort";
+import { createModelManager } from "@reactor/catalog/model-manager";
+import { getBundledModel } from "@reactor/catalog/models";
+import { githubCopilotModelManagerOptions } from "@reactor/catalog/provider-models/openai-compat";
 
 function getHeaderValue(headers: unknown, key: string): string | undefined {
 	if (!headers) return undefined;
@@ -241,7 +241,7 @@ describe("github copilot model limits mapping", () => {
 	});
 
 	it("keeps discovered context window through full model resolution for bundled models", async () => {
-		const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "pi-ai-copilot-models-"));
+		const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "ai-copilot-models-"));
 		try {
 			const fetchMock = vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
 				const url = typeof input === "string" ? input : input.toString();
@@ -320,7 +320,7 @@ describe("github copilot model limits mapping", () => {
 		expect(model?.api).toBe("openai-responses");
 	});
 	it("invalidates a cached MAI-Code completion route after the endpoint migration", async () => {
-		const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "pi-ai-copilot-mai-cache-"));
+		const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "ai-copilot-mai-cache-"));
 		const cacheDbPath = path.join(tempDir, "models.db");
 		const cacheProviderId = "github-copilot-mai-cache-test";
 		try {
@@ -717,7 +717,7 @@ describe("github copilot vision endpoint policy", () => {
 	});
 
 	it("keeps explicit upstream vision false text-only through the personal endpoint manager merge", async () => {
-		const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "pi-ai-copilot-vision-"));
+		const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "ai-copilot-vision-"));
 		try {
 			const fetchMock = vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
 				const url = typeof input === "string" ? input : input.toString();
@@ -762,7 +762,7 @@ describe("github copilot vision endpoint policy", () => {
 		// Discovery against the business host confirms the same upstream vision
 		// capability; the full manager merge must preserve image input instead
 		// of downgrading solely because the baseUrl is non-personal.
-		const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "pi-ai-copilot-vision-"));
+		const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "ai-copilot-vision-"));
 		try {
 			const fetchMock = vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
 				const url = typeof input === "string" ? input : input.toString();

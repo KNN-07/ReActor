@@ -43,7 +43,7 @@ Behavior details:
 - `--copy`, `clipboard`, and `copy` arguments are explicitly rejected with a warning to use `/dump`.
 - Export embeds session header/entries/leaf plus current `systemPrompt` and tool descriptions from agent state.
 - Subagent transcripts stored next to the session file (`<session>/<AgentId>.jsonl`, recursively for nested spawns) are embedded as `subSessions` (`collectSubSessions` in `src/export/html/index.ts`; disable with `includeSubSessions: false` in `ExportOptions`). In the page, agent ids in task tool cards open a breadcrumbed sub-session overlay.
-- Tool calls render through the `<omp-tool-view>` web component — the React per-tool renderers shared with collab-web (`packages/collab-web/src/tool-render/`), prebuilt into `src/export/html/tool-views.generated.js` by `bun run gen:tool-views`.
+- Tool calls render through the `<reactor-tool-view>` web component — the React per-tool renderers shared with collab-web (`packages/collab-web/src/tool-render/`), prebuilt into `src/export/html/tool-views.generated.js` by `bun run gen:tool-views`.
 - No session entries are appended during export.
 
 Caveat:
@@ -91,7 +91,7 @@ a viewer link. Implementation: [`../packages/coding-agent/src/export/share.ts`](
 
 ### Phase 1: custom share handler (if present)
 
-`loadCustomShare()` checks `~/.omp/agent` for first existing candidate:
+`loadCustomShare()` checks `~/.reactor/agent` for first existing candidate:
 
 - `share.ts`
 - `share.js`
@@ -130,13 +130,13 @@ Only when no custom share handler is found (`shareSession()`):
    (`[12B IV][ciphertext+tag]`).
 4. Upload target is chosen by `share.store`:
    - **Share server** (default, `store: "blob"`) — `POST <share.serverUrl>`
-     (default `https://my.omp.sh/s`) with the raw blob, capped at 1 MB.
+     (default `https://my.reactor.sh/s`) with the raw blob, capped at 1 MB.
      Oversized snapshots are trimmed until they fit: inline images first,
      then long strings (32 KB → 8 KB → 2 KB → 512 B caps), then oldest
      entries.
    - **Secret gist** (`store: "gist"`) — when `gh` is installed and
      authenticated, the sealed blob is pushed base64-encoded as
-     `session.ompshare.txt` (budget 5 MB sealed; gist raw fetches cap at
+     `session.reactorshare.txt` (budget 5 MB sealed; gist raw fetches cap at
      10 MB), falling back to the share server when `gh` is unusable.
 5. The link is `<share.serverUrl>/<id>#<base64url key>` in both cases. The
    viewer page served there fetches the blob (hex ids via the GitHub gist
@@ -203,7 +203,7 @@ Startup `--fork` is resolved before normal session creation:
 4. The forked file is created in the current cwd/session-dir scope and becomes the active session manager for startup.
 5. Full-context forks automatically seed `providerPromptCacheKey` from the source header's inherited key, falling back to the source session id. Startup drops that automatic inheritance when `--model`, `--thinking`, `--system-prompt`, `--append-system-prompt`, `--tools`, or `--no-tools` changes the provider route or prompt/tool shape.
 
-Use `--prompt-cache-key <key>` to pin the provider prompt-cache identity explicitly and independently from both the OMP session id and `--provider-session-id`. `--provider-session-id` continues to control provider session/routing headers and sticky credential selection; `--prompt-cache-key` controls the OpenAI Responses `prompt_cache_key` payload where supported.
+Use `--prompt-cache-key <key>` to pin the provider prompt-cache identity explicitly and independently from both the ReActor session id and `--provider-session-id`. `--provider-session-id` continues to control provider session/routing headers and sticky credential selection; `--prompt-cache-key` controls the OpenAI Responses `prompt_cache_key` payload where supported.
 
 ## Resume and continue
 

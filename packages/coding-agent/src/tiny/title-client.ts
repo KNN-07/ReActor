@@ -1,4 +1,4 @@
-import { $env, logger } from "@oh-my-pi/pi-utils";
+import { $env, logger } from "@reactor/utils";
 import { settings } from "../config/settings";
 import {
 	createUnavailableWorker,
@@ -64,20 +64,20 @@ function normalizeTinyTitleGenerateOptions(
  * Hidden subcommand on the main CLI that boots the tiny-model worker in the
  * spawned subprocess. Kept in sync with the dispatch in `cli.ts`.
  */
-export const TINY_WORKER_ARG = "__omp_worker_tiny_inference";
+export const TINY_WORKER_ARG = "__reactor_worker_tiny_inference";
 
 function readTinyModelSetting(path: "providers.tinyModelDevice" | "providers.tinyModelDtype"): string | undefined {
 	try {
 		const value = settings.get(path);
 		return typeof value === "string" ? value : undefined;
 	} catch {
-		// Settings may be uninitialized (e.g. `omp --smoke-test`); fall back to env/default.
+		// Settings may be uninitialized (e.g. `reactor --smoke-test`); fall back to env/default.
 		return undefined;
 	}
 }
 
 /**
- * Decide which `PI_TINY_DEVICE` / `PI_TINY_DTYPE` vars to overlay onto the worker
+ * Decide which `REACTOR_TINY_DEVICE` / `REACTOR_TINY_DTYPE` vars to overlay onto the worker
  * env. A present env var wins (left untouched); otherwise the mapped persisted
  * setting is used. Returns only the keys to add — never the default sentinel.
  * Pure for testability; see {@link tinyWorkerEnv} for the spawn-time glue.
@@ -89,13 +89,13 @@ export function tinyWorkerEnvOverlay(
 	dtypeSetting: string | undefined,
 ): Record<string, string> {
 	const overlay: Record<string, string> = {};
-	if (!env.PI_TINY_DEVICE) {
+	if (!env.REACTOR_TINY_DEVICE) {
 		const device = tinyModelDeviceSettingToEnv(deviceSetting);
-		if (device) overlay.PI_TINY_DEVICE = device;
+		if (device) overlay.REACTOR_TINY_DEVICE = device;
 	}
-	if (!env.PI_TINY_DTYPE) {
+	if (!env.REACTOR_TINY_DTYPE) {
 		const dtype = tinyModelDtypeSettingToEnv(dtypeSetting);
-		if (dtype) overlay.PI_TINY_DTYPE = dtype;
+		if (dtype) overlay.REACTOR_TINY_DTYPE = dtype;
 	}
 	return overlay;
 }
@@ -103,7 +103,7 @@ export function tinyWorkerEnvOverlay(
 /**
  * Env handed to the tiny-model subprocess — and reused verbatim by the STT and
  * TTS workers, which share the same device/dtype resolution. The
- * `PI_TINY_DEVICE` / `PI_TINY_DTYPE` env vars win; otherwise the persisted
+ * `REACTOR_TINY_DEVICE` / `REACTOR_TINY_DTYPE` env vars win; otherwise the persisted
  * `providers.tinyModelDevice` / `providers.tinyModelDtype` settings are mapped
  * onto those vars so the subprocess's env-based resolution picks them up.
  * Resolved once at spawn (pipelines are cached for the lifetime of the

@@ -1,22 +1,22 @@
 /**
  * Compatibility shim for legacy extensions importing the package root of
- * `@oh-my-pi/pi-ai` (or one of its aliased scopes like `@earendil-works/pi-ai`
- * or `@mariozechner/pi-ai`).
+ * `@reactor/ai` (or one of its aliased scopes like `@earendil-works/ai`
+ * or `@mariozechner/ai`).
  *
- * pi-ai 15.1.0 removed the historical TypeBox root exports (`Type`, plus the
+ * ai 15.1.0 removed the historical TypeBox root exports (`Type`, plus the
  * runtime-relevant half of the `Static`/`TSchema` pair) from the package
  * entrypoint. Legacy extensions still author parameter schemas as
  * `Type.Object({ ... })`, so this file is served by `legacy-pi-compat.ts` in
- * place of the real pi-ai entrypoint whenever a legacy extension imports the
- * bare package root. Subpath imports (`@oh-my-pi/pi-ai/oauth`, etc.)
- * continue to resolve directly against the bundled pi-ai package.
+ * place of the real ai entrypoint whenever a legacy extension imports the
+ * bare package root. Subpath imports (`@reactor/ai/oauth`, etc.)
+ * continue to resolve directly against the bundled ai package.
  *
  * The `Type` runtime and legacy `StringEnum()` helper are borrowed from the
  * Zod-backed TypeBox shim that already serves TypeBox imports for the same
  * extension class, keeping the legacy-compat surface internally consistent.
  *
- * Type-level `Static` and `TSchema` continue to come from pi-ai's own
- * `types.ts` via the `export *` below — pi-ai still exports both as types,
+ * Type-level `Static` and `TSchema` continue to come from ai's own
+ * `types.ts` via the `export *` below — ai still exports both as types,
  * only the runtime `Type` builder and `StringEnum()` helper were removed.
  */
 import {
@@ -25,7 +25,7 @@ import {
 	getBundledModels,
 	getBundledProviders,
 	modelsAreEqual,
-} from "@oh-my-pi/pi-catalog/models";
+} from "@reactor/catalog/models";
 import { type TSchema, Type } from "./typebox";
 
 export interface StringEnumOptions<T extends string> {
@@ -71,14 +71,14 @@ export function StringEnum<T extends string | number>(
 	return schema;
 }
 
-export * from "@oh-my-pi/pi-ai";
+export * from "@reactor/ai";
 /**
- * Compatibility re-exports for catalog symbols that pi-ai historically exposed
+ * Compatibility re-exports for catalog symbols that ai historically exposed
  * from its own barrel prior to the `refactor(catalog)!: split model catalog
- * from pi-ai` change. Legacy extensions still import these from the pi-ai
+ * from ai` change. Legacy extensions still import these from the ai
  * root, so the shim bridges them through to their new home in
- * `@oh-my-pi/pi-catalog/models`. `getModel`/`getModels` are the historical
- * pi-ai names for `getBundledModel`/`getBundledModels`; the remaining symbols
+ * `@reactor/catalog/models`. `getModel`/`getModels` are the historical
+ * ai names for `getBundledModel`/`getBundledModels`; the remaining symbols
  * kept their names across the move.
  */
 export { calculateCost, getBundledModel, getBundledModels, getBundledProviders, modelsAreEqual, Type };

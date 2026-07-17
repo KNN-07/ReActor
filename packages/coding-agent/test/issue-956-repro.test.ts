@@ -2,13 +2,13 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "bun:
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
-import * as mcpClient from "@oh-my-pi/pi-coding-agent/mcp/client";
-import { MCPCommandController } from "@oh-my-pi/pi-coding-agent/modes/controllers/mcp-command-controller";
-import { initTheme } from "@oh-my-pi/pi-coding-agent/modes/theme/theme";
-import { getConfigRootDir, getProjectDir, removeWithRetries, setAgentDir, setProjectDir } from "@oh-my-pi/pi-utils";
+import * as mcpClient from "@reactor/coding-agent/mcp/client";
+import { MCPCommandController } from "@reactor/coding-agent/modes/controllers/mcp-command-controller";
+import { initTheme } from "@reactor/coding-agent/modes/theme/theme";
+import { getConfigRootDir, getProjectDir, removeWithRetries, setAgentDir, setProjectDir } from "@reactor/utils";
 
 const originalProjectDir = getProjectDir();
-const originalAgentDir = process.env.PI_CODING_AGENT_DIR;
+const originalAgentDir = process.env.REACTOR_CODING_AGENT_DIR;
 const fallbackAgentDir = path.join(getConfigRootDir(), "agent");
 
 describe("issue #956: interactive /mcp test", () => {
@@ -20,8 +20,8 @@ describe("issue #956: interactive /mcp test", () => {
 	});
 
 	beforeEach(async () => {
-		projectDir = await fs.mkdtemp(path.join(os.tmpdir(), "omp-issue-956-project-"));
-		agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "omp-issue-956-agent-"));
+		projectDir = await fs.mkdtemp(path.join(os.tmpdir(), "reactor-issue-956-project-"));
+		agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "reactor-issue-956-agent-"));
 		setProjectDir(projectDir);
 		setAgentDir(agentDir);
 
@@ -50,7 +50,7 @@ describe("issue #956: interactive /mcp test", () => {
 			setAgentDir(originalAgentDir);
 		} else {
 			setAgentDir(fallbackAgentDir);
-			delete process.env.PI_CODING_AGENT_DIR;
+			delete process.env.REACTOR_CODING_AGENT_DIR;
 		}
 		await removeWithRetries(projectDir);
 		await removeWithRetries(agentDir);

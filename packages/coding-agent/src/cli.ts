@@ -12,10 +12,10 @@ try {
 
 /**
  * CLI entry point — registers all commands explicitly and delegates to the
- * lightweight CLI runner from pi-utils.
+ * lightweight CLI runner from utils.
  */
 import { parentPort } from "node:worker_threads";
-import type { CliConfig } from "@oh-my-pi/pi-utils/cli";
+import type { CliConfig } from "@reactor/utils/cli";
 import {
 	APP_NAME,
 	getActiveProfile,
@@ -23,8 +23,8 @@ import {
 	resolveProfileEnv,
 	setProfile,
 	VERSION,
-} from "@oh-my-pi/pi-utils/dirs";
-import { declareWorkerHostEntry, installWorkerInbox } from "@oh-my-pi/pi-utils/worker-host";
+} from "@reactor/utils/dirs";
+import { declareWorkerHostEntry, installWorkerInbox } from "@reactor/utils/worker-host";
 import { installProfileAlias, resolveProfileAliasCommandFromProcess } from "./cli/profile-alias";
 import { extractProfileFlags } from "./cli/profile-bootstrap";
 import { DAEMON_BROKER_WORKER_ARG } from "./launch/protocol";
@@ -43,17 +43,17 @@ process.title = APP_NAME;
 // (`B:\~BUN\root\cli.js`) but registers the main path with forward slashes
 // (`B:/~BUN/root/cli.js`), so Bun's internal match fails. `bun build --compile`
 // CLI builds are unaffected. A compiled binary's entry module is by definition
-// the process entry, so the define-folded PI_COMPILED marker stands in.
-const isProcessEntry = import.meta.main || process.env.PI_COMPILED === "true";
+// the process entry, so the define-folded REACTOR_COMPILED marker stands in.
+const isProcessEntry = import.meta.main || process.env.REACTOR_COMPILED === "true";
 
 // Worker-host entry declaration (Worker threads and worker subprocesses
 // re-enter `Bun.main` with a hidden argv selector instead of loading separate
 // worker entrypoints) happens inside `runCli` after profile bootstrap:
-// `@oh-my-pi/pi-utils/env` eagerly loads `.env` from the agent directory at
+// `@reactor/utils/env` eagerly loads `.env` from the agent directory at
 // import time, so it must not be imported before `setProfile` runs.
 
 async function showHelp(config: CliConfig): Promise<void> {
-	const { renderRootHelp } = await import("@oh-my-pi/pi-utils/cli");
+	const { renderRootHelp } = await import("@reactor/utils/cli");
 	const { getExtraHelpText } = await import("./cli/args");
 	renderRootHelp(config);
 	const extra = getExtraHelpText();
@@ -73,7 +73,7 @@ async function showHelp(config: CliConfig): Promise<void> {
  * tarball installs all exercise it on every CI run.
  */
 async function runSmokeTest(): Promise<void> {
-	const { smokeTestSyncWorker, startServer } = await import("@oh-my-pi/omp-stats");
+	const { smokeTestSyncWorker, startServer } = await import("@reactor/stats");
 	const { smokeTestTinyTitleWorker } = await import("./tiny/title-client");
 	const { smokeTestSttWorker } = await import("./stt/asr-client");
 	const { smokeTestTtsWorker } = await import("./tts/tts-client");
@@ -104,14 +104,14 @@ async function runSmokeTest(): Promise<void> {
 	process.stdout.write("smoke-test: ok\n");
 }
 
-const TINY_WORKER_ARG = "__omp_worker_tiny_inference";
-const STATS_SYNC_WORKER_ARG = "__omp_worker_stats_sync";
-const TAB_WORKER_ARG = "__omp_worker_tab";
-const JS_EVAL_WORKER_ARG = "__omp_worker_js_eval";
-const JS_EVAL_PROCESS_ARG = "__omp_worker_js_eval_process";
-const STT_WORKER_ARG = "__omp_worker_stt";
-const TTS_WORKER_ARG = "__omp_worker_tts";
-const MNEMOPI_EMBED_WORKER_ARG = "__omp_worker_mnemopi_embed";
+const TINY_WORKER_ARG = "__reactor_worker_tiny_inference";
+const STATS_SYNC_WORKER_ARG = "__reactor_worker_stats_sync";
+const TAB_WORKER_ARG = "__reactor_worker_tab";
+const JS_EVAL_WORKER_ARG = "__reactor_worker_js_eval";
+const JS_EVAL_PROCESS_ARG = "__reactor_worker_js_eval_process";
+const STT_WORKER_ARG = "__reactor_worker_stt";
+const TTS_WORKER_ARG = "__reactor_worker_tts";
+const REACTOR_MNEMOPI_EMBED_WORKER_ARG = "__reactor_worker_mnemopi_embed";
 
 async function runWorkerEntrypoint(arg: string | undefined): Promise<boolean> {
 	if (arg === TINY_WORKER_ARG) {
@@ -133,7 +133,7 @@ async function runWorkerEntrypoint(arg: string | undefined): Promise<boolean> {
 			pending.push(event);
 		};
 		scope.onmessage = buffer;
-		await import("@oh-my-pi/omp-stats/sync-worker");
+		await import("@reactor/stats/sync-worker");
 		const handler = scope.onmessage;
 		if (handler && handler !== buffer) {
 			for (const event of pending) handler.call(scope, event);
@@ -175,7 +175,7 @@ async function runWorkerEntrypoint(arg: string | undefined): Promise<boolean> {
 		await runIpcSubprocessWorker(startTtsWorker);
 		return true;
 	}
-	if (arg === MNEMOPI_EMBED_WORKER_ARG) {
+	if (arg === REACTOR_MNEMOPI_EMBED_WORKER_ARG) {
 		const { startMnemopiEmbedWorker } = await import("./mnemopi/embed-worker");
 		await runIpcSubprocessWorker(startMnemopiEmbedWorker);
 		return true;
@@ -298,20 +298,20 @@ export async function runCli(argv: string[]): Promise<void> {
 		if (extracted.profile !== undefined) {
 			setProfile(extracted.profile);
 		} else {
-			// No explicit --profile: activate any OMP_PROFILE/PI_PROFILE inherited
+			// No explicit --profile: activate any REACTOR_PROFILE/REACTOR_PROFILE inherited
 			// from the environment. Module-load resolution deliberately swallows an
 			// invalid value to avoid an uncaught throw before this try/catch is in
 			// scope (see `readProfileFromEnvSafe` in dirs.ts), and callers may set
-			// OMP_PROFILE after importing this module (profile aliases/tests). Surfacing
-			// validation here turns `OMP_PROFILE=.. omp --version` into a clean error;
+			// REACTOR_PROFILE after importing this module (profile aliases/tests). Surfacing
+			// validation here turns `REACTOR_PROFILE=.. reactor --version` into a clean error;
 			// calling setProfile keeps every later path helper on the env-selected
 			// profile instead of the default agent directory.
-			setProfile(resolveProfileEnv(process.env.OMP_PROFILE, process.env.PI_PROFILE));
+			setProfile(resolveProfileEnv(process.env.REACTOR_PROFILE));
 		}
 		if (extracted.aliasName !== undefined) {
 			const profile = extracted.profile ?? getActiveProfile();
 			if (!profile) {
-				throw new Error("--alias requires --profile <name> or OMP_PROFILE");
+				throw new Error("--alias requires --profile <name> or REACTOR_PROFILE");
 			}
 			const result = await installProfileAlias({
 				profile,
@@ -337,7 +337,7 @@ export async function runCli(argv: string[]): Promise<void> {
 	// synchronous prefix of `runWorkerEntrypoint`, and Bun flushes the
 	// worker's parked initial messages as soon as the entry module's
 	// top-level evaluation finishes.
-	if (resolvedArgv[0]?.startsWith("__omp_worker_")) {
+	if (resolvedArgv[0]?.startsWith("__reactor_worker_")) {
 		const dispatched = await runWorkerEntrypoint(resolvedArgv[0]);
 		if (!dispatched) {
 			process.stderr.write(`Error: unknown worker selector: ${resolvedArgv[0]}\n`);
@@ -348,10 +348,10 @@ export async function runCli(argv: string[]): Promise<void> {
 
 	// Declare this module as the worker-host entry now that the active profile
 	// is resolved. The worker-host module is side-effect-free; importing
-	// `@oh-my-pi/pi-utils/env` here would snapshot the wrong agent `.env`.
+	// `@reactor/utils/env` here would snapshot the wrong agent `.env`.
 	// Gated on `isProcessEntry`: only the real CLI process entry is a valid
 	// worker host. Worker-thread re-entry already returned above at the
-	// `__omp_worker_` dispatch, and importers (`runCli` in profile-CLI tests,
+	// `__reactor_worker_` dispatch, and importers (`runCli` in profile-CLI tests,
 	// SDK embedding) have `import.meta.main === false` — declaring there would
 	// poison `workerHostEntry()` for the whole test process, forcing eval/stats/
 	// browser workers onto the same-realm inline fallback.
@@ -362,7 +362,7 @@ export async function runCli(argv: string[]): Promise<void> {
 		return;
 	}
 	const [{ run }, { commands, resolveCliArgv }] = await Promise.all([
-		import("@oh-my-pi/pi-utils/cli"),
+		import("@reactor/utils/cli"),
 		import("./cli-commands"),
 	]);
 	// --help and --version are handled by run() directly, don't rewrite those.

@@ -2,16 +2,16 @@ import { afterEach, describe, expect, it, vi } from "bun:test";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
-import * as executorModule from "@oh-my-pi/pi-coding-agent/task/executor";
+import * as executorModule from "@reactor/coding-agent/task/executor";
 import {
 	applyEligibleNestedPatches,
 	mergeIsolatedChanges,
 	runIsolatedSubprocess,
-} from "@oh-my-pi/pi-coding-agent/task/isolation-runner";
-import type { SingleResult } from "@oh-my-pi/pi-coding-agent/task/types";
-import * as worktreeModule from "@oh-my-pi/pi-coding-agent/task/worktree";
-import * as gitModule from "@oh-my-pi/pi-coding-agent/utils/git";
-import * as natives from "@oh-my-pi/pi-natives";
+} from "@reactor/coding-agent/task/isolation-runner";
+import type { SingleResult } from "@reactor/coding-agent/task/types";
+import * as worktreeModule from "@reactor/coding-agent/task/worktree";
+import * as gitModule from "@reactor/coding-agent/utils/git";
+import * as natives from "@reactor/natives";
 import { $ } from "bun";
 
 function result(overrides: Partial<SingleResult> = {}): SingleResult {
@@ -44,7 +44,7 @@ async function git(repoRoot: string, ...args: string[]): Promise<string> {
 }
 
 async function seedFooRepo(finalContent: string): Promise<{ repoRoot: string; patchPath: string }> {
-	const repoRoot = await fs.mkdtemp(path.join(os.tmpdir(), "omp-isolation-merge-"));
+	const repoRoot = await fs.mkdtemp(path.join(os.tmpdir(), "reactor-isolation-merge-"));
 	tempRoots.push(repoRoot);
 
 	await git(repoRoot, "init");
@@ -77,7 +77,7 @@ describe("runIsolatedSubprocess", () => {
 	});
 
 	it("preserves branch-mode output as a patch when branch transfer fails", async () => {
-		const repoRoot = await fs.mkdtemp(path.join(os.tmpdir(), "omp-isolation-run-"));
+		const repoRoot = await fs.mkdtemp(path.join(os.tmpdir(), "reactor-isolation-run-"));
 		tempRoots.push(repoRoot);
 		const isolationDir = path.join(repoRoot, "isolated");
 		const artifactsDir = path.join(repoRoot, "artifacts");
@@ -136,7 +136,7 @@ describe("runIsolatedSubprocess", () => {
 		expect(await Bun.file(patchPath).text()).toBe(rootPatch);
 		expect(outcome.nestedPatches).toEqual([]);
 		expect(captureSpy).toHaveBeenCalledWith(isolationDir, baseline);
-		expect(deleteSpy).toHaveBeenCalledWith(repoRoot, "omp/task/PreserveBranchFailure");
+		expect(deleteSpy).toHaveBeenCalledWith(repoRoot, "reactor/task/PreserveBranchFailure");
 		expect(cleanupSpy).toHaveBeenCalledTimes(1);
 	});
 });

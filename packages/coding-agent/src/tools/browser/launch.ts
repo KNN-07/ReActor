@@ -1,8 +1,8 @@
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { $which, getPuppeteerDir, logger } from "@oh-my-pi/pi-utils";
 import type * as BrowsersNs from "@puppeteer/browsers";
+import { $which, getPuppeteerDir, logger } from "@reactor/utils";
 import type { Browser, CDPSession, Page, default as Puppeteer, Target } from "puppeteer-core";
 import stealthTamperingScript from "../puppeteer/00_stealth_tampering.txt" with { type: "text" };
 import stealthActivityScript from "../puppeteer/01_stealth_activity.txt" with { type: "text" };
@@ -124,7 +124,7 @@ async function loadBrowsers(): Promise<typeof BrowsersNs> {
  * Resolve the Chromium executable puppeteer will launch, lazily downloading it
  * on first use via @puppeteer/browsers. Skipped when a system Chromium (NixOS)
  * or PUPPETEER_EXECUTABLE_PATH is set. The browser is cached under
- * ~/.omp/puppeteer (getPuppeteerDir). Returns undefined when platform
+ * ~/.reactor/puppeteer (getPuppeteerDir). Returns undefined when platform
  * detection fails (puppeteer default resolution takes over). Exported so
  * real-browser tests can probe launchability and skip on hosts missing
  * Chrome's system libraries.

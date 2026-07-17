@@ -8,17 +8,17 @@
  */
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "bun:test";
 import * as path from "node:path";
-import { Agent, type AgentTool } from "@oh-my-pi/pi-agent-core";
-import { ModelRegistry } from "@oh-my-pi/pi-coding-agent/config/model-registry";
-import { resetSettingsForTest, Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { InteractiveMode } from "@oh-my-pi/pi-coding-agent/modes/interactive-mode";
-import { initTheme } from "@oh-my-pi/pi-coding-agent/modes/theme/theme";
-import { AgentSession } from "@oh-my-pi/pi-coding-agent/session/agent-session";
-import { AuthStorage } from "@oh-my-pi/pi-coding-agent/session/auth-storage";
-import { SessionManager } from "@oh-my-pi/pi-coding-agent/session/session-manager";
-import { VIBE_TOOL_NAMES } from "@oh-my-pi/pi-coding-agent/tools/vibe";
-import { EventBus } from "@oh-my-pi/pi-coding-agent/utils/event-bus";
-import { TempDir } from "@oh-my-pi/pi-utils";
+import { Agent, type AgentTool } from "@reactor/agent-core";
+import { ModelRegistry } from "@reactor/coding-agent/config/model-registry";
+import { resetSettingsForTest, Settings } from "@reactor/coding-agent/config/settings";
+import { InteractiveMode } from "@reactor/coding-agent/modes/interactive-mode";
+import { initTheme } from "@reactor/coding-agent/modes/theme/theme";
+import { AgentSession } from "@reactor/coding-agent/session/agent-session";
+import { AuthStorage } from "@reactor/coding-agent/session/auth-storage";
+import { SessionManager } from "@reactor/coding-agent/session/session-manager";
+import { VIBE_TOOL_NAMES } from "@reactor/coding-agent/tools/vibe";
+import { EventBus } from "@reactor/coding-agent/utils/event-bus";
+import { TempDir } from "@reactor/utils";
 import { type } from "arktype";
 
 function stubTool(name: string): AgentTool {

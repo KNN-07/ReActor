@@ -7,31 +7,31 @@
 /// <reference types="./bun-imports.d.ts" />
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { formatHashlineHeader, InMemorySnapshotStore } from "@oh-my-pi/hashline";
-import type { AgentMessage, ResolvedThinkingLevel, ThinkingLevel } from "@oh-my-pi/pi-agent-core";
-import type { Model, ToolExample } from "@oh-my-pi/pi-ai";
-import { formatSessionDumpText, RpcClient } from "@oh-my-pi/pi-coding-agent";
-import { prompt } from "@oh-my-pi/pi-utils";
+import { formatHashlineHeader, InMemorySnapshotStore } from "@reactor/hashline";
+import type { AgentMessage, ResolvedThinkingLevel, ThinkingLevel } from "@reactor/agent-core";
+import type { Model, ToolExample } from "@reactor/ai";
+import { formatSessionDumpText, RpcClient } from "@reactor/coding-agent";
+import { prompt } from "@reactor/utils";
 import { diffLines } from "diff";
-import { formatDirectory } from "@oh-my-pi/typescript-edit-benchmark/formatter";
+import { formatDirectory } from "@reactor/typescript-edit-benchmark/formatter";
 import {
 	discoverSharedInfra,
 	InProcessClient,
 	type SharedInfra,
-} from "@oh-my-pi/typescript-edit-benchmark/in-process-client";
+} from "@reactor/typescript-edit-benchmark/in-process-client";
 import benchmarkRetryPrompt from "./prompts/benchmark-retry.md" with { type: "text" };
 import benchmarkSystemPrompt from "./prompts/benchmark-system.md" with { type: "text" };
 import benchmarkTaskPrompt from "./prompts/benchmark-task.md" with { type: "text" };
-import type { EditTask } from "@oh-my-pi/typescript-edit-benchmark/tasks";
+import type { EditTask } from "@reactor/typescript-edit-benchmark/tasks";
 import {
 	verifyExpectedFileSubset,
 	verifyExpectedFiles,
-} from "@oh-my-pi/typescript-edit-benchmark/verify";
+} from "@reactor/typescript-edit-benchmark/verify";
 
 const REPO_ROOT = path.resolve(import.meta.dir, "..", "..", "..", "..");
 const RUNS_DIR = path.join(REPO_ROOT, "runs");
 const TMP = path.join(RUNS_DIR, `rb-${Math.random().toString(36).slice(2, 10)}`);
-const CLI_PATH = Bun.fileURLToPath(import.meta.resolve("@oh-my-pi/pi-coding-agent/cli"));
+const CLI_PATH = Bun.fileURLToPath(import.meta.resolve("@reactor/coding-agent/cli"));
 
 function formatLogPath(logFile: string): string {
 	const relativePath = path.relative(REPO_ROOT, logFile);
@@ -1049,11 +1049,11 @@ async function runSingleTask(
 	let providerFailureRetries = 0;
 
 	const previousEnv = {
-		PI_EDIT_VARIANT: process.env.PI_EDIT_VARIANT,
-		PI_EDIT_FUZZY: process.env.PI_EDIT_FUZZY,
-		PI_EDIT_FUZZY_THRESHOLD: process.env.PI_EDIT_FUZZY_THRESHOLD,
-		PI_STRICT_EDIT_MODE: process.env.PI_STRICT_EDIT_MODE,
-		PI_NO_TITLE: process.env.PI_NO_TITLE,
+		REACTOR_EDIT_VARIANT: process.env.REACTOR_EDIT_VARIANT,
+		REACTOR_EDIT_FUZZY: process.env.REACTOR_EDIT_FUZZY,
+		REACTOR_EDIT_FUZZY_THRESHOLD: process.env.REACTOR_EDIT_FUZZY_THRESHOLD,
+		REACTOR_STRICT_EDIT_MODE: process.env.REACTOR_STRICT_EDIT_MODE,
+		REACTOR_NO_TITLE: process.env.REACTOR_NO_TITLE,
 	};
 	try {
 		const sessionSetup = await prepareBenchmarkSessionSetup({
@@ -1068,14 +1068,14 @@ async function runSingleTask(
 			`{"type":"meta","task":"${task.id}","run":${runIndex},"workDir":"${cwd}","providerSessionId":${JSON.stringify(sessionSetup.providerSessionId)}}\n`,
 		);
 
-		if (config.editVariant !== undefined) process.env.PI_EDIT_VARIANT = config.editVariant;
+		if (config.editVariant !== undefined) process.env.REACTOR_EDIT_VARIANT = config.editVariant;
 		if (config.editFuzzy !== undefined)
-			process.env.PI_EDIT_FUZZY = config.editFuzzy === "auto" ? "auto" : config.editFuzzy ? "1" : "0";
+			process.env.REACTOR_EDIT_FUZZY = config.editFuzzy === "auto" ? "auto" : config.editFuzzy ? "1" : "0";
 		if (config.editFuzzyThreshold !== undefined)
-			process.env.PI_EDIT_FUZZY_THRESHOLD =
+			process.env.REACTOR_EDIT_FUZZY_THRESHOLD =
 				config.editFuzzyThreshold === "auto" ? "auto" : String(config.editFuzzyThreshold);
-		process.env.PI_STRICT_EDIT_MODE = "1";
-		process.env.PI_NO_TITLE = "1";
+		process.env.REACTOR_STRICT_EDIT_MODE = "1";
+		process.env.REACTOR_NO_TITLE = "1";
 
 		const useInProcess = config.inProcess !== false;
 		const client: BenchmarkClient = useInProcess
@@ -1365,11 +1365,11 @@ async function runSingleTask(
 				process.env[key] = value;
 			}
 		};
-		restoreEnvKey("PI_EDIT_VARIANT");
-		restoreEnvKey("PI_EDIT_FUZZY");
-		restoreEnvKey("PI_EDIT_FUZZY_THRESHOLD");
-		restoreEnvKey("PI_STRICT_EDIT_MODE");
-		restoreEnvKey("PI_NO_TITLE");
+		restoreEnvKey("REACTOR_EDIT_VARIANT");
+		restoreEnvKey("REACTOR_EDIT_FUZZY");
+		restoreEnvKey("REACTOR_EDIT_FUZZY_THRESHOLD");
+		restoreEnvKey("REACTOR_STRICT_EDIT_MODE");
+		restoreEnvKey("REACTOR_NO_TITLE");
 	}
 
 	const duration = Date.now() - startTime;

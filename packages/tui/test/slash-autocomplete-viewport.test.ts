@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
-import { Container, Editor, TUI } from "@oh-my-pi/pi-tui";
-import type { AutocompleteItem, AutocompleteProvider } from "@oh-my-pi/pi-tui/autocomplete";
+import { Container, Editor, TUI } from "@reactor/tui";
+import type { AutocompleteItem, AutocompleteProvider } from "@reactor/tui/autocomplete";
 import { defaultEditorTheme } from "./test-themes";
 import { VirtualTerminal } from "./virtual-terminal";
 

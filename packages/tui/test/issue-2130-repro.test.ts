@@ -1,8 +1,8 @@
 import { describe, expect, it } from "bun:test";
-import { type Component, type NativeScrollbackLiveRegion, TUI } from "@oh-my-pi/pi-tui";
+import { type Component, type NativeScrollbackLiveRegion, TUI } from "@reactor/tui";
 import { VirtualTerminal } from "./virtual-terminal";
 
-// Regression test for https://github.com/can1357/oh-my-pi/issues/2130
+// Regression test for https://github.com/KNN-07/ReActor/issues/2130
 //
 // Inside tmux (and other multiplexers), `requestRender(true, { clearScrollback: true })`
 // dispatches the `sessionReplace` intent, which re-emits the entire transcript

@@ -1,19 +1,19 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "bun:test";
 import * as path from "node:path";
-import { Agent } from "@oh-my-pi/pi-agent-core";
-import type { Model } from "@oh-my-pi/pi-ai";
-import { ModelRegistry } from "@oh-my-pi/pi-coding-agent/config/model-registry";
-import { resetSettingsForTest, Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { GoalTool } from "@oh-my-pi/pi-coding-agent/goals/tools/goal-tool";
-import { InteractiveMode } from "@oh-my-pi/pi-coding-agent/modes/interactive-mode";
-import { initTheme } from "@oh-my-pi/pi-coding-agent/modes/theme/theme";
-import { AgentSession } from "@oh-my-pi/pi-coding-agent/session/agent-session";
-import { AuthStorage } from "@oh-my-pi/pi-coding-agent/session/auth-storage";
-import { normalizeCustomMessagePayload } from "@oh-my-pi/pi-coding-agent/session/messages";
-import { SessionManager } from "@oh-my-pi/pi-coding-agent/session/session-manager";
-import { createTools, type Tool, type ToolSession } from "@oh-my-pi/pi-coding-agent/tools";
-import type { TodoPhase } from "@oh-my-pi/pi-coding-agent/tools/todo";
-import { TempDir } from "@oh-my-pi/pi-utils";
+import { Agent } from "@reactor/agent-core";
+import type { Model } from "@reactor/ai";
+import { ModelRegistry } from "@reactor/coding-agent/config/model-registry";
+import { resetSettingsForTest, Settings } from "@reactor/coding-agent/config/settings";
+import { GoalTool } from "@reactor/coding-agent/goals/tools/goal-tool";
+import { InteractiveMode } from "@reactor/coding-agent/modes/interactive-mode";
+import { initTheme } from "@reactor/coding-agent/modes/theme/theme";
+import { AgentSession } from "@reactor/coding-agent/session/agent-session";
+import { AuthStorage } from "@reactor/coding-agent/session/auth-storage";
+import { normalizeCustomMessagePayload } from "@reactor/coding-agent/session/messages";
+import { SessionManager } from "@reactor/coding-agent/session/session-manager";
+import { createTools, type Tool, type ToolSession } from "@reactor/coding-agent/tools";
+import type { TodoPhase } from "@reactor/coding-agent/tools/todo";
+import { TempDir } from "@reactor/utils";
 
 function createToolSession(cwd: string, settings: Settings, overrides: Partial<ToolSession> = {}): ToolSession {
 	return {

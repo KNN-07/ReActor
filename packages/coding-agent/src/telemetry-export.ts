@@ -1,11 +1,11 @@
 /**
  * OTLP telemetry export bootstrap.
  *
- * oh-my-pi's agent core (`@oh-my-pi/pi-agent-core`) emits OpenTelemetry GenAI
+ * ReActor's agent core (`@reactor/agent-core`) emits OpenTelemetry GenAI
  * spans through the global `@opentelemetry/api` tracer, and exposes run-level
  * callbacks for metrics/log pipelines. This module registers the OTLP/proto
  * trace, log, and metric SDK providers when the standard `OTEL_*` endpoint env
- * vars are set so `omp` can be observed by any OTLP collector without vendor
+ * vars are set so `reactor` can be observed by any OTLP collector without vendor
  * coupling.
  *
  * Only the `http/protobuf` transport is supported — an
@@ -14,15 +14,7 @@
  * family validated under Bun; the 1.x OTLP line deadlocks when its
  * `req.on("close")` handler fires after a successful export.
  */
-import type {
-	AgentRunCoverage,
-	AgentRunSummary,
-	AgentTelemetryConfig,
-	AgentTelemetryWarning,
-	ChatUsageEvent,
-	ToolStatus,
-} from "@oh-my-pi/pi-agent-core";
-import { logger, postmortem } from "@oh-my-pi/pi-utils";
+
 import {
 	type Attributes,
 	type AttributeValue,
@@ -42,15 +34,24 @@ import { BatchLogRecordProcessor, LoggerProvider } from "@opentelemetry/sdk-logs
 import { MeterProvider, PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
 import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-base";
 import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
+import type {
+	AgentRunCoverage,
+	AgentRunSummary,
+	AgentTelemetryConfig,
+	AgentTelemetryWarning,
+	ChatUsageEvent,
+	ToolStatus,
+} from "@reactor/agent-core";
+import { logger, postmortem } from "@reactor/utils";
 
 /**
- * Periodic flush interval. A long-lived `omp` process (the ACP server is
+ * Periodic flush interval. A long-lived `reactor` process (the ACP server is
  * spawned once and reused across many turns) would otherwise hold finished
  * telemetry until a batch window elapses or the process exits.
  */
 const FLUSH_INTERVAL_MS = 30_000;
 
-const SERVICE_NAME = "oh-my-pi";
+const SERVICE_NAME = "ReActor";
 
 type TelemetrySignal = "trace" | "log" | "metric";
 type OtelLogLevel = "none" | logger.LogLevel;
@@ -166,7 +167,7 @@ async function registerProviders(signalConfig: SignalConfig): Promise<void> {
 			readers: [new PeriodicExportingMetricReader({ exporter })],
 		});
 		metrics.setGlobalMeterProvider(meterProvider);
-		metricRecorder = new AgentMetricRecorder(metrics.getMeter("@oh-my-pi/pi-coding-agent"));
+		metricRecorder = new AgentMetricRecorder(metrics.getMeter("@reactor/coding-agent"));
 	}
 
 	if (signalConfig.log) {
@@ -176,13 +177,13 @@ async function registerProviders(signalConfig: SignalConfig): Promise<void> {
 			processors: [new BatchLogRecordProcessor({ exporter })],
 		});
 		logs.setGlobalLoggerProvider(logProvider);
-		otelLogger = logProvider.getLogger("@oh-my-pi/pi-coding-agent");
+		otelLogger = logProvider.getLogger("@reactor/coding-agent");
 		unregisterLogSink = logger.registerLogSink(event => {
 			emitOtelLog(
 				event.level,
 				event.message,
 				logAttributesFromContext(event.context),
-				"pi.omp.log",
+				"pi.reactor.log",
 				event.timestamp,
 			);
 		});
@@ -268,35 +269,35 @@ class AgentMetricRecorder {
 			description: "Token usage reported by GenAI chat calls.",
 			unit: "{token}",
 		});
-		this.#chatCostUsd = meter.createCounter("pi.omp.agent.chat.cost.estimated_usd", {
+		this.#chatCostUsd = meter.createCounter("pi.reactor.agent.chat.cost.estimated_usd", {
 			description: "Estimated USD cost for completed chat calls.",
 			unit: "USD",
 		});
-		this.#runs = meter.createCounter("pi.omp.agent.runs", {
+		this.#runs = meter.createCounter("pi.reactor.agent.runs", {
 			description: "Completed agent runs.",
 			unit: "{run}",
 		});
-		this.#steps = meter.createCounter("pi.omp.agent.steps", {
+		this.#steps = meter.createCounter("pi.reactor.agent.steps", {
 			description: "Agent loop steps completed inside a run.",
 			unit: "{step}",
 		});
-		this.#chatCalls = meter.createCounter("pi.omp.agent.chat.calls", {
+		this.#chatCalls = meter.createCounter("pi.reactor.agent.chat.calls", {
 			description: "Chat calls completed inside agent runs.",
 			unit: "{call}",
 		});
-		this.#chatDurationMs = meter.createHistogram("pi.omp.agent.chat.duration", {
+		this.#chatDurationMs = meter.createHistogram("pi.reactor.agent.chat.duration", {
 			description: "Total chat latency observed in an agent run.",
 			unit: "ms",
 		});
-		this.#toolCalls = meter.createCounter("pi.omp.agent.tool.calls", {
+		this.#toolCalls = meter.createCounter("pi.reactor.agent.tool.calls", {
 			description: "Tool calls completed inside agent runs.",
 			unit: "{call}",
 		});
-		this.#toolDurationMs = meter.createHistogram("pi.omp.agent.tool.duration", {
+		this.#toolDurationMs = meter.createHistogram("pi.reactor.agent.tool.duration", {
 			description: "Total tool latency observed in an agent run.",
 			unit: "ms",
 		});
-		this.#errors = meter.createCounter("pi.omp.agent.errors", {
+		this.#errors = meter.createCounter("pi.reactor.agent.errors", {
 			description: "Errors observed in chat and tool execution.",
 			unit: "{error}",
 		});
@@ -326,11 +327,11 @@ class AgentMetricRecorder {
 
 	recordRun(summary: AgentRunSummary, coverage: AgentRunCoverage): void {
 		const runAttrs = metricAttributes({
-			"pi.omp.agent.models_used.count": coverage.modelsUsed.length,
-			"pi.omp.agent.providers_used.count": coverage.providersUsed.length,
-			"pi.omp.agent.tools_available.count": coverage.toolsAvailable.length,
-			"pi.omp.agent.tools_invoked.count": coverage.toolsInvoked.length,
-			"pi.omp.agent.tools_unused.count": coverage.toolsUnused.length,
+			"pi.reactor.agent.models_used.count": coverage.modelsUsed.length,
+			"pi.reactor.agent.providers_used.count": coverage.providersUsed.length,
+			"pi.reactor.agent.tools_available.count": coverage.toolsAvailable.length,
+			"pi.reactor.agent.tools_invoked.count": coverage.toolsInvoked.length,
+			"pi.reactor.agent.tools_unused.count": coverage.toolsUnused.length,
 		});
 
 		this.#runs.add(1, runAttrs);
@@ -348,7 +349,8 @@ class AgentMetricRecorder {
 			if (counters.totalLatencyMs > 0) this.#toolDurationMs.record(counters.totalLatencyMs, toolAttrs);
 			for (const status of TOOL_STATUSES) {
 				const count = counters[status];
-				if (count > 0) this.#toolCalls.add(count, metricAttributes({ ...toolAttrs, "pi.omp.tool.status": status }));
+				if (count > 0)
+					this.#toolCalls.add(count, metricAttributes({ ...toolAttrs, "pi.reactor.tool.status": status }));
 			}
 		}
 		for (const errorType in summary.errors.byType) {
@@ -383,33 +385,33 @@ function emitRunSummaryLog(summary: AgentRunSummary, coverage: AgentRunCoverage)
 		"info",
 		"agent run completed",
 		{
-			"pi.omp.agent.step_count": summary.stepCount,
-			"pi.omp.agent.chats.total": summary.chats.total,
-			"pi.omp.agent.chats.total_latency_ms": summary.chats.totalLatencyMs,
-			"pi.omp.agent.tools.total": summary.tools.total,
-			"pi.omp.agent.tools.ok": summary.tools.ok,
-			"pi.omp.agent.tools.error": summary.tools.error,
-			"pi.omp.agent.tools.skipped": summary.tools.skipped,
-			"pi.omp.agent.tools.blocked": summary.tools.blocked,
-			"pi.omp.agent.tools.timeout": summary.tools.timeout,
-			"pi.omp.agent.tools.aborted": summary.tools.aborted,
-			"pi.omp.agent.tools.total_latency_ms": summary.tools.totalLatencyMs,
-			"pi.omp.agent.usage.input_tokens": summary.usage.inputTokens,
-			"pi.omp.agent.usage.output_tokens": summary.usage.outputTokens,
-			"pi.omp.agent.usage.cached_input_tokens": summary.usage.cachedInputTokens,
-			"pi.omp.agent.usage.cache_write_tokens": summary.usage.cacheWriteTokens,
-			"pi.omp.agent.usage.reasoning_output_tokens": summary.usage.reasoningOutputTokens,
-			"pi.omp.agent.usage.total_tokens": summary.usage.totalTokens,
-			"pi.omp.agent.cost.estimated_usd": summary.cost.estimatedUsd,
-			"pi.omp.agent.cost.unavailable_reasons": summary.cost.unavailableReasons.join(","),
-			"pi.omp.agent.errors.total": summary.errors.total,
-			"pi.omp.agent.coverage.tools_available": coverage.toolsAvailable.join(","),
-			"pi.omp.agent.coverage.tools_invoked": coverage.toolsInvoked.join(","),
-			"pi.omp.agent.coverage.tools_unused": coverage.toolsUnused.join(","),
-			"pi.omp.agent.coverage.models_used": coverage.modelsUsed.join(","),
-			"pi.omp.agent.coverage.providers_used": coverage.providersUsed.join(","),
+			"pi.reactor.agent.step_count": summary.stepCount,
+			"pi.reactor.agent.chats.total": summary.chats.total,
+			"pi.reactor.agent.chats.total_latency_ms": summary.chats.totalLatencyMs,
+			"pi.reactor.agent.tools.total": summary.tools.total,
+			"pi.reactor.agent.tools.ok": summary.tools.ok,
+			"pi.reactor.agent.tools.error": summary.tools.error,
+			"pi.reactor.agent.tools.skipped": summary.tools.skipped,
+			"pi.reactor.agent.tools.blocked": summary.tools.blocked,
+			"pi.reactor.agent.tools.timeout": summary.tools.timeout,
+			"pi.reactor.agent.tools.aborted": summary.tools.aborted,
+			"pi.reactor.agent.tools.total_latency_ms": summary.tools.totalLatencyMs,
+			"pi.reactor.agent.usage.input_tokens": summary.usage.inputTokens,
+			"pi.reactor.agent.usage.output_tokens": summary.usage.outputTokens,
+			"pi.reactor.agent.usage.cached_input_tokens": summary.usage.cachedInputTokens,
+			"pi.reactor.agent.usage.cache_write_tokens": summary.usage.cacheWriteTokens,
+			"pi.reactor.agent.usage.reasoning_output_tokens": summary.usage.reasoningOutputTokens,
+			"pi.reactor.agent.usage.total_tokens": summary.usage.totalTokens,
+			"pi.reactor.agent.cost.estimated_usd": summary.cost.estimatedUsd,
+			"pi.reactor.agent.cost.unavailable_reasons": summary.cost.unavailableReasons.join(","),
+			"pi.reactor.agent.errors.total": summary.errors.total,
+			"pi.reactor.agent.coverage.tools_available": coverage.toolsAvailable.join(","),
+			"pi.reactor.agent.coverage.tools_invoked": coverage.toolsInvoked.join(","),
+			"pi.reactor.agent.coverage.tools_unused": coverage.toolsUnused.join(","),
+			"pi.reactor.agent.coverage.models_used": coverage.modelsUsed.join(","),
+			"pi.reactor.agent.coverage.providers_used": coverage.providersUsed.join(","),
 		},
-		"pi.omp.agent.run.completed",
+		"pi.reactor.agent.run.completed",
 	);
 }
 
@@ -418,7 +420,7 @@ function emitTelemetryWarningLog(warning: AgentTelemetryWarning): void {
 		code: warning.code,
 		error: warning.error,
 	});
-	emitOtelLog("warn", warning.message, attrs, "pi.omp.telemetry.warning");
+	emitOtelLog("warn", warning.message, attrs, "pi.reactor.telemetry.warning");
 }
 
 function emitOtelLog(

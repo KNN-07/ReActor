@@ -2,12 +2,12 @@
  * Print mode (single-shot): Send prompts, output result, exit.
  *
  * Used for:
- * - `omp -p "prompt"` - text output
- * - `omp --mode json "prompt"` - JSON event stream
+ * - `reactor -p "prompt"` - text output
+ * - `reactor --mode json "prompt"` - JSON event stream
  */
-import type { AgentMessage } from "@oh-my-pi/pi-agent-core";
-import type { AssistantMessage, ImageContent } from "@oh-my-pi/pi-ai";
-import { logger, sanitizeText } from "@oh-my-pi/pi-utils";
+import type { AgentMessage } from "@reactor/agent-core";
+import type { AssistantMessage, ImageContent } from "@reactor/ai";
+import { logger, sanitizeText } from "@reactor/utils";
 import { type AgentSession, type AgentSessionEvent, SHUTDOWN_CONSOLIDATE_BUDGET_MS } from "../session/agent-session";
 import { isSilentAbort } from "../session/messages";
 import { flushTelemetryExport } from "../telemetry-export";
@@ -149,7 +149,7 @@ export async function runPrintMode(session: AgentSession, options: PrintModeOpti
 				// HERE so error spans reach the exporter (the postmortem `exit`
 				// handler can't await) and the browser reaper installed in
 				// `dispose()` (releaseTabsForOwner) actually runs — otherwise an
-				// OMP-owned Chromium survives this exit (issue #5643). `dispose()`
+				// ReActor-owned Chromium survives this exit (issue #5643). `dispose()`
 				// is idempotent, so the unreachable call below is a harmless no-op.
 				await flushTelemetryExport();
 				await session.dispose({ mnemopiConsolidateTimeoutMs: SHUTDOWN_CONSOLIDATE_BUDGET_MS });

@@ -1,11 +1,7 @@
 import { describe, expect, it } from "bun:test";
-import { getThemeByName } from "@oh-my-pi/pi-coding-agent/modes/theme/theme";
-import {
-	recallToolRenderer,
-	reflectToolRenderer,
-	retainToolRenderer,
-} from "@oh-my-pi/pi-coding-agent/tools/memory-render";
-import { sanitizeText } from "@oh-my-pi/pi-utils";
+import { getThemeByName } from "@reactor/coding-agent/modes/theme/theme";
+import { recallToolRenderer, reflectToolRenderer, retainToolRenderer } from "@reactor/coding-agent/tools/memory-render";
+import { sanitizeText } from "@reactor/utils";
 
 async function theme() {
 	const t = await getThemeByName("dark");

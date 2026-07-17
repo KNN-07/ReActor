@@ -1,13 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "bun:test";
 import { scheduler } from "node:timers/promises";
-import { streamSimple } from "@oh-my-pi/pi-ai";
+import { streamSimple } from "@reactor/ai";
 import {
 	getOpenAICodexTransportDetails,
 	getOpenAICodexWebSocketDebugStats,
 	prewarmOpenAICodexResponses,
 	resetOpenAICodexHistoryAfterCompaction,
 	streamOpenAICodexResponses,
-} from "@oh-my-pi/pi-ai/providers/openai-codex-responses";
+} from "@reactor/ai/providers/openai-codex-responses";
 import type {
 	CodexCompactionRequestContext,
 	Context,
@@ -15,19 +15,19 @@ import type {
 	Model,
 	ModelSpec,
 	ProviderSessionState,
-} from "@oh-my-pi/pi-ai/types";
-import { __resetProxyCache } from "@oh-my-pi/pi-ai/utils/proxy";
-import { buildModel } from "@oh-my-pi/pi-catalog/build";
-import * as piUtils from "@oh-my-pi/pi-utils";
+} from "@reactor/ai/types";
+import { __resetProxyCache } from "@reactor/ai/utils/proxy";
+import { buildModel } from "@reactor/catalog/build";
+import * as piUtils from "@reactor/utils";
 
 const { getAgentDir, setAgentDir, TempDir } = piUtils;
 
 const originalAgentDir = getAgentDir();
 const originalWebSocket = global.WebSocket;
-const originalCodexWebSocketV2 = Bun.env.PI_CODEX_WEBSOCKET_V2;
+const originalCodexWebSocketV2 = Bun.env.REACTOR_CODEX_WEBSOCKET_V2;
 const originalProxyEnv: Record<string, string | undefined> = {
-	PI_PROXY: Bun.env.PI_PROXY,
-	PI_PROXY_CODEX_PROXY_TEST: Bun.env.PI_PROXY_CODEX_PROXY_TEST,
+	REACTOR_PROXY: Bun.env.REACTOR_PROXY,
+	REACTOR_PROXY_CODEX_PROXY_TEST: Bun.env.REACTOR_PROXY_CODEX_PROXY_TEST,
 	HTTPS_PROXY: Bun.env.HTTPS_PROXY,
 	https_proxy: Bun.env.https_proxy,
 	ALL_PROXY: Bun.env.ALL_PROXY,
@@ -54,7 +54,7 @@ beforeEach(() => {
 afterEach(() => {
 	global.WebSocket = originalWebSocket;
 	setAgentDir(originalAgentDir);
-	restoreEnv("PI_CODEX_WEBSOCKET_V2", originalCodexWebSocketV2);
+	restoreEnv("REACTOR_CODEX_WEBSOCKET_V2", originalCodexWebSocketV2);
 	vi.useRealTimers();
 	for (const key in originalProxyEnv) restoreEnv(key, originalProxyEnv[key]);
 	__resetProxyCache();
@@ -1396,7 +1396,7 @@ describe("openai-codex streaming", () => {
 
 	it("passes the provider proxy to websocket handshakes", async () => {
 		const proxy = "socks5://127.0.0.1:7890";
-		Bun.env.PI_PROXY_CODEX_PROXY_TEST = proxy;
+		Bun.env.REACTOR_PROXY_CODEX_PROXY_TEST = proxy;
 		__resetProxyCache();
 		let capturedProxy: string | undefined;
 		class ProxyCaptureWebSocket extends MockWebSocket {
@@ -1422,7 +1422,7 @@ describe("openai-codex streaming", () => {
 			expect(capturedProxy).toBe(proxy);
 		} finally {
 			for (const state of providerSessionState.values()) state.close();
-			delete Bun.env.PI_PROXY_CODEX_PROXY_TEST;
+			delete Bun.env.REACTOR_PROXY_CODEX_PROXY_TEST;
 		}
 	});
 
@@ -1465,7 +1465,7 @@ describe("openai-codex streaming", () => {
 	});
 
 	it("bypasses configured proxies for NO_PROXY websocket targets", async () => {
-		Bun.env.PI_PROXY_CODEX_PROXY_TEST = "http://127.0.0.1:7890";
+		Bun.env.REACTOR_PROXY_CODEX_PROXY_TEST = "http://127.0.0.1:7890";
 		Bun.env.NO_PROXY = "chatgpt.com:443";
 		__resetProxyCache();
 		let capturedProxy: string | undefined;
@@ -3606,7 +3606,7 @@ describe("openai-codex streaming", () => {
 	it("uses websocket v2 beta header when v2 mode is enabled", async () => {
 		const tempDir = TempDir.createSync("@pi-codex-stream-");
 		setAgentDir(tempDir.path());
-		Bun.env.PI_CODEX_WEBSOCKET_V2 = "1";
+		Bun.env.REACTOR_CODEX_WEBSOCKET_V2 = "1";
 
 		const payload = Buffer.from(
 			JSON.stringify({ "https://api.openai.com/auth": { chatgpt_account_id: "acc_test" } }),

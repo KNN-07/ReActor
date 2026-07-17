@@ -2,23 +2,23 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { callToolJson, handleJsonRpc, runStdio } from "@oh-my-pi/pi-mnemopi/mcp-server";
-import { getToolDefinitions, handleToolCall, TOOLS } from "@oh-my-pi/pi-mnemopi/mcp-tools";
+import { callToolJson, handleJsonRpc, runStdio } from "@reactor/mnemopi/mcp-server";
+import { getToolDefinitions, handleToolCall, TOOLS } from "@reactor/mnemopi/mcp-tools";
 
 let dataDir: string;
 
 beforeEach(() => {
 	dataDir = mkdtempSync(join(tmpdir(), "mnemopi-mcp-server-"));
-	process.env.MNEMOPI_DATA_DIR = dataDir;
-	process.env.MNEMOPI_NO_EMBEDDINGS = "1";
-	delete process.env.MNEMOPI_MCP_BANK;
+	process.env.REACTOR_MNEMOPI_DATA_DIR = dataDir;
+	process.env.REACTOR_MNEMOPI_NO_EMBEDDINGS = "1";
+	delete process.env.REACTOR_MNEMOPI_MCP_BANK;
 });
 
 afterEach(() => {
 	rmSync(dataDir, { recursive: true, force: true });
-	delete process.env.MNEMOPI_DATA_DIR;
-	delete process.env.MNEMOPI_NO_EMBEDDINGS;
-	delete process.env.MNEMOPI_MCP_BANK;
+	delete process.env.REACTOR_MNEMOPI_DATA_DIR;
+	delete process.env.REACTOR_MNEMOPI_NO_EMBEDDINGS;
+	delete process.env.REACTOR_MNEMOPI_MCP_BANK;
 });
 
 function streamFromText(text: string): ReadableStream<Uint8Array> {
@@ -174,8 +174,8 @@ describe("MCP JSON handlers", () => {
 		expect(sleep.bank).toBe("work");
 	});
 
-	it("uses MNEMOPI_MCP_BANK when a call omits bank", async () => {
-		process.env.MNEMOPI_MCP_BANK = "env-bank";
+	it("uses REACTOR_MNEMOPI_MCP_BANK when a call omits bank", async () => {
+		process.env.REACTOR_MNEMOPI_MCP_BANK = "env-bank";
 		const remembered = await handleToolCall("mnemopi_remember", { content: "env bank memory" });
 		expect(remembered.bank).toBe("env-bank");
 		const stats = await handleToolCall("mnemopi_stats", {});

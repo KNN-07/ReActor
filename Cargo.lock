@@ -2293,7 +2293,7 @@ dependencies = [
  "jaq-std",
  "memmap2",
  "parking_lot",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "tempfile",
  "unicode-width 0.1.14",
  "yansi",
@@ -3263,8 +3263,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "pi-ast"
-version = "17.0.2"
+name = "reactor-ast"
+version = "0.1.0"
 dependencies = [
  "anyhow",
  "ast-grep-core",
@@ -3332,8 +3332,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "pi-iso"
-version = "17.0.2"
+name = "reactor-iso"
+version = "0.1.0"
 dependencies = [
  "async-trait",
  "libc",
@@ -3344,8 +3344,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "pi-natives"
-version = "17.0.2"
+name = "reactor-natives"
+version = "0.1.0"
 dependencies = [
  "anyhow",
  "arboard",
@@ -3371,11 +3371,11 @@ dependencies = [
  "napi-derive",
  "parking_lot",
  "phf 0.13.1",
- "pi-ast",
- "pi-iso",
- "pi-shell",
- "pi-uutils-ctx",
- "pi-walker",
+ "reactor-ast",
+ "reactor-iso",
+ "reactor-shell",
+ "reactor-uutils-ctx",
+ "reactor-walker",
  "png",
  "portable-pty",
  "rayon",
@@ -3397,8 +3397,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "pi-shell"
-version = "17.0.2"
+name = "reactor-shell"
+version = "0.1.0"
 dependencies = [
  "anyhow",
  "brush-builtins",
@@ -3413,10 +3413,10 @@ dependencies = [
  "libc",
  "os_pipe",
  "parking_lot",
- "pi-uutils-ctx",
- "pi-walker",
- "pi_uu_diff",
- "pi_uu_grep",
+ "reactor-uutils-ctx",
+ "reactor-walker",
+ "reactor_uu_diff",
+ "reactor_uu_grep",
  "regex",
  "serde",
  "serde_json",
@@ -3474,15 +3474,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "pi-uutils-ctx"
+name = "reactor-uutils-ctx"
 version = "0.1.0"
 dependencies = [
  "libc",
 ]
 
 [[package]]
-name = "pi-walker"
-version = "17.0.2"
+name = "reactor-walker"
+version = "0.1.0"
 dependencies = [
  "dashmap",
  "globset",
@@ -3494,18 +3494,18 @@ dependencies = [
 ]
 
 [[package]]
-name = "pi_uu_diff"
+name = "reactor_uu_diff"
 version = "0.8.0"
 dependencies = [
  "clap",
  "parking_lot",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "similar 3.1.1",
  "tempfile",
 ]
 
 [[package]]
-name = "pi_uu_grep"
+name = "reactor_uu_grep"
 version = "0.8.0"
 dependencies = [
  "clap",
@@ -3518,8 +3518,8 @@ dependencies = [
  "grep-searcher",
  "ignore",
  "parking_lot",
- "pi-uutils-ctx",
- "pi-walker",
+ "reactor-uutils-ctx",
+ "reactor-walker",
  "serde_json",
 ]
 
@@ -5323,7 +5323,7 @@ name = "uu_b2sum"
 version = "0.8.0"
 dependencies = [
  "clap",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "uu_checksum_common",
  "uucore 0.8.0",
 ]
@@ -5333,7 +5333,7 @@ name = "uu_base32"
 version = "0.8.0"
 dependencies = [
  "clap",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "uucore 0.8.0",
 ]
 
@@ -5343,7 +5343,7 @@ version = "0.8.0"
 dependencies = [
  "clap",
  "parking_lot",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "tempfile",
  "uu_base32",
  "uucore 0.8.0",
@@ -5354,7 +5354,7 @@ name = "uu_basename"
 version = "0.8.0"
 dependencies = [
  "clap",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "uucore 0.8.0",
 ]
 
@@ -5364,7 +5364,7 @@ version = "0.8.0"
 dependencies = [
  "clap",
  "memchr",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "thiserror 2.0.18",
  "uucore 0.8.0",
 ]
@@ -5377,7 +5377,7 @@ dependencies = [
  "clap",
  "hex",
  "os_display",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "uucore 0.8.0",
 ]
 
@@ -5386,7 +5386,7 @@ name = "uu_comm"
 version = "0.8.0"
 dependencies = [
  "clap",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "uucore 0.8.0",
 ]
 
@@ -5397,7 +5397,7 @@ dependencies = [
  "bstr",
  "clap",
  "memchr",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "uucore 0.8.0",
 ]
 
@@ -5409,7 +5409,7 @@ dependencies = [
  "jiff",
  "parking_lot",
  "parse_datetime",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "regex",
  "rustix",
  "tempfile",
@@ -5422,7 +5422,7 @@ version = "0.8.0"
 dependencies = [
  "clap",
  "parking_lot",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "uucore 0.8.0",
 ]
 
@@ -5438,8 +5438,8 @@ dependencies = [
  "nix 0.29.0",
  "onig",
  "parking_lot",
- "pi-uutils-ctx",
- "pi-walker",
+ "reactor-uutils-ctx",
+ "reactor-walker",
  "regex",
  "tempfile",
  "uucore 0.0.30",
@@ -5451,7 +5451,7 @@ version = "0.8.0"
 dependencies = [
  "clap",
  "memchr",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "thiserror 2.0.18",
  "uucore 0.8.0",
 ]
@@ -5464,7 +5464,7 @@ dependencies = [
  "dns-lookup",
  "hostname",
  "parking_lot",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "uucore 0.8.0",
  "windows-sys 0.61.2",
 ]
@@ -5475,7 +5475,7 @@ version = "0.8.0"
 dependencies = [
  "clap",
  "parking_lot",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "tempfile",
  "thiserror 2.0.18",
  "uucore 0.8.0",
@@ -5490,7 +5490,7 @@ dependencies = [
  "glob",
  "hostname",
  "lscolors",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "rustc-hash 2.1.3",
  "thiserror 2.0.18",
  "uucore 0.8.0",
@@ -5511,7 +5511,7 @@ name = "uu_mkdir"
 version = "0.8.0"
 dependencies = [
  "clap",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "rustix",
  "uucore 0.8.0",
 ]
@@ -5522,7 +5522,7 @@ version = "0.8.0"
 dependencies = [
  "clap",
  "parking_lot",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "rand 0.10.2",
  "tempfile",
  "thiserror 2.0.18",
@@ -5537,7 +5537,7 @@ dependencies = [
  "fs_extra",
  "indicatif",
  "libc",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "rustc-hash 2.1.3",
  "thiserror 2.0.18",
  "uucore 0.8.0",
@@ -5551,7 +5551,7 @@ dependencies = [
  "clap",
  "libc",
  "parking_lot",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "uucore 0.8.0",
 ]
 
@@ -5560,7 +5560,7 @@ name = "uu_paste"
 version = "0.8.0"
 dependencies = [
  "clap",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "uucore 0.8.0",
 ]
 
@@ -5570,7 +5570,7 @@ version = "0.8.0"
 dependencies = [
  "clap",
  "parking_lot",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "uucore 0.8.0",
 ]
 
@@ -5580,7 +5580,7 @@ version = "0.8.0"
 dependencies = [
  "clap",
  "parking_lot",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "tempfile",
  "uucore 0.8.0",
 ]
@@ -5591,7 +5591,7 @@ version = "0.8.0"
 dependencies = [
  "clap",
  "parking_lot",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "tempfile",
  "uucore 0.8.0",
 ]
@@ -5603,7 +5603,7 @@ dependencies = [
  "clap",
  "indicatif",
  "libc",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "thiserror 2.0.18",
  "uucore 0.8.0",
  "windows-sys 0.61.2",
@@ -5618,7 +5618,7 @@ dependencies = [
  "memchr",
  "memmap2",
  "parking_lot",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "regex",
  "tempfile",
  "uucore 0.9.0",
@@ -5633,7 +5633,7 @@ dependencies = [
  "num-bigint",
  "num-traits",
  "parking_lot",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "thiserror 2.0.18",
  "uucore 0.8.0",
 ]
@@ -5643,7 +5643,7 @@ name = "uu_sha1sum"
 version = "0.8.0"
 dependencies = [
  "clap",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "uu_checksum_common",
  "uucore 0.8.0",
 ]
@@ -5653,7 +5653,7 @@ name = "uu_sha224sum"
 version = "0.8.0"
 dependencies = [
  "clap",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "uu_checksum_common",
  "uucore 0.8.0",
 ]
@@ -5663,7 +5663,7 @@ name = "uu_sha256sum"
 version = "0.8.0"
 dependencies = [
  "clap",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "uu_checksum_common",
  "uucore 0.8.0",
 ]
@@ -5673,7 +5673,7 @@ name = "uu_sha384sum"
 version = "0.8.0"
 dependencies = [
  "clap",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "uu_checksum_common",
  "uucore 0.8.0",
 ]
@@ -5683,7 +5683,7 @@ name = "uu_sha512sum"
 version = "0.8.0"
 dependencies = [
  "clap",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "uu_checksum_common",
  "uucore 0.8.0",
 ]
@@ -5701,7 +5701,7 @@ dependencies = [
  "itertools",
  "memchr",
  "nix 0.31.3",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "rand 0.10.2",
  "rayon",
  "self_cell",
@@ -5716,7 +5716,7 @@ version = "0.8.0"
 dependencies = [
  "clap",
  "parking_lot",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "tempfile",
  "thiserror 2.0.18",
  "uucore 0.8.0",
@@ -5730,7 +5730,7 @@ dependencies = [
  "memchr",
  "memmap2",
  "parking_lot",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "regex",
  "tempfile",
  "thiserror 2.0.18",
@@ -5746,7 +5746,7 @@ dependencies = [
  "memchr",
  "notify",
  "parking_lot",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "rstest",
  "rustix",
  "tempfile",
@@ -5760,7 +5760,7 @@ name = "uu_tee"
 version = "0.8.0"
 dependencies = [
  "clap",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "uucore 0.8.0",
 ]
 
@@ -5774,7 +5774,7 @@ dependencies = [
  "libc",
  "parking_lot",
  "parse_datetime",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "rustix",
  "tempfile",
  "thiserror 2.0.18",
@@ -5789,7 +5789,7 @@ dependencies = [
  "bytecount",
  "clap",
  "nom 8.0.0",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "uucore 0.8.0",
 ]
 
@@ -5799,7 +5799,7 @@ version = "0.8.0"
 dependencies = [
  "clap",
  "parking_lot",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "tempfile",
  "uucore 0.8.0",
 ]
@@ -5810,7 +5810,7 @@ version = "0.8.0"
 dependencies = [
  "clap",
  "parking_lot",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "platform-info",
  "uucore 0.8.0",
 ]
@@ -5820,7 +5820,7 @@ name = "uu_uniq"
 version = "0.8.0"
 dependencies = [
  "clap",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "uucore 0.8.0",
 ]
 
@@ -5831,7 +5831,7 @@ dependencies = [
  "bytecount",
  "clap",
  "libc",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "rustix",
  "thiserror 2.0.18",
  "unicode-width 0.2.2",
@@ -5844,7 +5844,7 @@ version = "0.8.0"
 dependencies = [
  "clap",
  "parking_lot",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "uucore 0.8.0",
  "windows-sys 0.61.2",
 ]
@@ -5856,7 +5856,7 @@ dependencies = [
  "clap",
  "libc",
  "parking_lot",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "tempfile",
 ]
 
@@ -5867,7 +5867,7 @@ dependencies = [
  "clap",
  "itertools",
  "parking_lot",
- "pi-uutils-ctx",
+ "reactor-uutils-ctx",
  "uucore 0.8.0",
 ]
 

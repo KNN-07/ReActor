@@ -10,7 +10,7 @@
 
 use std::{error::Error, io::Write};
 
-use pi_uutils_ctx::stderr;
+use reactor_uutils_ctx::stderr;
 #[cfg(unix)]
 use uucore::mode::{parse_numeric, parse_symbolic};
 

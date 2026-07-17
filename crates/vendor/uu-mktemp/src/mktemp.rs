@@ -8,9 +8,9 @@
 // pi-uutils: vendored from uutils/coreutils 0.8.0 and patched to run in-process
 // as a shell builtin. The temp-file parent directory (from `-p`/`--tmpdir` or a
 // relative TEMPLATE prefix) is resolved against the shell working directory via
-// `pi_uutils_ctx::resolve` at the creation sites, so the printed path is the
+// `reactor_uutils_ctx::resolve` at the creation sites, so the printed path is the
 // path actually created. TMPDIR/POSIXLY_CORRECT are read from the scope
-// environment, all stdio goes through `pi_uutils_ctx`, `translate!` strings are
+// environment, all stdio goes through `reactor_uutils_ctx`, `translate!` strings are
 // literalized, and the entry point no longer calls `std::process::exit`.
 
 #[cfg(unix)]
@@ -29,7 +29,7 @@ use clap::{
 	Arg, ArgAction, ArgMatches, Command,
 	builder::{TypedValueParser, ValueParserFactory},
 };
-use pi_uutils_ctx::format_usage;
+use reactor_uutils_ctx::format_usage;
 use rand::{
 	RngExt as _, SeedableRng as _,
 	rngs::{self, SmallRng},
@@ -148,7 +148,7 @@ impl Options {
 			Some(template) => {
 				// pi-uutils: TMPDIR comes from the scope environment, not the
 				// host process environment.
-				let tmpdir = if let Some(tmpdir) = pi_uutils_ctx::var(TMPDIR_ENV_VAR)
+				let tmpdir = if let Some(tmpdir) = reactor_uutils_ctx::var(TMPDIR_ENV_VAR)
 					&& matches.get_flag(OPT_T)
 				{
 					Some(PathBuf::from(tmpdir))
@@ -399,20 +399,20 @@ pub fn run(argv: Vec<OsString>) -> i32 {
 					kind == clap::error::ContextKind::InvalidArg
 						&& val == &clap::error::ContextValue::String("[template]".into())
 				}) {
-				let _ = writeln!(pi_uutils_ctx::stderr(), "mktemp: too many templates");
+				let _ = writeln!(reactor_uutils_ctx::stderr(), "mktemp: too many templates");
 				return 1;
 			}
 			let rendered = err.to_string();
 			if err.use_stderr() {
-				let _ = write!(pi_uutils_ctx::stderr(), "{rendered}");
+				let _ = write!(reactor_uutils_ctx::stderr(), "{rendered}");
 				return 1;
 			}
-			let _ = write!(pi_uutils_ctx::stdout(), "{rendered}");
+			let _ = write!(reactor_uutils_ctx::stdout(), "{rendered}");
 			return 0;
 		},
 	};
 	match mktemp_main(&argv, &matches) {
-		Ok(()) => pi_uutils_ctx::exit_code(),
+		Ok(()) => reactor_uutils_ctx::exit_code(),
 		Err(err) => {
 			let code = err.code();
 			// pi-uutils: --quiet failures surface as bare exit-code errors
@@ -420,7 +420,7 @@ pub fn run(argv: Vec<OsString>) -> i32 {
 			// "mktemp: " prefix.
 			let msg = err.to_string();
 			if !msg.is_empty() {
-				let _ = writeln!(pi_uutils_ctx::stderr(), "mktemp: {msg}");
+				let _ = writeln!(reactor_uutils_ctx::stderr(), "mktemp: {msg}");
 			}
 			if code == 0 { 1 } else { code }
 		},
@@ -433,7 +433,7 @@ fn mktemp_main(args: &[OsString], matches: &ArgMatches) -> UResult<()> {
 	let options = Options::from(matches);
 
 	// pi-uutils: POSIXLY_CORRECT comes from the scope environment.
-	if pi_uutils_ctx::var("POSIXLY_CORRECT").is_some() {
+	if reactor_uutils_ctx::var("POSIXLY_CORRECT").is_some() {
 		// If POSIXLY_CORRECT was set, template MUST be the last argument.
 		if matches.contains_id(ARG_TEMPLATE) {
 			// Template argument was provided, check if was the last one.
@@ -469,7 +469,7 @@ fn mktemp_main(args: &[OsString], matches: &ArgMatches) -> UResult<()> {
 	// process stdout.
 	let path = res?;
 	let print = || -> std::io::Result<()> {
-		let mut out = pi_uutils_ctx::stdout();
+		let mut out = reactor_uutils_ctx::stdout();
 		out.write_all(uucore::os_str_as_bytes(path.as_os_str()).map_err(std::io::Error::other)?)?;
 		out.write_all(b"\n")?;
 		out.flush()
@@ -562,7 +562,7 @@ pub fn uu_app() -> Command {
 fn dry_exec(tmpdir: &Path, prefix: &str, rand: usize, suffix: &str) -> PathBuf {
 	// pi-uutils: resolve the parent directory against the shell working
 	// directory so the printed candidate matches where creation would occur.
-	let tmpdir = pi_uutils_ctx::resolve(tmpdir);
+	let tmpdir = reactor_uutils_ctx::resolve(tmpdir);
 	let len = prefix.len() + suffix.len() + rand;
 	let mut buf = Vec::with_capacity(len);
 	buf.extend(prefix.as_bytes());
@@ -660,7 +660,7 @@ fn exec(dir: &Path, prefix: &str, rand: usize, suffix: &str, make_dir: bool) -> 
 	// pi-uutils: resolve the parent directory against the shell working
 	// directory at the creation site; the resolved form is also what gets
 	// printed, so the printed path is the path actually created.
-	let dir = pi_uutils_ctx::resolve(dir);
+	let dir = reactor_uutils_ctx::resolve(dir);
 	let path = if make_dir {
 		make_temp_dir(&dir, prefix, rand, suffix)?
 	} else {
@@ -686,7 +686,7 @@ fn exec(dir: &Path, prefix: &str, rand: usize, suffix: &str, make_dir: bool) -> 
 fn get_tmpdir_env_or_default() -> PathBuf {
 	// pi-uutils: read TMPDIR from the scope environment; when it is unset
 	// there, fall back to the host default temp dir as upstream does.
-	match pi_uutils_ctx::var(TMPDIR_ENV_VAR) {
+	match reactor_uutils_ctx::var(TMPDIR_ENV_VAR) {
 		Some(val) if val.is_empty() => PathBuf::from(FALLBACK_TMPDIR),
 		Some(val) => PathBuf::from(val),
 		None => env::temp_dir(),
@@ -715,7 +715,7 @@ mod tests {
 	use std::{collections::HashMap, io::Write, path::PathBuf, sync::Arc};
 
 	use parking_lot::Mutex;
-	use pi_uutils_ctx::ScopeIo;
+	use reactor_uutils_ctx::ScopeIo;
 
 	use super::*;
 
@@ -753,7 +753,7 @@ mod tests {
 			.map(OsString::from)
 			.collect();
 
-		let code = pi_uutils_ctx::scope(io, || run(argv));
+		let code = reactor_uutils_ctx::scope(io, || run(argv));
 
 		let out_str = String::from_utf8(stdout_buf.lock().clone()).unwrap();
 		let err_str = String::from_utf8(stderr_buf.lock().clone()).unwrap();
@@ -812,7 +812,7 @@ mod tests {
 		std::fs::create_dir(root.join("sub")).unwrap();
 
 		// Relative -p operand + scope cwd differing from the process cwd: only
-		// the creation-site `pi_uutils_ctx::resolve` patch makes this land in
+		// the creation-site `reactor_uutils_ctx::resolve` patch makes this land in
 		// the scope cwd's subdir.
 		let (code, stdout, stderr) =
 			run_in(root.clone(), HashMap::new(), vec!["-p", "sub", "foo.XXXX"]);
@@ -845,15 +845,15 @@ mod tests {
 	fn bsd_t_prefix_creates_file_in_tmpdir() {
 		let (_dir, root) = canonical_tempdir();
 
-		let (code, stdout, stderr) = run_in(root.clone(), tmpdir_env(&root), vec!["-t", "omp"]);
+		let (code, stdout, stderr) = run_in(root.clone(), tmpdir_env(&root), vec!["-t", "reactor"]);
 		assert_eq!(code, 0);
 		assert_eq!(stderr, "");
 		let printed = PathBuf::from(stdout.trim_end_matches('\n'));
 		assert!(printed.is_file(), "printed path {printed:?} must be a regular file");
 		assert_eq!(printed.parent(), Some(root.as_path()));
 		let name = printed.file_name().unwrap().to_str().unwrap();
-		assert!(name.starts_with("omp."), "unexpected name {name}");
-		assert_eq!(name.len(), "omp.".len() + 10);
+		assert!(name.starts_with("reactor."), "unexpected name {name}");
+		assert_eq!(name.len(), "reactor.".len() + 10);
 	}
 
 	#[test]

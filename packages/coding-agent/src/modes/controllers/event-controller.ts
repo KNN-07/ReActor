@@ -1,9 +1,9 @@
-import type { AssistantMessage, ImageContent } from "@oh-my-pi/pi-ai";
-import * as AIError from "@oh-my-pi/pi-ai/error";
-import { getStreamingPartialJson } from "@oh-my-pi/pi-ai/utils/block-symbols";
-import { type Component, Loader, TERMINAL } from "@oh-my-pi/pi-tui";
-import { logger, prompt } from "@oh-my-pi/pi-utils";
-import { INTENT_FIELD } from "@oh-my-pi/pi-wire";
+import type { AssistantMessage, ImageContent } from "@reactor/ai";
+import * as AIError from "@reactor/ai/error";
+import { getStreamingPartialJson } from "@reactor/ai/utils/block-symbols";
+import { type Component, Loader, TERMINAL } from "@reactor/tui";
+import { logger, prompt } from "@reactor/utils";
+import { INTENT_FIELD } from "@reactor/wire";
 import { extractTextContent } from "../../commit/utils";
 import { settings } from "../../config/settings";
 import { getFileSnapshotStore } from "../../edit/file-snapshot-store";
@@ -1578,7 +1578,7 @@ export class EventController {
 
 		const sessionName = this.ctx.sessionManager.getSessionName();
 		TERMINAL.sendNotification({
-			title: sessionName || "Oh My Pi",
+			title: sessionName || "ReActor",
 			body: "Complete",
 			type: "completion",
 			actions: "focus",

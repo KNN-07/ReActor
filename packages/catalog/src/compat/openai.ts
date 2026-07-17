@@ -424,7 +424,7 @@ export function buildOpenAICompat(spec: ModelSpec<"openai-completions">): Resolv
 		supportsSamplingParams: !isOpenAISamplingRestrictedModelId(spec.id),
 		reasoningEffortMap: isMimoReasoningEffortModel ? MIMO_REASONING_EFFORT_MAP : {},
 		supportsUsageInStreaming: !isCerebras,
-		// pi-ai's thinking-loop guard is gemini-only; default the flag from the
+		// ai's thinking-loop guard is gemini-only; default the flag from the
 		// family classifier so OpenAI-compat proxies serving Gemini are covered.
 		// An opaque alias can opt in via `compat.enableGeminiThinkingLoopGuard`.
 		enableGeminiThinkingLoopGuard: modelFamilyToken(spec.id) === "gemini",

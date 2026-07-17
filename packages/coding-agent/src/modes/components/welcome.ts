@@ -6,8 +6,8 @@ import {
 	truncateToWidth,
 	visibleWidth,
 	wrapTextWithAnsi,
-} from "@oh-my-pi/pi-tui";
-import { APP_NAME } from "@oh-my-pi/pi-utils";
+} from "@reactor/tui";
+import { APP_NAME } from "@reactor/utils";
 import { theme } from "../../modes/theme/theme";
 import tipsText from "./tips.txt" with { type: "text" };
 
@@ -136,7 +136,7 @@ export interface LspServerInfo {
 }
 
 /**
- * Premium welcome screen with block-based OMP logo and two-column layout.
+ * Premium welcome screen with block-based ReActor logo and two-column layout.
  */
 export class WelcomeComponent implements Component {
 	#animStart: number | null = null;
@@ -450,7 +450,7 @@ export class WelcomeComponent implements Component {
 	}
 }
 
-export const PI_LOGO = ["▀██████████▀", " ╘██    ██  ", "  ██    ██  ", "  ██    ██  ", " ▄██▄  ▄██▄ "];
+export const REACTOR_LOGO = ["▀██████████▀", " ╘██    ██  ", "  ██    ██  ", "  ██    ██  ", " ▄██▄  ▄██▄ "];
 
 /** Multi-stop palette for the diagonal gradient. */
 const GRADIENT_STOPS: ReadonlyArray<readonly [number, number, number]> = [
@@ -571,8 +571,8 @@ function introLogoFrame(progress: number): string[] {
 	const phase = ((((1 - eased) * INTRO_SWEEPS) % 1) + 1) % 1;
 	const shinePos = (((progress * INTRO_SHINE_TRAVERSALS) % 1) + 1) % 1;
 	const shineStrength = (1 - eased) ** 1.5;
-	return gradientLogo(PI_LOGO, phase, { strength: shineStrength, pos: shinePos });
+	return gradientLogo(REACTOR_LOGO, phase, { strength: shineStrength, pos: shinePos });
 }
 
 /** Resting gradient frame, cached for re-renders outside of the intro. */
-const REST_FRAME = gradientLogo(PI_LOGO, 0);
+const REST_FRAME = gradientLogo(REACTOR_LOGO, 0);

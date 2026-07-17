@@ -1,0 +1,31 @@
+{
+	"version": 1,
+	"replacements": [
+		["@oh-my-pi/pi-coding-agent", "@reactor/coding-agent"],
+		["@oh-my-pi/pi-agent-core", "@reactor/agent-core"],
+		["@oh-my-pi/pi-ai", "@reactor/ai"],
+		["@oh-my-pi/pi-catalog", "@reactor/catalog"],
+		["@oh-my-pi/reactor-natives", "@reactor/natives"],
+		["@oh-my-pi/pi-tui", "@reactor/tui"],
+		["@oh-my-pi/pi-utils", "@reactor/utils"],
+		["@oh-my-pi/pi-wire", "@reactor/wire"],
+		["@oh-my-pi/omp-stats", "@reactor/stats"],
+		["@oh-my-pi/", "@reactor/"],
+		["crates/pi-", "crates/reactor-"],
+		["pi_natives", "reactor_natives"],
+		["pi_shell", "reactor_shell"],
+		["pi_ast", "reactor_ast"],
+		["pi_iso", "reactor_iso"],
+		["pi_uu_", "reactor_uu_"],
+		["pi_uutils_ctx", "reactor_uutils_ctx"],
+		["pi_walker", "reactor_walker"],
+		["python/omp-rpc", "python/reactor-rpc"],
+		["python/robomp", "python/reactor-worker"],
+		["omp_rpc", "reactor_rpc"],
+		["__omp_worker", "__reactor_worker"],
+		["OMP_", "REACTOR_"],
+		[".omp", ".reactor"],
+		["scripts/link-omp", "scripts/link-reactor"]
+	],
+	"protectedPaths": ["packages/autonomy/", ".upstream/", "THIRD_PARTY_NOTICES.md"]
+}

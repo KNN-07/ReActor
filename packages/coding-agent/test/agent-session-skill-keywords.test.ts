@@ -1,20 +1,20 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import * as path from "node:path";
-import { Agent, type AgentTool } from "@oh-my-pi/pi-agent-core";
-import { AssistantMessageEventStream } from "@oh-my-pi/pi-ai/utils/event-stream";
-import { getBundledModel } from "@oh-my-pi/pi-catalog/models";
-import { ModelRegistry } from "@oh-my-pi/pi-coding-agent/config/model-registry";
-import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { WORKFLOW_NOTICE } from "@oh-my-pi/pi-coding-agent/modes/workflow";
-import { AgentSession } from "@oh-my-pi/pi-coding-agent/session/agent-session";
-import { AuthStorage } from "@oh-my-pi/pi-coding-agent/session/auth-storage";
+import { Agent, type AgentTool } from "@reactor/agent-core";
+import { AssistantMessageEventStream } from "@reactor/ai/utils/event-stream";
+import { getBundledModel } from "@reactor/catalog/models";
+import { ModelRegistry } from "@reactor/coding-agent/config/model-registry";
+import { Settings } from "@reactor/coding-agent/config/settings";
+import { WORKFLOW_NOTICE } from "@reactor/coding-agent/modes/workflow";
+import { AgentSession } from "@reactor/coding-agent/session/agent-session";
+import { AuthStorage } from "@reactor/coding-agent/session/auth-storage";
 import {
 	convertToLlm,
 	SKILL_PROMPT_MESSAGE_TYPE,
 	type SkillPromptDetails,
-} from "@oh-my-pi/pi-coding-agent/session/messages";
-import { SessionManager } from "@oh-my-pi/pi-coding-agent/session/session-manager";
-import { TempDir } from "@oh-my-pi/pi-utils";
+} from "@reactor/coding-agent/session/messages";
+import { SessionManager } from "@reactor/coding-agent/session/session-manager";
+import { TempDir } from "@reactor/utils";
 import { type } from "arktype";
 import { createAssistantMessage } from "./helpers/agent-session-setup";
 

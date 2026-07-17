@@ -139,10 +139,10 @@ export function serializeEvalWithEnvelope(fn: string | ((...args: unknown[]) => 
 	return `(() => {
 		try {
 			const __v = (${expr});
-			if (__v && typeof __v.then === "function") return { __ompPromise: true };
-			return { __ompOk: __v === undefined ? null : __v };
+			if (__v && typeof __v.then === "function") return { __reactorPromise: true };
+			return { __reactorOk: __v === undefined ? null : __v };
 		} catch (e) {
-			return { __ompErr: (e && (e.stack || e.message)) || String(e) };
+			return { __reactorErr: (e && (e.stack || e.message)) || String(e) };
 		}
 	})()`;
 }
@@ -155,16 +155,16 @@ export function serializeEvalWithEnvelope(fn: string | ((...args: unknown[]) => 
  */
 export function unwrapEvalEnvelope<TResult>(value: unknown, label: string): TResult {
 	if (value && typeof value === "object") {
-		if ("__ompErr" in value && typeof value.__ompErr === "string") {
-			throw new ToolError(`${label} threw a JavaScript exception:\n${value.__ompErr}`);
+		if ("__reactorErr" in value && typeof value.__reactorErr === "string") {
+			throw new ToolError(`${label} threw a JavaScript exception:\n${value.__reactorErr}`);
 		}
-		if ("__ompPromise" in value && value.__ompPromise === true) {
+		if ("__reactorPromise" in value && value.__reactorPromise === true) {
 			throw new ToolError(
 				`${label} returned a Promise, but this surface evaluates synchronously and cannot await it — return a plain value (poll with waitForFunction for async state instead)`,
 			);
 		}
-		if ("__ompOk" in value) {
-			return value.__ompOk as TResult;
+		if ("__reactorOk" in value) {
+			return value.__reactorOk as TResult;
 		}
 	}
 	return value as TResult;
@@ -190,7 +190,7 @@ export function resolveCmuxKind(
 	options?: ResolveCmuxKindOptions | null,
 	env: Record<string, string | undefined> = process.env,
 ): CmuxKind | null {
-	if (!resolveCmuxEnabled(env.PI_BROWSER_CMUX, options?.settingEnabled ?? true)) {
+	if (!resolveCmuxEnabled(env.REACTOR_BROWSER_CMUX, options?.settingEnabled ?? true)) {
 		return null;
 	}
 	const socketPath = env.CMUX_SOCKET_PATH;

@@ -6,16 +6,13 @@
  * / `write xd://<tool>`).
  */
 import { describe, expect, it } from "bun:test";
-import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { CustomToolAdapter } from "@oh-my-pi/pi-coding-agent/extensibility/custom-tools/wrapper";
-import type { ExtensionRunner } from "@oh-my-pi/pi-coding-agent/extensibility/extensions/runner";
-import { RegisteredToolAdapter } from "@oh-my-pi/pi-coding-agent/extensibility/extensions/wrapper";
-import { BUILTIN_TOOLS, type ToolSession } from "@oh-my-pi/pi-coding-agent/tools";
-import {
-	defaultLoadModeForToolName,
-	ESSENTIAL_BUILTIN_TOOL_NAMES,
-} from "@oh-my-pi/pi-coding-agent/tools/essential-tools";
-import { isMountableUnderXdev } from "@oh-my-pi/pi-coding-agent/tools/xdev";
+import { Settings } from "@reactor/coding-agent/config/settings";
+import { CustomToolAdapter } from "@reactor/coding-agent/extensibility/custom-tools/wrapper";
+import type { ExtensionRunner } from "@reactor/coding-agent/extensibility/extensions/runner";
+import { RegisteredToolAdapter } from "@reactor/coding-agent/extensibility/extensions/wrapper";
+import { BUILTIN_TOOLS, type ToolSession } from "@reactor/coding-agent/tools";
+import { defaultLoadModeForToolName, ESSENTIAL_BUILTIN_TOOL_NAMES } from "@reactor/coding-agent/tools/essential-tools";
+import { isMountableUnderXdev } from "@reactor/coding-agent/tools/xdev";
 import { type } from "arktype";
 
 function makeSession(): ToolSession {

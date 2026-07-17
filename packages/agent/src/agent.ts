@@ -21,12 +21,12 @@ import {
 	type ThinkingBudgets,
 	type ToolChoice,
 	type ToolResultMessage,
-} from "@oh-my-pi/pi-ai";
-import type { Dialect } from "@oh-my-pi/pi-ai/dialect";
-import type { HarmonyAuditEvent } from "@oh-my-pi/pi-ai/utils/harmony-leak";
-import { preferredDialect } from "@oh-my-pi/pi-catalog/identity";
-import { getBundledModel } from "@oh-my-pi/pi-catalog/models";
-import { logger } from "@oh-my-pi/pi-utils";
+} from "@reactor/ai";
+import type { Dialect } from "@reactor/ai/dialect";
+import type { HarmonyAuditEvent } from "@reactor/ai/utils/harmony-leak";
+import { preferredDialect } from "@reactor/catalog/identity";
+import { getBundledModel } from "@reactor/catalog/models";
+import { logger } from "@reactor/utils";
 import {
 	abortReasonText,
 	agentLoop,
@@ -728,7 +728,7 @@ export class Agent {
 	): Promise<Context> {
 		const model = this.#state.model;
 		if (!model) throw new Error("No active model on agent");
-		const ownedDialect = this.#dialect ?? resolveOwnedDialectFromEnv(Bun.env.PI_DIALECT);
+		const ownedDialect = this.#dialect ?? resolveOwnedDialectFromEnv(Bun.env.REACTOR_DIALECT);
 		const messages = normalizeMessagesForProvider(llmMessages, model);
 		const tools = ownedDialect
 			? []

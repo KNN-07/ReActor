@@ -11,11 +11,11 @@ import type {
 	ToolApprovalDecision,
 	ToolLoadMode,
 	ToolTier,
-} from "@oh-my-pi/pi-agent-core";
-import type { CompactionResult } from "@oh-my-pi/pi-agent-core/compaction";
-import type { FetchImpl, Model, Static, TSchema } from "@oh-my-pi/pi-ai";
-import type { Component } from "@oh-my-pi/pi-tui";
-import type { logger as PiLogger } from "@oh-my-pi/pi-utils";
+} from "@reactor/agent-core";
+import type { CompactionResult } from "@reactor/agent-core/compaction";
+import type { FetchImpl, Model, Static, TSchema } from "@reactor/ai";
+import type { Component } from "@reactor/tui";
+import type { logger as PiLogger } from "@reactor/utils";
 import type { type as ArkType } from "arktype";
 import type * as zod from "zod/v4";
 import type { Rule } from "../../capability/rule";
@@ -71,7 +71,7 @@ export interface CustomToolAPI {
 	arktype: typeof ArkType;
 	/** Injected zod/v4 module for canonical parameter schemas. */
 	zod: typeof zod;
-	/** Injected pi-coding-agent exports */
+	/** Injected coding-agent exports */
 	pi: typeof PiCodingAgent;
 	/** Push a preview action that can later be resolved with the hidden resolve tool */
 	pushPendingAction(action: CustomToolPendingAction): void;
@@ -98,7 +98,7 @@ export interface CustomToolContext {
 	settings?: Settings;
 	/** Fetch implementation for outbound HTTP; defaults to global fetch when omitted. */
 	fetch?: FetchImpl;
-	/** Calling session's `local://` root mapping for tools that bridge out of the OMP process. */
+	/** Calling session's `local://` root mapping for tools that bridge out of the ReActor process. */
 	localProtocolOptions?: LocalProtocolOptions;
 	/** Whether to auto-approve all destructive tool operations (--auto-approve CLI flag) */
 	autoApprove?: boolean;

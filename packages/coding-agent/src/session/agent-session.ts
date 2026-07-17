@@ -18,9 +18,6 @@ import * as os from "node:os";
 import * as path from "node:path";
 import { scheduler } from "node:timers/promises";
 import { isPromise } from "node:util/types";
-
-import type { InMemorySnapshotStore } from "@oh-my-pi/hashline";
-import { Patch } from "@oh-my-pi/hashline";
 import {
 	type AfterToolCallContext,
 	type AfterToolCallResult,
@@ -42,7 +39,7 @@ import {
 	TERMINAL_TOOL_RESULT_ABORT_REASON,
 	ThinkingLevel,
 	type ToolChoiceDirective,
-} from "@oh-my-pi/pi-agent-core";
+} from "@reactor/agent-core";
 import {
 	AGGRESSIVE_SHAKE_CONFIG,
 	AUTO_HANDOFF_THRESHOLD_FOCUS,
@@ -73,14 +70,14 @@ import {
 	type SummaryOptions,
 	shouldCompact,
 	shouldUseOpenAiRemoteCompaction,
-} from "@oh-my-pi/pi-agent-core/compaction";
+} from "@reactor/agent-core/compaction";
 import {
 	DEFAULT_PRUNE_CONFIG,
 	pruneSupersededToolResults,
 	pruneToolOutputs,
 	readToolSupersedeKey,
-} from "@oh-my-pi/pi-agent-core/compaction/pruning";
-import type { ProtectedToolMatcher } from "@oh-my-pi/pi-agent-core/compaction/tool-protection";
+} from "@reactor/agent-core/compaction/pruning";
+import type { ProtectedToolMatcher } from "@reactor/agent-core/compaction/tool-protection";
 import type {
 	AssistantMessage,
 	AssistantMessageEvent,
@@ -106,7 +103,7 @@ import type {
 	ToolChoice,
 	Usage,
 	UsageReport,
-} from "@oh-my-pi/pi-ai";
+} from "@reactor/ai";
 import {
 	calculateRateLimitBackoffMs,
 	clearAnthropicFastModeFallback,
@@ -118,16 +115,19 @@ import {
 	resolveModelServiceTier,
 	serviceTierFamily,
 	streamSimple,
-} from "@oh-my-pi/pi-ai";
-import * as AIError from "@oh-my-pi/pi-ai/error";
-import { resetOpenAICodexHistoryAfterCompaction } from "@oh-my-pi/pi-ai/providers/openai-codex-responses";
-import { toolWireSchema } from "@oh-my-pi/pi-ai/utils/schema";
-import { GeminiHeaderRunDetector, isGeminiThinkingModel } from "@oh-my-pi/pi-ai/utils/thinking-loop";
-import { type RepeatedToolCallDetection, ToolCallLoopGuard } from "@oh-my-pi/pi-ai/utils/tool-call-loop-guard";
-import { isFireworksFastModelId, toFireworksBaseModelId } from "@oh-my-pi/pi-catalog/fireworks-model-id";
-import { getSupportedEfforts } from "@oh-my-pi/pi-catalog/model-thinking";
-import { modelsAreEqual } from "@oh-my-pi/pi-catalog/models";
-import { MacOSPowerAssertion } from "@oh-my-pi/pi-natives";
+} from "@reactor/ai";
+import * as AIError from "@reactor/ai/error";
+import { resetOpenAICodexHistoryAfterCompaction } from "@reactor/ai/providers/openai-codex-responses";
+import { toolWireSchema } from "@reactor/ai/utils/schema";
+import { GeminiHeaderRunDetector, isGeminiThinkingModel } from "@reactor/ai/utils/thinking-loop";
+import { type RepeatedToolCallDetection, ToolCallLoopGuard } from "@reactor/ai/utils/tool-call-loop-guard";
+import { isFireworksFastModelId, toFireworksBaseModelId } from "@reactor/catalog/fireworks-model-id";
+import { getSupportedEfforts } from "@reactor/catalog/model-thinking";
+import { modelsAreEqual } from "@reactor/catalog/models";
+import type { InMemorySnapshotStore } from "@reactor/hashline";
+import { Patch } from "@reactor/hashline";
+import { MacOSPowerAssertion } from "@reactor/natives";
+import * as snapcompact from "@reactor/snapcompact";
 import {
 	escapeXmlText,
 	extractHttpStatusFromError,
@@ -143,8 +143,7 @@ import {
 	relativePathWithinRoot,
 	Snowflake,
 	withTimeout,
-} from "@oh-my-pi/pi-utils";
-import * as snapcompact from "@oh-my-pi/snapcompact";
+} from "@reactor/utils";
 import {
 	ADVISOR_DEFAULT_TOOL_NAMES,
 	AdviseTool,
@@ -1434,7 +1433,7 @@ function buildSessionMetadata(
 		if (typeof accountUuid === "string" && accountUuid.length > 0) {
 			userId.account_uuid = accountUuid;
 			// Claude Code's `device_id` is a stable 64-hex account-scoped install
-			// identifier. Include both omp's persistent install id and the Claude
+			// identifier. Include both reactor's persistent install id and the Claude
 			// account UUID so two accounts on the same install do not share a device.
 			userId.device_id = deriveClaudeDeviceId(getInstallId(), accountUuid);
 		}
@@ -2197,7 +2196,7 @@ export class AgentSession {
 		if (mode === "off") return;
 		try {
 			this.#powerAssertion = MacOSPowerAssertion.start({
-				reason: "Oh My Pi agent session",
+				reason: "ReActor agent session",
 				idle: true,
 				display: mode === "display" || mode === "system",
 				system: mode === "system",
@@ -5889,13 +5888,13 @@ export class AgentSession {
 
 	/**
 	 * Whether the Gemini header-runaway guard applies to the current model: the loop
-	 * guard is on (settings + `PI_NO_THINKING_LOOP_GUARD`), the tool-call reminder is
+	 * guard is on (settings + `REACTOR_NO_THINKING_LOOP_GUARD`), the tool-call reminder is
 	 * enabled, and the active model is a Gemini thinking model.
 	 */
 	#geminiHeaderGuardActive(): boolean {
 		const model = this.model;
 		return (
-			process.env.PI_NO_THINKING_LOOP_GUARD !== "1" &&
+			process.env.REACTOR_NO_THINKING_LOOP_GUARD !== "1" &&
 			this.settings.get("model.loopGuard.enabled") === true &&
 			this.settings.get("model.loopGuard.toolCallReminder") === true &&
 			model !== undefined &&
@@ -6558,7 +6557,7 @@ export class AgentSession {
 	 * `metadata.user_id` shaped like real Claude Code's `getAPIMetadata` output:
 	 * `{ session_id, account_uuid, device_id }`. `account_uuid` is included only
 	 * when an Anthropic OAuth credential with a known account UUID is loaded;
-	 * `device_id` is derived from both the persistent omp install id and that
+	 * `device_id` is derived from both the persistent reactor install id and that
 	 * account UUID. Resolving live keeps the value in sync with auth-state changes
 	 * (login/logout, token refresh that surfaces a new account UUID) without
 	 * needing to re-call `#syncAgentSessionId()` on every such event.
@@ -6799,7 +6798,7 @@ export class AgentSession {
 		//
 		// BOUNDED: an owned manager may hold an HTTP/SSE server whose session-
 		// termination DELETE blocks up to the MCP request timeout (30s default,
-		// unbounded when OMP_MCP_TIMEOUT_MS=0), so awaiting `disconnectAll()`
+		// unbounded when REACTOR_MCP_TIMEOUT_MS=0), so awaiting `disconnectAll()`
 		// unbounded would stall /exit and print-mode shutdown on a broken remote
 		// endpoint. Race it against a short deadline — stdio close (the subprocess
 		// reap this targets) completes well within the bound; a slow transport
@@ -8865,7 +8864,7 @@ export class AgentSession {
 				// Await the idempotent dispose() before exiting so the browser
 				// reaper and other bounded teardown complete — a fire-and-forget
 				// `void this.dispose()` raced process.exit() and could leave an
-				// OMP-owned Chromium alive (#5643).
+				// ReActor-owned Chromium alive (#5643).
 				void this.dispose().finally(() => process.exit(0));
 			},
 			getContextUsage: () => this.getContextUsage(),
@@ -17363,8 +17362,8 @@ export class AgentSession {
 	 * @returns Path to exported file
 	 */
 	async exportToHtml(outputPath?: string): Promise<string> {
-		// Public HTML export ships in the omp brand palette (collab-web
-		// pink/purple), matching my.omp.sh — not the host's terminal theme.
+		// Public HTML export ships in the reactor brand palette (collab-web
+		// pink/purple), matching my.reactor.sh — not the host's terminal theme.
 		// Callers who want a themed export can pass `palette: "theme"` with
 		// `themeName` directly to `exportSessionToHtml`.
 		const { exportSessionToHtml } = await import("../export/html");
@@ -17489,7 +17488,7 @@ export class AgentSession {
 			})),
 			messages: llmMessages,
 		};
-		const filePath = path.join(os.tmpdir(), `omp-llm-request-${Snowflake.next()}.json`);
+		const filePath = path.join(os.tmpdir(), `reactor-llm-request-${Snowflake.next()}.json`);
 		await Bun.write(filePath, `${JSON.stringify(payload, null, 2)}\n`);
 		return filePath;
 	}

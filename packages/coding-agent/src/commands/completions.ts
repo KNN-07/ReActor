@@ -1,11 +1,11 @@
 /**
- * `omp completions <bash|zsh|fish>` — print a shell completion script.
+ * `reactor completions <bash|zsh|fish>` — print a shell completion script.
  *
  * The script is derived entirely from the declarative command/flag metadata
  * (see `cli/completion-gen.ts`), so it never drifts from the actual CLI surface.
  */
-import { APP_NAME, VERSION } from "@oh-my-pi/pi-utils";
-import { Args, type CliConfig, Command, type CommandCtor } from "@oh-my-pi/pi-utils/cli";
+import { APP_NAME, VERSION } from "@reactor/utils";
+import { Args, type CliConfig, Command, type CommandCtor } from "@reactor/utils/cli";
 import { buildSpec, generateCompletion, type Shell } from "../cli/completion-gen";
 import { commands } from "../cli-commands";
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
-import { KeybindingsManager as AppKeybindingsManager } from "@oh-my-pi/pi-coding-agent/config/keybindings";
-import { getGithubRefContext, getGithubRefSuggestions } from "@oh-my-pi/pi-coding-agent/modes/github-ref-autocomplete";
-import { createPromptActionAutocompleteProvider } from "@oh-my-pi/pi-coding-agent/modes/prompt-action-autocomplete";
+import { KeybindingsManager as AppKeybindingsManager } from "@reactor/coding-agent/config/keybindings";
+import { getGithubRefContext, getGithubRefSuggestions } from "@reactor/coding-agent/modes/github-ref-autocomplete";
+import { createPromptActionAutocompleteProvider } from "@reactor/coding-agent/modes/prompt-action-autocomplete";
 
 function makeProvider() {
 	return createPromptActionAutocompleteProvider({
@@ -35,7 +35,7 @@ describe("github-ref autocomplete — token detection", () => {
 		expect(getGithubRefContext("owner/repo#3164")).toBeNull();
 		expect(getGithubRefContext("foo#3164")).toBeNull();
 		expect(getGithubRefContext("C#12")).toBeNull();
-		expect(getGithubRefContext("https://github.com/can1357/oh-my-pi#3164")).toBeNull();
+		expect(getGithubRefContext("https://github.com/KNN-07/ReActor#3164")).toBeNull();
 		expect(getGithubRefContext("path/#3164")).toBeNull();
 	});
 

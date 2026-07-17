@@ -1,8 +1,8 @@
-import type { Effort } from "@oh-my-pi/pi-catalog/effort";
-import { toFirepassWireModelId, toFireworksWireModelId } from "@oh-my-pi/pi-catalog/fireworks-model-id";
-import { isGlm52ReasoningEffortModelId, isKimiK3ModelId } from "@oh-my-pi/pi-catalog/identity";
-import { getSupportedEfforts } from "@oh-my-pi/pi-catalog/model-thinking";
-import { calculateCost } from "@oh-my-pi/pi-catalog/models";
+import type { Effort } from "@reactor/catalog/effort";
+import { toFirepassWireModelId, toFireworksWireModelId } from "@reactor/catalog/fireworks-model-id";
+import { isGlm52ReasoningEffortModelId, isKimiK3ModelId } from "@reactor/catalog/identity";
+import { getSupportedEfforts } from "@reactor/catalog/model-thinking";
+import { calculateCost } from "@reactor/catalog/models";
 import type {
 	OpenAICompat,
 	OpenAIReasoningDisableMode,
@@ -12,14 +12,14 @@ import type {
 	ResolvedOpenAIResponsesCompat,
 	ResolvedOpenAISharedCompat,
 	VercelGatewayRouting,
-} from "@oh-my-pi/pi-catalog/types";
+} from "@reactor/catalog/types";
 import {
 	COREWEAVE_PROJECT_HEADER,
 	coreWeaveProjectHeaders,
 	hasCoreWeaveProjectHeader,
 	removeBlankCoreWeaveProjectHeaders,
-} from "@oh-my-pi/pi-catalog/wire/coreweave";
-import { parseGitHubCopilotApiKey } from "@oh-my-pi/pi-catalog/wire/github-copilot";
+} from "@reactor/catalog/wire/coreweave";
+import { parseGitHubCopilotApiKey } from "@reactor/catalog/wire/github-copilot";
 import {
 	$env,
 	classifyJsonPrefix,
@@ -30,7 +30,7 @@ import {
 	parseStreamingJsonThrottled,
 	stringifyJson,
 	structuredCloneJSON,
-} from "@oh-my-pi/pi-utils";
+} from "@reactor/utils";
 import * as AIError from "../error";
 import {
 	type Api,
@@ -645,7 +645,7 @@ export function applyOpenAIExtraBody<P extends object>(
 
 /**
  * Chat Completions streaming request body shaped by the OpenAI-family providers.
- * Extends the vendored SDK params with the compat dialect fields pi-ai emits
+ * Extends the vendored SDK params with the compat dialect fields ai emits
  * (binary `thinking`, Qwen `enable_thinking`/`chat_template_kwargs`, nested
  * `reasoning`, gateway `provider`/`providerOptions`, sampling extras). Lives in
  * the shared module beside the request-shaping helpers that mutate it.
@@ -1392,7 +1392,7 @@ export function convertResponsesInputContent(
 /**
  * Map freeform custom-tool wire names back to the internal tool name for
  * providers that only accept function_call / function_call_output.
- * Built once per request; `apply_patch` → `edit` is the OMP default.
+ * Built once per request; `apply_patch` → `edit` is the ReActor default.
  */
 function buildCustomToolWireNameMap(tools: readonly Tool[] | undefined): ReadonlyMap<string, string> | undefined {
 	if (!tools?.length) return undefined;
@@ -2110,7 +2110,7 @@ export async function processResponsesStream<TApi extends Api>(
 
 	// Multiple items (parallel function_calls in particular) can be open at the same
 	// time. OpenAI's spec routes every per-item event by `output_index`/`item_id`;
-	// see https://github.com/can1357/oh-my-pi/issues/1880 — llama.cpp emits parallel
+	// see https://github.com/KNN-07/ReActor/issues/1880 — llama.cpp emits parallel
 	// function_call deltas interleaved, and a singleton `current` reference would
 	// fold them into the wrong block and drop arguments on every call but the last.
 	//

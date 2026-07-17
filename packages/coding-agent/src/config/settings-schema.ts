@@ -1,6 +1,6 @@
-import { THINKING_EFFORTS } from "@oh-my-pi/pi-ai";
-import { DEFAULT_SHARE_URL } from "@oh-my-pi/pi-wire";
-import { SHAPE_VARIANT_NAMES } from "@oh-my-pi/snapcompact";
+import { THINKING_EFFORTS } from "@reactor/ai";
+import { SHAPE_VARIANT_NAMES } from "@reactor/snapcompact";
+import { DEFAULT_SHARE_URL } from "@reactor/wire";
 import { DEFAULT_RELAY_URL } from "../collab/protocol";
 import { DEFAULT_STT_MODEL_KEY, STT_MODEL_OPTIONS, STT_MODEL_VALUES } from "../stt/models";
 import { STT_SUBMIT_TRIGGER_OPTIONS, STT_SUBMIT_TRIGGER_VALUES } from "../stt/submit-trigger";
@@ -344,7 +344,7 @@ export const DEFAULT_BASH_INTERCEPTOR_RULES: BashInterceptorRule[] = [
 			"^\\s*(?:(?:bun|npm|pnpm|yarn)\\s+(?:run\\s+)?(?:dev|start)(?:\\s|$)|(?:vite|next\\s+dev|nuxt\\s+dev|nodemon|lldb|gdb|tail\\s+-f)(?:\\s|$)|docker\\s+compose\\s+up(?!.*(?:\\s-d(?:\\s|$)|--detach))(?:\\s|$))",
 		tool: "hub",
 		message:
-			'Use the `hub` tool (`op:"start"`) for services, watchers, and debuggers so other omp instances can observe and control them.',
+			'Use the `hub` tool (`op:"start"`) for services, watchers, and debuggers so other reactor instances can observe and control them.',
 	},
 	{
 		pattern:
@@ -360,9 +360,9 @@ export const SETTINGS_SCHEMA = {
 	// ────────────────────────────────────────────────────────────────────────
 	setupVersion: { type: "number", default: 0 },
 
-	// Auth broker — credentials proxied through a remote `omp auth-broker serve`
+	// Auth broker — credentials proxied through a remote `reactor auth-broker serve`
 	// host. Hidden from the UI; populate via env vars or hand-edited config.yml.
-	// Env (`OMP_AUTH_BROKER_URL` / `OMP_AUTH_BROKER_TOKEN`) takes precedence so
+	// Env (`REACTOR_AUTH_BROKER_URL` / `REACTOR_AUTH_BROKER_TOKEN`) takes precedence so
 	// per-machine overrides remain trivial.
 	"auth.broker.url": { type: "string", default: undefined },
 	"auth.broker.token": { type: "string", default: undefined },
@@ -505,7 +505,7 @@ export const SETTINGS_SCHEMA = {
 			group: "Services",
 			label: "Max In-Flight Requests",
 			description:
-				'Maximum concurrent LLM requests per provider id (for example "openai" or "anthropic"), shared across local OMP processes with this config root. Omitted providers are unlimited.',
+				'Maximum concurrent LLM requests per provider id (for example "openai" or "anthropic"), shared across local ReActor processes with this config root. Omitted providers are unlimited.',
 		},
 	},
 
@@ -529,7 +529,8 @@ export const SETTINGS_SCHEMA = {
 				{
 					value: "project",
 					label: "Per-project",
-					description: "Save project role models in .omp/config.yml; missing project roles use global defaults",
+					description:
+						"Save project role models in .reactor/config.yml; missing project roles use global defaults",
 				},
 			],
 		},
@@ -1681,7 +1682,7 @@ export const SETTINGS_SCHEMA = {
 			tab: "interaction",
 			group: "Startup & Updates",
 			label: "Check for Updates",
-			description: "Check for omp updates on startup",
+			description: "Check for reactor updates on startup",
 		},
 	},
 
@@ -2471,7 +2472,7 @@ export const SETTINGS_SCHEMA = {
 	},
 
 	// Auto-Learn (experimental): post-stop nudge to capture lessons to memory
-	// and mint/enhance isolated managed skills under ~/.omp/agent/managed-skills.
+	// and mint/enhance isolated managed skills under ~/.reactor/agent/managed-skills.
 	// Master flag is default-off → zero footprint; sub-flags gate behaviour.
 	"autolearn.enabled": {
 		type: "boolean",
@@ -2847,7 +2848,7 @@ export const SETTINGS_SCHEMA = {
 	},
 	"hindsight.retainEveryNTurns": { type: "number", default: 3 },
 	"hindsight.retainOverlapTurns": { type: "number", default: 2 },
-	"hindsight.retainContext": { type: "string", default: "omp" },
+	"hindsight.retainContext": { type: "string", default: "reactor" },
 
 	"hindsight.recallBudget": {
 		type: "enum",
@@ -3717,7 +3718,8 @@ export const SETTINGS_SCHEMA = {
 			tab: "tools",
 			group: "GitHub",
 			label: "GitHub View Cache",
-			description: "Cache rendered issue/PR view output in ~/.omp/cache/github-cache.db so repeated reads are free",
+			description:
+				"Cache rendered issue/PR view output in ~/.reactor/cache/github-cache.db so repeated reads are free",
 		},
 	},
 
@@ -3797,7 +3799,7 @@ export const SETTINGS_SCHEMA = {
 			group: "Grep & Browser",
 			label: "cmux Browser",
 			description:
-				"Use cmux WKWebView surfaces for browser automation when a cmux socket is available. Set PI_BROWSER_CMUX=0 or PI_BROWSER_CMUX=1 to override.",
+				"Use cmux WKWebView surfaces for browser automation when a cmux socket is available. Set REACTOR_BROWSER_CMUX=0 or REACTOR_BROWSER_CMUX=1 to override.",
 		},
 	},
 	"browser.screenshotDir": {
@@ -4124,7 +4126,7 @@ export const SETTINGS_SCHEMA = {
 			group: "Isolation",
 			label: "Worktree Base Directory",
 			description:
-				"Base directory for agent-managed worktrees — task-isolation copies, `github` PR checkouts, and `omp worktree` cleanup all live here. Unset uses ~/.omp/wt. Must be an absolute or ~-relative path; relative paths are ignored. The OMP_WORKTREE_DIR env var overrides this.",
+				"Base directory for agent-managed worktrees — task-isolation copies, `github` PR checkouts, and `reactor worktree` cleanup all live here. Unset uses ~/.reactor/wt. Must be an absolute or ~-relative path; relative paths are ignored. The REACTOR_WORKTREE_DIR env var overrides this.",
 		},
 	},
 
@@ -4674,7 +4676,7 @@ export const SETTINGS_SCHEMA = {
 			group: "Tiny Model",
 			label: "Tiny Model Device",
 			description:
-				"ONNX execution provider for local tiny models (titles + memory). Default uses CPU-only inference. The PI_TINY_DEVICE env var overrides this.",
+				"ONNX execution provider for local tiny models (titles + memory). Default uses CPU-only inference. The REACTOR_TINY_DEVICE env var overrides this.",
 			options: TINY_MODEL_DEVICE_SETTING_OPTIONS,
 		},
 	},
@@ -4687,7 +4689,7 @@ export const SETTINGS_SCHEMA = {
 			group: "Tiny Model",
 			label: "Tiny Model Precision",
 			description:
-				"ONNX quantization/precision for local tiny models. Default uses each model's shipped dtype (q4); lower precision is faster, higher is more faithful. The PI_TINY_DTYPE env var overrides this.",
+				"ONNX quantization/precision for local tiny models. Default uses each model's shipped dtype (q4); lower precision is faster, higher is more faithful. The REACTOR_TINY_DTYPE env var overrides this.",
 			options: TINY_MODEL_DTYPE_SETTING_OPTIONS,
 		},
 	},
@@ -4789,7 +4791,7 @@ export const SETTINGS_SCHEMA = {
 			description:
 				"Seconds to wait for the first model stream event; -1 uses provider/env defaults, 0 disables the watchdog",
 			options: [
-				{ value: "-1", label: "Auto", description: "Use provider defaults and PI_* timeout env vars" },
+				{ value: "-1", label: "Auto", description: "Use provider defaults and REACTOR_* timeout env vars" },
 				{ value: "0", label: "Off", description: "Disable first-event timeout" },
 				{ value: "300", label: "5 minutes" },
 				{ value: "600", label: "10 minutes" },
@@ -4808,7 +4810,7 @@ export const SETTINGS_SCHEMA = {
 			description:
 				"Seconds a model stream may stay silent between events; -1 uses provider/env defaults, 0 disables the watchdog",
 			options: [
-				{ value: "-1", label: "Auto", description: "Use provider defaults and PI_* timeout env vars" },
+				{ value: "-1", label: "Auto", description: "Use provider defaults and REACTOR_* timeout env vars" },
 				{ value: "0", label: "Off", description: "Disable idle timeout" },
 				{ value: "300", label: "5 minutes" },
 				{ value: "600", label: "10 minutes" },
@@ -5037,12 +5039,12 @@ export const SETTINGS_SCHEMA = {
 
 	"dev.autoqaPush.endpoint": {
 		type: "string",
-		default: "https://qa.omp.sh/v1/grievances" as const,
+		default: "https://qa.reactor.sh/v1/grievances" as const,
 		ui: {
 			tab: "tools",
 			group: "Developer",
 			label: "Auto QA Push Endpoint",
-			description: "Full URL receiving Auto QA JSON reports (default https://qa.omp.sh/v1/grievances)",
+			description: "Full URL receiving Auto QA JSON reports (default https://qa.reactor.sh/v1/grievances)",
 		},
 	},
 

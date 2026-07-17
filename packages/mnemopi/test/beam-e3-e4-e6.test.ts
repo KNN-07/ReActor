@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { BeamMemory } from "@oh-my-pi/pi-mnemopi/core/beam";
+import { BeamMemory } from "@reactor/mnemopi/core/beam";
 
 // Real embeddings (fastembed + onnxruntime-node, ~270MB) install on demand via
 // `bun install` on first use. These tests never exercise embeddings — the
@@ -11,11 +11,11 @@ import { BeamMemory } from "@oh-my-pi/pi-mnemopi/core/beam";
 // on-demand install hangs each test past the 5s timeout (and starves siblings
 // under parallel CI).
 beforeEach(() => {
-	process.env.MNEMOPI_NO_EMBEDDINGS = "1";
+	process.env.REACTOR_MNEMOPI_NO_EMBEDDINGS = "1";
 });
 
 afterEach(() => {
-	delete process.env.MNEMOPI_NO_EMBEDDINGS;
+	delete process.env.REACTOR_MNEMOPI_NO_EMBEDDINGS;
 });
 
 type TempDb = { dir: string; path: string };
@@ -89,7 +89,7 @@ function seedLegacyTriples(dbPath: string): void {
 }
 
 afterEach(() => {
-	delete process.env.MNEMOPI_AUTO_MIGRATE;
+	delete process.env.REACTOR_MNEMOPI_AUTO_MIGRATE;
 	while (tempDbs.length > 0) {
 		const db = tempDbs.pop();
 		if (db) rmSync(db.dir, { recursive: true, force: true });

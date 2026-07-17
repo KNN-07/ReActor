@@ -11,22 +11,22 @@ import {
 	sanitizeContent,
 	shannonEntropy,
 	storeBlob,
-} from "@oh-my-pi/pi-mnemopi/core/content-sanitizer";
+} from "@reactor/mnemopi/core/content-sanitizer";
 
-const ORIGINAL_BLOB_DIR = process.env.MNEMOPI_BLOB_DIR;
+const ORIGINAL_BLOB_DIR = process.env.REACTOR_MNEMOPI_BLOB_DIR;
 
 afterEach(() => {
 	if (ORIGINAL_BLOB_DIR === undefined) {
-		delete process.env.MNEMOPI_BLOB_DIR;
+		delete process.env.REACTOR_MNEMOPI_BLOB_DIR;
 	} else {
-		process.env.MNEMOPI_BLOB_DIR = ORIGINAL_BLOB_DIR;
+		process.env.REACTOR_MNEMOPI_BLOB_DIR = ORIGINAL_BLOB_DIR;
 	}
 });
 
 function useTempBlobDir(): string {
 	const dir = mkdtempSync(join(tmpdir(), "mnemopi-blobs-"));
-	process.env.MNEMOPI_BLOB_DIR = join(dir, "blobs");
-	return process.env.MNEMOPI_BLOB_DIR;
+	process.env.REACTOR_MNEMOPI_BLOB_DIR = join(dir, "blobs");
+	return process.env.REACTOR_MNEMOPI_BLOB_DIR;
 }
 
 describe("content sanitizer data URI parsing", () => {

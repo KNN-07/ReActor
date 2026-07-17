@@ -2,12 +2,12 @@ import { describe, expect, test } from "bun:test";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
-import { resolveProviderModels } from "@oh-my-pi/pi-catalog/model-manager";
-import { PROVIDER_DESCRIPTORS } from "@oh-my-pi/pi-catalog/provider-models/descriptors";
+import { resolveProviderModels } from "@reactor/catalog/model-manager";
+import { PROVIDER_DESCRIPTORS } from "@reactor/catalog/provider-models/descriptors";
 import {
 	opencodeGoModelManagerOptions,
 	opencodeZenModelManagerOptions,
-} from "@oh-my-pi/pi-catalog/provider-models/openai-compat";
+} from "@reactor/catalog/provider-models/openai-compat";
 
 const LIVE_FREE_MODEL_IDS = [
 	"deepseek-v4-flash-free",
@@ -37,7 +37,7 @@ describe("OpenCode provider discovery", () => {
 	});
 
 	test("replaces stale bundled Zen models with each credential's live endpoint list", async () => {
-		const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "pi-catalog-opencode-zen-"));
+		const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "catalog-opencode-zen-"));
 		try {
 			let freeFetches = 0;
 			const freeOptions = opencodeZenModelManagerOptions({

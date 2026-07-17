@@ -1,6 +1,6 @@
 /**
  * Issue #4919: a pi extension calling `ctx.ui.addAutocompleteProvider(...)` in its
- * `session_start` handler crashed at load under omp — the method was absent from
+ * `session_start` handler crashed at load under reactor — the method was absent from
  * `ExtensionUIContext`, so the call threw `TypeError: ... is not a function` and
  * (for extensions that wrap init in try/catch, e.g. @ff-labs/pi-fff) aborted the
  * extension's entire initialization.
@@ -10,17 +10,17 @@
  * - interactive mode stacks each factory on top of the built-in editor provider.
  *
  * NOTE: imports are relative (`../src/...`) so the tests exercise this checkout
- * even when `node_modules/@oh-my-pi/pi-coding-agent` resolves elsewhere.
+ * even when `node_modules/@reactor/coding-agent` resolves elsewhere.
  */
 
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "bun:test";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { Agent, type AgentTool } from "@oh-my-pi/pi-agent-core";
-import { type Api, Effort, type Model } from "@oh-my-pi/pi-ai";
-import type { AutocompleteProvider } from "@oh-my-pi/pi-tui";
-import { logger, TempDir } from "@oh-my-pi/pi-utils";
+import { Agent, type AgentTool } from "@reactor/agent-core";
+import { type Api, Effort, type Model } from "@reactor/ai";
+import type { AutocompleteProvider } from "@reactor/tui";
+import { logger, TempDir } from "@reactor/utils";
 import { type } from "arktype";
 import { ModelRegistry } from "../src/config/model-registry";
 import { resetSettingsForTest, Settings } from "../src/config/settings";

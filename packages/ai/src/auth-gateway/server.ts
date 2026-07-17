@@ -1,12 +1,12 @@
 /**
- * omp auth-gateway HTTP server.
+ * reactor auth-gateway HTTP server.
  *
  * Accepts any provider-format request (OpenAI chat-completions, Anthropic
- * messages, OpenAI Responses) and dispatches through pi-ai's `streamSimple()`
+ * messages, OpenAI Responses) and dispatches through ai's `streamSimple()`
  * — which handles credential injection, anthropic-beta headers, codex
  * websocket transport, and all the per-provider intricacies. The gateway is
- * pure protocol translation: foreign wire → omp Context → pi-ai stream() →
- * omp events → foreign wire.
+ * pure protocol translation: foreign wire → reactor Context → ai stream() →
+ * reactor events → foreign wire.
  *
  * Endpoints:
  *   GET  /healthz                          → unauth; ok + version
@@ -18,8 +18,8 @@
  *   POST /v1/responses                     → OpenAI Responses in/out
  */
 
-import { Effort } from "@oh-my-pi/pi-catalog/effort";
-import { extractHttpStatusFromError, extractRetryHint, logger } from "@oh-my-pi/pi-utils";
+import { Effort } from "@reactor/catalog/effort";
+import { extractHttpStatusFromError, extractRetryHint, logger } from "@reactor/utils";
 import type { ApiKeyResolver } from "../auth-retry";
 import type { AuthStorage } from "../auth-storage";
 import * as AIError from "../error";
@@ -28,7 +28,7 @@ import { isUsageLimitOutcome } from "../error/rate-limit";
 import * as anthropicMessages from "../providers/anthropic-messages-server";
 import * as openaiChat from "../providers/openai-chat-server";
 import * as openaiResponses from "../providers/openai-responses-server";
-import * as piNative from "../providers/pi-native-server";
+import * as piNative from "../providers/reactor-native-server";
 import { completeSimple, streamSimple } from "../stream";
 import type { Api, AssistantMessageEventStream, Context, Model, SimpleStreamOptions } from "../types";
 import { deterministicUuid } from "../utils/deterministic-id";
@@ -58,9 +58,9 @@ export interface AuthGatewayBootOptions extends AuthGatewayServerOptions {
 	/** Source of credentials. Caller wires this to a broker-backed AuthStorage. */
 	storage: AuthStorage;
 	/**
-	 * Resolve a client-requested model id to a pi-ai Model. Caller supplies
+	 * Resolve a client-requested model id to a ai Model. Caller supplies
 	 * this from a ModelRegistry (lives in `coding-agent` to avoid an inverse
-	 * dependency in `pi-ai`).
+	 * dependency in `ai`).
 	 */
 	resolveModel: ModelResolver;
 	/** Optional supplier for `/v1/models` listing. Returns the full model array. */
@@ -76,7 +76,7 @@ const FORMAT_ROUTES: Record<string, { module: FormatModule; label: string }> = {
 	"/v1/responses": { module: openaiResponses, label: "openai-responses" },
 };
 
-// (passthrough fast-path removed — it bypassed pi-ai provider logic, in
+// (passthrough fast-path removed — it bypassed ai provider logic, in
 // particular the Anthropic Claude-Code OAuth system-prompt prefix injection.
 // Every request now takes the translate path so credential-specific request
 // shaping always applies.)
@@ -116,7 +116,7 @@ function deriveSessionId(modelId: string, context: Context): string {
 	const first = context.messages?.[0];
 	if (first) {
 		// Strip timestamp / provider metadata so the hash is stable across turns
-		// of the same conversation (omp re-stamps every parsed Message). role +
+		// of the same conversation (reactor re-stamps every parsed Message). role +
 		// content is what's actually on the wire.
 		parts.push(JSON.stringify({ role: first.role, content: first.content }));
 	}
@@ -176,11 +176,11 @@ function buildStreamOptions(parsed: ParsedFormatRequest, api: Api, signal: Abort
 		};
 		opts.reasoning ??= effort;
 	}
-	// Fields that don't yet have a matching pi-ai `SimpleStreamOptions` slot.
+	// Fields that don't yet have a matching ai `SimpleStreamOptions` slot.
 	// Surfaced once in debug logs so they show up when wiring a new provider,
 	// but NEVER widened into `options.extra` — every consumer would have to
 	// re-implement the typed parse to read them back out.
-	// TODO(pi-ai): land first-class fields and replace these blocks.
+	// TODO(ai): land first-class fields and replace these blocks.
 	if (
 		options.parallelToolCalls !== undefined ||
 		options.previousResponseId !== undefined ||
@@ -405,7 +405,7 @@ async function handleFormatEndpoint(
 	const sessionId = parsed.options.promptCacheKey ?? deriveSessionId(parsed.modelId, parsed.context);
 	parsed.options.promptCacheKey ??= sessionId;
 
-	// pi-ai's stream() does NOT consult AuthStorage — the caller (us) is
+	// ai's stream() does NOT consult AuthStorage — the caller (us) is
 	// expected to resolve the credential and pass it as `options.apiKey`.
 	// For OAuth providers this returns the access token (refreshed via the
 	// broker override on AuthStorage when needed).
@@ -523,11 +523,11 @@ async function handleFormatEndpoint(
 }
 
 /**
- * Pi-native fast path: `POST /v1/pi/stream`. Accepts the canonical pi-ai
+ * Pi-native fast path: `POST /v1/pi/stream`. Accepts the canonical ai
  * `Context` directly (no wire-format round-trip) and emits a bandwidth-shrunk
  * event stream matching `pi-agent`'s `streamProxy`. Skips the OpenAI /
  * Anthropic / Responses translation layers — those exist to bridge foreign
- * SDKs (llm-git, anthropic-sdk, openai-sdk), and bridging back to pi-native
+ * SDKs (llm-git, anthropic-sdk, openai-sdk), and bridging back to reactor-native
  * just to bridge forward again is wasted work.
  *
  * Every other gateway concern (bearer auth, model resolve, credential fetch,
@@ -605,7 +605,7 @@ async function handlePiNative(bootOpts: AuthGatewayBootOptions, req: Request, pe
 		sessionId,
 		apiKey,
 		controller.signal,
-		"pi-native",
+		"reactor-native",
 		peer,
 	);
 	if (model.api === "openai-codex-responses") {
@@ -626,7 +626,7 @@ async function handlePiNative(bootOpts: AuthGatewayBootOptions, req: Request, pe
 
 	logger.info("auth-gateway request", {
 		requestId,
-		format: "pi-native",
+		format: "reactor-native",
 		model: parsed.modelId,
 		resolvedProvider: model.provider,
 		resolvedModel: model.id,
@@ -643,7 +643,7 @@ async function handlePiNative(bootOpts: AuthGatewayBootOptions, req: Request, pe
 					message.errorMessage ??
 					(message.stopReason === "aborted" ? "Request was aborted" : "Upstream request failed");
 				logger.warn("auth-gateway non-streaming failed", {
-					format: "pi-native",
+					format: "reactor-native",
 					reason: message.stopReason,
 					error: errorMessage,
 					peer,
@@ -658,7 +658,11 @@ async function handlePiNative(bootOpts: AuthGatewayBootOptions, req: Request, pe
 		} catch (error) {
 			if (controller.signal.aborted) return aborted();
 			const classified = classifyGatewayError(error);
-			logger.warn("auth-gateway non-streaming aborted", { format: "pi-native", error: classified.message, peer });
+			logger.warn("auth-gateway non-streaming aborted", {
+				format: "reactor-native",
+				error: classified.message,
+				peer,
+			});
 			return piNative.formatError(classified.status, classified.type, classified.message);
 		}
 	}
@@ -669,7 +673,7 @@ async function handlePiNative(bootOpts: AuthGatewayBootOptions, req: Request, pe
 		events = streamSimple(model, parsed.context, streamOpts);
 	} catch (error) {
 		const classified = classifyGatewayError(error);
-		logger.warn("auth-gateway streamSimple threw", { format: "pi-native", error: classified.message, peer });
+		logger.warn("auth-gateway streamSimple threw", { format: "reactor-native", error: classified.message, peer });
 		return piNative.formatError(classified.status, classified.type, classified.message);
 	}
 	if (controller.signal.aborted) return aborted();

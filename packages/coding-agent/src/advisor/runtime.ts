@@ -1,13 +1,13 @@
-import type { AgentMessage } from "@oh-my-pi/pi-agent-core";
-import { estimateTokens } from "@oh-my-pi/pi-agent-core/compaction";
-import type { AssistantMessage, ImageContent, TextContent } from "@oh-my-pi/pi-ai";
-import * as AIError from "@oh-my-pi/pi-ai/error";
-import { logger } from "@oh-my-pi/pi-utils";
+import type { AgentMessage } from "@reactor/agent-core";
+import { estimateTokens } from "@reactor/agent-core/compaction";
+import type { AssistantMessage, ImageContent, TextContent } from "@reactor/ai";
+import * as AIError from "@reactor/ai/error";
+import { logger } from "@reactor/utils";
 import { obfuscateToolArguments, type SecretObfuscator } from "../secrets/obfuscator";
 import { formatSessionHistoryMarkdown, PRIMARY_CONTEXT_CUSTOM_TYPES } from "../session/session-history-format";
 
 /**
- * Minimal slice of `Agent` the runtime drives — satisfied by pi-agent-core
+ * Minimal slice of `Agent` the runtime drives — satisfied by agent-core
  * `Agent`. `state.error` mirrors `Agent.state.error`: provider/stream failures
  * the loop catches internally never reject `prompt()`, so the runtime reads
  * this field after every prompt to detect a failed turn.

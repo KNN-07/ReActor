@@ -6,8 +6,8 @@ import * as url from "node:url";
 import {
 	__rewriteLegacyExtensionSourceForTests,
 	loadLegacyPiModule,
-} from "@oh-my-pi/pi-coding-agent/extensibility/plugins/legacy-pi-compat";
-import { removeWithRetries } from "@oh-my-pi/pi-utils";
+} from "@reactor/coding-agent/extensibility/plugins/legacy-pi-compat";
+import { removeWithRetries } from "@reactor/utils";
 
 // Issue #1674: legacy Pi extensions load browser-UI assets (HTML/CSS) at module
 // init via `readFileSync(join(__dirname, "ui.html"))`. The compat layer must run
@@ -25,7 +25,7 @@ afterAll(async () => {
 });
 
 async function writePackage(files: Record<string, string>): Promise<string> {
-	const dir = await fs.mkdtemp(path.join(os.tmpdir(), "omp-legacy-inplace-"));
+	const dir = await fs.mkdtemp(path.join(os.tmpdir(), "reactor-legacy-inplace-"));
 	tempRoots.push(dir);
 	for (const rel in files) {
 		const abs = path.join(dir, rel);
@@ -440,7 +440,7 @@ describe("legacy-pi in-place module loading (issue #1674)", () => {
 				// `@earendil-works/*` is a fork alias with no real published package,
 				// so a working import proves the load-time rewrite fired rather than
 				// a coincidental native resolution against a cached package.
-				'import { z } from "@earendil-works/pi-ai";',
+				'import { z } from "@earendil-works/ai";',
 				"export const depValue = cjs.value;",
 				'export const hasZod = typeof z?.object === "function";',
 				"export default function (pi) { void pi; }",
@@ -460,7 +460,7 @@ describe("legacy-pi in-place module loading (issue #1674)", () => {
 		const dir = await writePackage({
 			"package.json": JSON.stringify({ name: "legacy-tool-factory-ext", version: "1.0.0" }),
 			"index.ts": [
-				'import { Text } from "@earendil-works/pi-tui";',
+				'import { Text } from "@earendil-works/tui";',
 				"import {",
 				"  createBashToolDefinition,",
 				"  createFindToolDefinition,",
@@ -471,7 +471,7 @@ describe("legacy-pi in-place module loading (issue #1674)", () => {
 				"  getLanguageFromPath,",
 				"  highlightCode,",
 				"  truncateHead,",
-				'} from "@earendil-works/pi-coding-agent";',
+				'} from "@earendil-works/coding-agent";',
 				"const cwd = process.cwd();",
 				"const definitions = [",
 				"  createBashToolDefinition(cwd),",
@@ -514,7 +514,7 @@ describe("legacy-pi in-place module loading (issue #1674)", () => {
 		const dir = await writePackage({
 			"package.json": JSON.stringify({ name: "legacy-bash-ops-ext", version: "1.0.0" }),
 			"index.ts": [
-				'import { createBashToolDefinition } from "@earendil-works/pi-coding-agent";',
+				'import { createBashToolDefinition } from "@earendil-works/coding-agent";',
 				"const updates = [];",
 				"let captured;",
 				"const tool = createBashToolDefinition(process.cwd(), {",
@@ -564,7 +564,7 @@ describe("legacy-pi in-place module loading (issue #1674)", () => {
 		const dir = await writePackage({
 			"package.json": JSON.stringify({ name: "legacy-find-ops-ext", version: "1.0.0" }),
 			"index.ts": [
-				'import { createFindToolDefinition } from "@earendil-works/pi-coding-agent";',
+				'import { createFindToolDefinition } from "@earendil-works/coding-agent";',
 				"const tool = createFindToolDefinition('/remote/project', {",
 				"  operations: {",
 				"    exists: () => true,",
@@ -692,12 +692,12 @@ describe("legacy-pi in-place module loading (issue #1674)", () => {
 		expect(loadSource).toContain(addon.replaceAll("\\", "/"));
 	});
 
-	it("remaps legacy pi-ai utils/oauth subpaths to registry OAuth exports", async () => {
+	it("remaps legacy ai utils/oauth subpaths to registry OAuth exports", async () => {
 		const dir = await writePackage({
 			"package.json": JSON.stringify({ name: "legacy-oauth-ext", version: "1.0.0" }),
 			"index.ts": [
-				'import { registerOAuthProvider } from "@mariozechner/pi-ai/utils/oauth";',
-				'import { refreshAnthropicToken } from "@mariozechner/pi-ai/utils/oauth/anthropic";',
+				'import { registerOAuthProvider } from "@mariozechner/ai/utils/oauth";',
+				'import { refreshAnthropicToken } from "@mariozechner/ai/utils/oauth/anthropic";',
 				'export const hasRegisterOAuthProvider = typeof registerOAuthProvider === "function";',
 				'export const hasRefreshAnthropicToken = typeof refreshAnthropicToken === "function";',
 				"export default function (pi) { void pi; }",
@@ -717,7 +717,7 @@ describe("legacy-pi in-place module loading (issue #1674)", () => {
 		const dir = await writePackage({
 			"package.json": JSON.stringify({ name: "dist-ext", version: "1.0.0" }),
 			"src/helper.ts": [
-				'import { isCompiledBinary } from "@earendil-works/pi-utils";',
+				'import { isCompiledBinary } from "@earendil-works/utils";',
 				'export const ok = typeof isCompiledBinary === "function";',
 			].join("\n"),
 			"dist/extension.ts": [
@@ -742,7 +742,7 @@ describe("legacy-pi in-place module loading (issue #1674)", () => {
 			// `@earendil-works/*` only resolves via the rewrite, so an un-rewritten
 			// import fails — proving the hook did not over-reach to this sibling.
 			"unrelated.ts": [
-				'import { z } from "@earendil-works/pi-ai";',
+				'import { z } from "@earendil-works/ai";',
 				'export const hasZod = typeof z?.object === "function";',
 			].join("\n"),
 		});
@@ -753,6 +753,6 @@ describe("legacy-pi in-place module loading (issue #1674)", () => {
 		// Loading the un-imported sibling directly must NOT benefit from the
 		// extension's rewrite hook; its fork-scope import stays unresolved.
 		const siblingUrl = `${url.pathToFileURL(await fs.realpath(path.join(dir, "unrelated.ts"))).href}?nonce=${Date.now()}`;
-		await expect(import(siblingUrl)).rejects.toThrow(/@earendil-works\/pi-ai/);
+		await expect(import(siblingUrl)).rejects.toThrow(/@earendil-works\/ai/);
 	});
 });

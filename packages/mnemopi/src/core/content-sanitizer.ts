@@ -19,8 +19,8 @@ export interface BlobMetadata {
 }
 
 export function blobRoot(env: NodeJS.ProcessEnv = process.env): string {
-	return env.MNEMOPI_BLOB_DIR && env.MNEMOPI_BLOB_DIR.length > 0
-		? env.MNEMOPI_BLOB_DIR
+	return env.REACTOR_MNEMOPI_BLOB_DIR && env.REACTOR_MNEMOPI_BLOB_DIR.length > 0
+		? env.REACTOR_MNEMOPI_BLOB_DIR
 		: join(homedir(), ".hermes", "mnemopi", "blobs");
 }
 

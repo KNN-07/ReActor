@@ -101,10 +101,10 @@ export function parseEnvFile(filePath: string): Record<string, string> {
 		// File doesn't exist or can't be read - return empty result
 	}
 
-	// OMP_ overrides PI_
+	// REACTOR_ overrides REACTOR_
 	for (const k in result) {
-		if (k.startsWith("OMP_")) {
-			result[`PI_${k.slice(4)}`] = result[k];
+		if (k.startsWith("REACTOR_")) {
+			result[`REACTOR_${k.slice(4)}`] = result[k];
 		}
 	}
 
@@ -132,7 +132,7 @@ for (const file of [projectEnv, agentEnv, piEnv, homeEnv]) {
 	}
 }
 
-// Directory-affecting keys (XDG_*_HOME, and in default mode PI_CODING_AGENT_DIR)
+// Directory-affecting keys (XDG_*_HOME, and in default mode REACTOR_CODING_AGENT_DIR)
 // may have just arrived from the profile/agent `.env` applied above. The dirs
 // resolver cached its paths at module load — before this file ran — so rebuild
 // it now from the updated env. `getAgentDir()` already located the `.env` from
@@ -142,7 +142,7 @@ refreshDirsFromEnv();
 /**
  * Intentional re-export of Bun.env.
  *
- * All users should import this env module (import { $env } from "@oh-my-pi/pi-utils")
+ * All users should import this env module (import { $env } from "@reactor/utils")
  * before using environment variables. This ensures that .env files have been loaded and
  * overrides (project, home) have been applied, so $env always reflects the correct values.
  */
@@ -212,11 +212,11 @@ export function setTerminalHeadless(headless: boolean): boolean {
  * binary. Detects via the embedded virtual-filesystem path markers
  * (`$bunfs`, `~BUN`, or its URL-encoded form `%7EBUN`) in `import.meta.url`,
  * which Bun rewrites for every module bundled into the executable. The
- * `PI_COMPILED` env var (set by the build script's `--define`) is checked
+ * `REACTOR_COMPILED` env var (set by the build script's `--define`) is checked
  * first for cheap fast-path detection.
  */
 export function isCompiledBinary(): boolean {
-	if (process.env.PI_COMPILED || Bun.env.PI_COMPILED) return true;
+	if (process.env.REACTOR_COMPILED || Bun.env.REACTOR_COMPILED) return true;
 	const url = import.meta.url;
 	return url.includes("$bunfs") || url.includes("~BUN") || url.includes("%7EBUN");
 }

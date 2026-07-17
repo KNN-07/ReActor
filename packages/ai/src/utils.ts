@@ -1,4 +1,4 @@
-import { $env } from "@oh-my-pi/pi-utils";
+import { $env } from "@reactor/utils";
 import type { ResponseInput, ResponseInputItem } from "./providers/openai-responses-wire";
 import { redactSensitiveCredentials } from "./providers/transform-messages";
 import type { CacheRetention, OpenAIResponsesHistoryPayload, ProviderPayload } from "./types";
@@ -6,7 +6,7 @@ import type { CacheRetention, OpenAIResponsesHistoryPayload, ProviderPayload } f
 type OpenAIResponsesReplayItem = ResponseInput[number];
 const NON_WHITESPACE_RE = /\S/;
 
-export { isRecord } from "@oh-my-pi/pi-utils";
+export { isRecord } from "@reactor/utils";
 export function normalizeSystemPrompts(systemPrompt: readonly string[] | string | undefined | null): string[] {
 	if (systemPrompt === undefined || systemPrompt === null) return [];
 	const prompts = Array.isArray(systemPrompt) ? systemPrompt : typeof systemPrompt === "string" ? [systemPrompt] : [];
@@ -288,10 +288,10 @@ export function getOpenAIResponsesHistoryItems(
 
 /**
  * Resolve cache retention preference.
- * Defaults to "short" and uses PI_CACHE_RETENTION for backward compatibility.
+ * Defaults to "short" and uses REACTOR_CACHE_RETENTION for backward compatibility.
  */
 export function resolveCacheRetention(cacheRetention?: CacheRetention): CacheRetention {
 	if (cacheRetention) return cacheRetention;
-	if ($env.PI_CACHE_RETENTION === "long") return "long";
+	if ($env.REACTOR_CACHE_RETENTION === "long") return "long";
 	return "short";
 }

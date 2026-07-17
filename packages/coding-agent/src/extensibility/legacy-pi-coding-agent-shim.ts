@@ -1,7 +1,7 @@
 /**
  * Compatibility shim for legacy extensions importing the package root of
- * `@oh-my-pi/pi-coding-agent` (or one of its aliased scopes like
- * `@earendil-works/pi-coding-agent` or `@mariozechner/pi-coding-agent`).
+ * `@reactor/coding-agent` (or one of its aliased scopes like
+ * `@earendil-works/coding-agent` or `@mariozechner/coding-agent`).
  *
  * The coding-agent package's own barrel (`./src/index.ts`) cannot be listed
  * as a `bun --compile` extra entrypoint alongside the CLI entry without
@@ -9,15 +9,15 @@
  * Routing legacy plugin imports through this sibling shim sidesteps that
  * conflict: bun bundles a distinct entry whose path differs from the CLI
  * entry, while still re-exporting the canonical surface so plugins observe
- * the same module identity as a direct `@oh-my-pi/pi-coding-agent` import.
+ * the same module identity as a direct `@reactor/coding-agent` import.
  */
 
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import type { AgentToolResult, AgentToolUpdateCallback } from "@oh-my-pi/pi-agent-core";
-import type { TSchema } from "@oh-my-pi/pi-ai";
-import { Text } from "@oh-my-pi/pi-tui";
-import { getAgentDir, getProjectDir, parseFrontmatter as parseOmpFrontmatter } from "@oh-my-pi/pi-utils";
+import type { AgentToolResult, AgentToolUpdateCallback } from "@reactor/agent-core";
+import type { TSchema } from "@reactor/ai";
+import { Text } from "@reactor/tui";
+import { getAgentDir, getProjectDir, parseFrontmatter as parseOmpFrontmatter } from "@reactor/utils";
 import type { PromptTemplate } from "../config/prompt-templates";
 import { type SettingPath, Settings } from "../config/settings";
 import { EditTool } from "../edit";
@@ -27,7 +27,7 @@ import {
 	discoverPromptTemplates,
 	discoverSessionExtensionPaths,
 	discoverSkills,
-	createAgentSession as ompCreateAgentSession,
+	createAgentSession as reactorCreateAgentSession,
 } from "../sdk";
 import {
 	DEFAULT_MAX_BYTES,
@@ -53,7 +53,7 @@ import { loadSkillsFromDir } from "./skills";
 import { Type } from "./typebox";
 
 const TOOL_DEFINITION_MARKER = "__isToolDefinition";
-const LEGACY_BUILTIN_TOOL_MARKER = "__ompLegacyBuiltinTool";
+const LEGACY_BUILTIN_TOOL_MARKER = "__reactorLegacyBuiltinTool";
 const LEGACY_CODING_TOOL_NAMES = ["read", "bash", "edit", "write"] as const;
 const LEGACY_READ_ONLY_TOOL_NAMES = ["read", "grep", "find", "ls"] as const;
 
@@ -693,7 +693,7 @@ export interface DefaultPackageManagerOptions {
 }
 
 /**
- * Enumerates the extensions OMP would load through the historical package
+ * Enumerates the extensions ReActor would load through the historical package
  * manager surface used by legacy extensions.
  */
 export class DefaultPackageManager {
@@ -707,7 +707,7 @@ export class DefaultPackageManager {
 		this.#settingsManager = options.settingsManager;
 	}
 
-	/** Resolve enabled extension paths with their OMP plugin provenance. */
+	/** Resolve enabled extension paths with their ReActor plugin provenance. */
 	async resolve(_onMissing?: (source: string) => Promise<MissingSourceAction>): Promise<ResolvedPaths> {
 		const settings = await this.#settingsManager;
 		const configuredPaths = settings.get("extensions") ?? [];
@@ -753,7 +753,7 @@ export class DefaultPackageManager {
 /**
  * Resource-loader compatibility layer for legacy pi extensions.
  *
- * Upstream `@earendil-works/pi-coding-agent` centralizes extension / skill /
+ * Upstream `@earendil-works/coding-agent` centralizes extension / skill /
  * prompt / theme / AGENTS.md discovery inside a `DefaultResourceLoader`
  * instance that the caller constructs, `reload()`s, and hands to
  * `createAgentSession({ resourceLoader })`. Every published version of
@@ -761,18 +761,18 @@ export class DefaultPackageManager {
  * import the class at module scope; a missing export takes the whole
  * extension down at parse time (issue #4567).
  *
- * OMP does the same discovery inline inside `createAgentSession()`, so this
+ * ReActor does the same discovery inline inside `createAgentSession()`, so this
  * shim intentionally does NOT re-implement pi's ResourceLoader plumbing.
  * Instead the loader captures the caller's intent (`no*` flags, `*Override`
  * callbacks, `additional*Paths`, `extensionFactories`, `settingsManager`,
  * `eventBus`) plus the discovery results, and the sibling `createAgentSession`
- * override below translates them into OMP's native session options
+ * override below translates them into ReActor's native session options
  * (`disableExtensionDiscovery`, `preloadedExtensionPaths`, `extensions`,
  * `skills`, `promptTemplates`, `contextFiles`, `settings`, `eventBus`,
  * `systemPrompt`) before delegating to `../sdk`.
  *
  * The pi surface it emulates is the intersection actually used by real
- * extensions in the wild — themes are silently dropped (OMP has no
+ * extensions in the wild — themes are silently dropped (ReActor has no
  * session-level themes surface); `extendResources`, `loadProjectTrustExtensions`,
  * and provider-trust hooks are omitted.
  */
@@ -844,7 +844,7 @@ export interface ResourceLoader {
 	getAppendSystemPrompt(): string[];
 	reload(): Promise<void>;
 	/** @internal — used by the shim's createAgentSession to detect its own loaders. */
-	readonly __ompLegacyPiLoader?: true;
+	readonly __reactorLegacyPiLoader?: true;
 }
 
 /**
@@ -877,7 +877,7 @@ interface AdditionalPromptLoadResult {
 }
 
 export class DefaultResourceLoader implements ResourceLoader {
-	readonly __ompLegacyPiLoader = true as const;
+	readonly __reactorLegacyPiLoader = true as const;
 	#state: ResolvedLoaderState;
 	#options: DefaultResourceLoaderOptions;
 	#extensionsResult: LoadExtensionsResult = { extensions: [], errors: [], runtime: new ExtensionRuntime() };
@@ -1197,15 +1197,15 @@ export class DefaultResourceLoader implements ResourceLoader {
 }
 
 /**
- * Legacy pi extensions call `createAgentSession({ resourceLoader })`. OMP's
+ * Legacy pi extensions call `createAgentSession({ resourceLoader })`. ReActor's
  * native option surface has no such field — extension / skill / prompt /
  * context-file discovery are configured directly on the session options — so
  * an untranslated call would silently ignore the loader (including its
- * `noExtensions`/`noSkills` opt-outs), re-run OMP's own discovery, and
+ * `noExtensions`/`noSkills` opt-outs), re-run ReActor's own discovery, and
  * happily re-load the calling extension into the subagent. That's exactly
  * the recursion the caller passed the loader to prevent.
  *
- * Translate the loader's captured state into OMP's option fields, then
+ * Translate the loader's captured state into ReActor's option fields, then
  * delegate to the underlying SDK. Explicit fields on `options` override the
  * loader (matches upstream pi semantics — a caller can partially override a
  * shared loader).
@@ -1222,7 +1222,7 @@ export async function createAgentSession(
 ): Promise<CreateAgentSessionResult> {
 	const loader = options.resourceLoader;
 	if (!loader) {
-		return ompCreateAgentSession(options);
+		return reactorCreateAgentSession(options);
 	}
 
 	if (loader instanceof DefaultResourceLoader && !loader.loaded) {
@@ -1285,7 +1285,7 @@ export async function createAgentSession(
 		forwarded.appendSystemPrompt = state.appendSystemPrompt.join("\n\n");
 	}
 
-	return ompCreateAgentSession(forwarded);
+	return reactorCreateAgentSession(forwarded);
 }
 
 export * from "../index";

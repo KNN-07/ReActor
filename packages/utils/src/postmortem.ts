@@ -120,7 +120,7 @@ export function registerStdioDisconnectHandling(): () => void {
 // Well-known key marking an error as an *expected* teardown artifact (e.g. a
 // browser run-scope abort at normal run end). `Symbol.for` so the marker
 // survives duplicate module instances across bundles/realms.
-const EXPECTED_CLEANUP = Symbol.for("omp.expectedCleanupError");
+const EXPECTED_CLEANUP = Symbol.for("reactor.expectedCleanupError");
 
 /**
  * Mark an error as expected cleanup fallout so the global fatal handlers

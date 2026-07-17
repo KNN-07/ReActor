@@ -1,4 +1,4 @@
-import { logger } from "@oh-my-pi/pi-utils";
+import { logger } from "@reactor/utils";
 import { Settings } from "../config/settings";
 import { OutputSink } from "../session/streaming-output";
 import type { ToolSession } from "../tools";
@@ -252,12 +252,12 @@ export function createCancelledKernelResult(output: string): KernelExecutionResu
 // ---------------------------------------------------------------------------
 
 export const MANAGED_KERNEL_ENV_KEYS = [
-	"PI_SESSION_FILE",
-	"PI_ARTIFACTS_DIR",
-	"PI_TOOL_BRIDGE_URL",
-	"PI_TOOL_BRIDGE_TOKEN",
-	"PI_TOOL_BRIDGE_SESSION",
-	"PI_EVAL_LOCAL_ROOTS",
+	"REACTOR_SESSION_FILE",
+	"REACTOR_ARTIFACTS_DIR",
+	"REACTOR_TOOL_BRIDGE_URL",
+	"REACTOR_TOOL_BRIDGE_TOKEN",
+	"REACTOR_TOOL_BRIDGE_SESSION",
+	"REACTOR_EVAL_LOCAL_ROOTS",
 ] as const;
 
 interface ManagedKernelEnvOptions {
@@ -271,12 +271,12 @@ interface ManagedKernelEnvOptions {
 export function buildManagedKernelEnvPatch(options: ManagedKernelEnvOptions): Record<string, string | null> {
 	const localRoots = options.localRoots;
 	return {
-		PI_SESSION_FILE: options.sessionFile ?? null,
-		PI_ARTIFACTS_DIR: options.artifactsDir ?? null,
-		PI_TOOL_BRIDGE_URL: options.bridge?.url ?? null,
-		PI_TOOL_BRIDGE_TOKEN: options.bridge?.token ?? null,
-		PI_TOOL_BRIDGE_SESSION: options.bridge && options.bridgeSessionId ? options.bridgeSessionId : null,
-		PI_EVAL_LOCAL_ROOTS: localRoots && Object.keys(localRoots).length > 0 ? JSON.stringify(localRoots) : null,
+		REACTOR_SESSION_FILE: options.sessionFile ?? null,
+		REACTOR_ARTIFACTS_DIR: options.artifactsDir ?? null,
+		REACTOR_TOOL_BRIDGE_URL: options.bridge?.url ?? null,
+		REACTOR_TOOL_BRIDGE_TOKEN: options.bridge?.token ?? null,
+		REACTOR_TOOL_BRIDGE_SESSION: options.bridge && options.bridgeSessionId ? options.bridgeSessionId : null,
+		REACTOR_EVAL_LOCAL_ROOTS: localRoots && Object.keys(localRoots).length > 0 ? JSON.stringify(localRoots) : null,
 	};
 }
 

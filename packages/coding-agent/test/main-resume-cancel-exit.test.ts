@@ -12,11 +12,11 @@
  */
 import { describe, expect, it, vi } from "bun:test";
 import * as path from "node:path";
-import { parseArgs } from "@oh-my-pi/pi-coding-agent/cli/args";
-import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { runRootCommand } from "@oh-my-pi/pi-coding-agent/main";
-import { AuthStorage } from "@oh-my-pi/pi-coding-agent/session/auth-storage";
-import { TempDir } from "@oh-my-pi/pi-utils";
+import { parseArgs } from "@reactor/coding-agent/cli/args";
+import { Settings } from "@reactor/coding-agent/config/settings";
+import { runRootCommand } from "@reactor/coding-agent/main";
+import { AuthStorage } from "@reactor/coding-agent/session/auth-storage";
+import { TempDir } from "@reactor/utils";
 
 class ProcessExitSignal extends Error {
 	constructor(readonly code: number) {
@@ -27,7 +27,7 @@ class ProcessExitSignal extends Error {
 
 describe("runRootCommand — startup --resume picker cancellation", () => {
 	it("exits cleanly (process.exit 0) when the picker is cancelled instead of returning and hanging", async () => {
-		using tempDir = TempDir.createSync("@omp-resume-cancel-");
+		using tempDir = TempDir.createSync("@reactor-resume-cancel-");
 		const sessionDir = tempDir.path();
 		// One valid session so folderSessions is non-empty and the picker (not the
 		// "No sessions found" probe) is the path under test.

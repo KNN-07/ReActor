@@ -32,7 +32,7 @@ concurrency:
 
 env:
    FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-   # glibc floor for shipped linux native addons. The omp-kata runner image is
+   # glibc floor for shipped linux native addons. The reactor-kata runner image is
    # Ubuntu 24.04 (glibc 2.39); a plain native build links 2.39 symbol versions
    # and fails to dlopen on older distros. Building the linux-gnu addons through
    # cargo-zigbuild against this floor keeps them portable. Bump to raise the
@@ -56,7 +56,7 @@ jobs:
    # ref (or from a tagged main HEAD) is also treated as a release.
    release_metadata:
       name: Resolve release metadata
-      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'omp-kata' }}
+      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'reactor-kata' }}
       outputs:
          is-release: ${{ steps.detect.outputs.is-release }}
          release-tag: ${{ steps.detect.outputs.release-tag }}
@@ -98,7 +98,7 @@ jobs:
    # then look for any prior successful main run that already uploaded the
    # native artifacts for this hash. Two independent outputs:
    #   * `linux-x64-run-id` — set when the linux x64 canary
-   #     (`pi-natives-linux-x64-modern-h<hash>`) is present on a prior main run,
+   #     (`reactor-natives-linux-x64-modern-h<hash>`) is present on a prior main run,
    #     so native-dependent TS test jobs and `native_linux_x64` can reuse it.
    #   * `cross-platform-run-id` — set when ALL cross-platform native artifacts
    #     also have non-expired artifacts on that same prior run, so
@@ -108,7 +108,7 @@ jobs:
    # retention window (see build-native action) is the effective TTL.
    native_artifact_lookup:
       name: Look up cached native artifacts
-      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'omp-kata' }}
+      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'reactor-kata' }}
       outputs:
          source-hash: ${{ steps.compute.outputs.source-hash }}
          linux-x64-run-id: ${{ steps.find.outputs.linux-x64-run-id }}
@@ -139,14 +139,14 @@ jobs:
               # Canary for native_linux_x64: presence of the modern artifact
               # implies the baseline sibling is also there (they upload from the
               # same job).
-              linux_canary="pi-natives-linux-x64-modern-h${hash}"
+              linux_canary="reactor-natives-linux-x64-modern-h${hash}"
               # Required set for cross-platform reuse — names must match the
               # `actions/upload-artifact` `name:` template in build-native action.
               cross_platform_required=(
-                "pi-natives-linux-arm64-h${hash}"
-                "pi-natives-darwin-x64-baseline-h${hash}"
-                "pi-natives-darwin-arm64-h${hash}"
-                "pi-natives-win32-x64-baseline-h${hash}"
+                "reactor-natives-linux-arm64-h${hash}"
+                "reactor-natives-darwin-x64-baseline-h${hash}"
+                "reactor-natives-darwin-arm64-h${hash}"
+                "reactor-natives-win32-x64-baseline-h${hash}"
               )
               linux_x64_run_id=""
               cross_platform_run_id=""
@@ -199,7 +199,7 @@ jobs:
    # Fast lint, type check, and browser bundle build (no Rust, no native build needed)
    check:
       name: Lint, type check & web build
-      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'omp-kata' }}
+      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'reactor-kata' }}
       steps:
          - uses: actions/checkout@v4
          - uses: ./.github/actions/bun-install
@@ -215,7 +215,7 @@ jobs:
       name: "Native: Linux x64 (${{ matrix.variant }})"
       needs: [release_metadata, native_artifact_lookup]
       if: ${{ needs.release_metadata.outputs.is-release == 'true' || needs.native_artifact_lookup.outputs.linux-x64-run-id == '' }}
-      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'omp-kata' }}
+      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'reactor-kata' }}
       strategy:
          fail-fast: false
          matrix:
@@ -245,8 +245,8 @@ jobs:
          fail-fast: false
          matrix:
             include:
-               - { os: omp-kata, platform: linux, arch: arm64, target: aarch64-unknown-linux-gnu }
-               - { os: omp-kata, platform: win32, arch: x64, target: x86_64-pc-windows-msvc, variant: baseline }
+               - { os: reactor-kata, platform: linux, arch: arm64, target: aarch64-unknown-linux-gnu }
+               - { os: reactor-kata, platform: win32, arch: x64, target: x86_64-pc-windows-msvc, variant: baseline }
       runs-on: ${{ matrix.os }}
       steps:
          - uses: actions/checkout@v4
@@ -283,7 +283,7 @@ jobs:
               save_cache: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
    test_workspace:
       name: Test TS workspace fast
-      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'omp-kata' }}
+      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'reactor-kata' }}
       needs: [native_linux_x64, native_artifact_lookup]
       if: ${{ !cancelled() && needs.native_linux_x64.result != 'failure' }}
       timeout-minutes: 20
@@ -303,7 +303,7 @@ jobs:
          - name: Download native addons
            uses: actions/download-artifact@v4
            with:
-              pattern: pi-natives-linux-x64-*-h${{ needs.native_artifact_lookup.outputs.source-hash }}
+              pattern: reactor-natives-linux-x64-*-h${{ needs.native_artifact_lookup.outputs.source-hash }}
               path: packages/natives/native
               merge-multiple: true
               run-id: ${{ steps.source.outputs.artifact-run-id }}
@@ -313,7 +313,7 @@ jobs:
 
    test_coding_agent_singleton:
       name: Test coding-agent singleton/global-state (TS)
-      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'omp-kata' }}
+      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'reactor-kata' }}
       needs: [native_linux_x64, native_artifact_lookup]
       if: ${{ !cancelled() && needs.native_linux_x64.result != 'failure' }}
       timeout-minutes: 20
@@ -333,7 +333,7 @@ jobs:
          - name: Download native addons
            uses: actions/download-artifact@v4
            with:
-              pattern: pi-natives-linux-x64-*-h${{ needs.native_artifact_lookup.outputs.source-hash }}
+              pattern: reactor-natives-linux-x64-*-h${{ needs.native_artifact_lookup.outputs.source-hash }}
               path: packages/natives/native
               merge-multiple: true
               run-id: ${{ steps.source.outputs.artifact-run-id }}
@@ -345,7 +345,7 @@ jobs:
 
    test_ts_native:
       name: Test TS native/integration packages
-      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'omp-kata' }}
+      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'reactor-kata' }}
       needs: [native_linux_x64, native_artifact_lookup]
       if: ${{ !cancelled() && needs.native_linux_x64.result != 'failure' }}
       timeout-minutes: 25
@@ -366,7 +366,7 @@ jobs:
          - name: Download native addons
            uses: actions/download-artifact@v4
            with:
-              pattern: pi-natives-linux-x64-*-h${{ needs.native_artifact_lookup.outputs.source-hash }}
+              pattern: reactor-natives-linux-x64-*-h${{ needs.native_artifact_lookup.outputs.source-hash }}
               path: packages/natives/native
               merge-multiple: true
               run-id: ${{ steps.source.outputs.artifact-run-id }}
@@ -376,7 +376,7 @@ jobs:
 
    test_coding_agent_ui:
       name: Test coding-agent UI/TUI (TS)
-      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'omp-kata' }}
+      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'reactor-kata' }}
       needs: [native_linux_x64, native_artifact_lookup]
       if: ${{ !cancelled() && needs.native_linux_x64.result != 'failure' }}
       timeout-minutes: 25
@@ -397,7 +397,7 @@ jobs:
          - name: Download native addons
            uses: actions/download-artifact@v4
            with:
-              pattern: pi-natives-linux-x64-*-h${{ needs.native_artifact_lookup.outputs.source-hash }}
+              pattern: reactor-natives-linux-x64-*-h${{ needs.native_artifact_lookup.outputs.source-hash }}
               path: packages/natives/native
               merge-multiple: true
               run-id: ${{ steps.source.outputs.artifact-run-id }}
@@ -407,7 +407,7 @@ jobs:
 
    test_coding_agent_runtime:
       name: Test coding-agent runtime/session (TS)
-      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'omp-kata' }}
+      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'reactor-kata' }}
       needs: [native_linux_x64, native_artifact_lookup]
       if: ${{ !cancelled() && needs.native_linux_x64.result != 'failure' }}
       timeout-minutes: 25
@@ -427,7 +427,7 @@ jobs:
          - name: Download native addons
            uses: actions/download-artifact@v4
            with:
-              pattern: pi-natives-linux-x64-*-h${{ needs.native_artifact_lookup.outputs.source-hash }}
+              pattern: reactor-natives-linux-x64-*-h${{ needs.native_artifact_lookup.outputs.source-hash }}
               path: packages/natives/native
               merge-multiple: true
               run-id: ${{ steps.source.outputs.artifact-run-id }}
@@ -439,7 +439,7 @@ jobs:
 
    test_coding_agent_native:
       name: Test coding-agent native/unit (TS)
-      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'omp-kata' }}
+      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'reactor-kata' }}
       needs: [native_linux_x64, native_artifact_lookup]
       if: ${{ !cancelled() && needs.native_linux_x64.result != 'failure' }}
       timeout-minutes: 25
@@ -460,7 +460,7 @@ jobs:
          - name: Download native addons
            uses: actions/download-artifact@v4
            with:
-              pattern: pi-natives-linux-x64-*-h${{ needs.native_artifact_lookup.outputs.source-hash }}
+              pattern: reactor-natives-linux-x64-*-h${{ needs.native_artifact_lookup.outputs.source-hash }}
               path: packages/natives/native
               merge-multiple: true
               run-id: ${{ steps.source.outputs.artifact-run-id }}
@@ -470,7 +470,7 @@ jobs:
 
    test_smoke:
       name: Test CLI smoke (TS)
-      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'omp-kata' }}
+      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'reactor-kata' }}
       needs: [native_linux_x64, native_artifact_lookup]
       if: ${{ !cancelled() && needs.native_linux_x64.result != 'failure' }}
       timeout-minutes: 15
@@ -491,7 +491,7 @@ jobs:
          - name: Download native addons
            uses: actions/download-artifact@v4
            with:
-              pattern: pi-natives-linux-x64-*-h${{ needs.native_artifact_lookup.outputs.source-hash }}
+              pattern: reactor-natives-linux-x64-*-h${{ needs.native_artifact_lookup.outputs.source-hash }}
               path: packages/natives/native
               merge-multiple: true
               run-id: ${{ steps.source.outputs.artifact-run-id }}
@@ -501,7 +501,7 @@ jobs:
 
    install_methods:
       name: Install method smoke tests
-      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'omp-kata' }}
+      runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-22.04' || 'reactor-kata' }}
       steps:
          - uses: actions/checkout@v4
          - uses: ./.github/actions/ensure-rust-toolchain
@@ -511,7 +511,7 @@ jobs:
            id: detect
            shell: bash
            run: |
-              # $SCCACHE_BUCKET is injected only on self-hosted omp-kata pods; its
+              # $SCCACHE_BUCKET is injected only on self-hosted reactor-kata pods; its
               # presence selects baked sccache + shared S3. GitHub-hosted runners
               # (PRs) need sccache-action to export the GHA cache URL/token into the
               # step env — a bare binary install leaves SCCACHE_GHA_ENABLED set with
@@ -522,7 +522,7 @@ jobs:
               else
                 echo "on_infra=false" >> "$GITHUB_OUTPUT"
               fi
-         - name: Ensure baked sccache (omp-kata)
+         - name: Ensure baked sccache (reactor-kata)
            if: steps.detect.outputs.on_infra == 'true'
            uses: ./.github/actions/ensure-sccache
            with:
@@ -531,7 +531,7 @@ jobs:
            if: steps.detect.outputs.on_infra == 'false'
            uses: mozilla-actions/sccache-action@v0.0.10
          - name: Enable sccache for cargo
-           # Conditional backend: self-hosted omp-kata injects a shared S3
+           # Conditional backend: self-hosted reactor-kata injects a shared S3
            # (RustFS) sccache via pod env; GitHub-hosted runners keep the GHA
            # cache. CARGO_INCREMENTAL=0 keeps sccache from silently no-oping.
            shell: bash
@@ -574,35 +574,35 @@ jobs:
                     platform: linux,
                     arch: x64,
                     target_id: linux-x64,
-                    binary_path: packages/coding-agent/binaries/omp-linux-x64,
+                    binary_path: packages/coding-agent/binaries/reactor-linux-x64,
                  }
                - {
                     os: ubuntu-24.04-arm,
                     platform: linux,
                     arch: arm64,
                     target_id: linux-arm64,
-                    binary_path: packages/coding-agent/binaries/omp-linux-arm64,
+                    binary_path: packages/coding-agent/binaries/reactor-linux-arm64,
                  }
                - {
                     os: macos-15-intel,
                     platform: darwin,
                     arch: x64,
                     target_id: darwin-x64,
-                    binary_path: packages/coding-agent/binaries/omp-darwin-x64,
+                    binary_path: packages/coding-agent/binaries/reactor-darwin-x64,
                  }
                - {
                     os: macos-14,
                     platform: darwin,
                     arch: arm64,
                     target_id: darwin-arm64,
-                    binary_path: packages/coding-agent/binaries/omp-darwin-arm64,
+                    binary_path: packages/coding-agent/binaries/reactor-darwin-arm64,
                  }
                - {
                     os: ubuntu-22.04,
                     platform: win32,
                     arch: x64,
                     target_id: win32-x64,
-                    binary_path: packages/coding-agent/binaries/omp-windows-x64.exe,
+                    binary_path: packages/coding-agent/binaries/reactor-windows-x64.exe,
                  }
       runs-on: ${{ matrix.os }}
       permissions:
@@ -636,7 +636,7 @@ jobs:
          - name: Download native addon(s)
            uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
            with:
-              pattern: pi-natives-${{ matrix.platform }}-${{ matrix.arch }}*-h${{ needs.native_artifact_lookup.outputs.source-hash }}
+              pattern: reactor-natives-${{ matrix.platform }}-${{ matrix.arch }}*-h${{ needs.native_artifact_lookup.outputs.source-hash }}
               path: packages/natives/native
               merge-multiple: true
          - name: Build release binary
@@ -645,7 +645,7 @@ jobs:
            run: bun run ci:release:build-binaries
          - name: Sign and notarize macOS binary (Developer ID)
            # Replaces the ad-hoc signature with a Developer ID + hardened-runtime
-           # one (+JIT/library-validation entitlements; omp dlopens its
+           # one (+JIT/library-validation entitlements; reactor dlopens its
            # runtime-extracted native addon, which has a different Team ID) and
            # notarizes. Auto-skips until the APPLE_* secrets are configured.
            if: matrix.platform == 'darwin' && env.MACOS_SIGNING == 'true'
@@ -677,7 +677,7 @@ jobs:
          - name: Upload release binary artifact
            uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
            with:
-              name: omp-binary-${{ matrix.target_id }}
+              name: reactor-binary-${{ matrix.target_id }}
               path: ${{ matrix.binary_path }}
 
    release_github:
@@ -705,7 +705,7 @@ jobs:
          - name: Download release binaries
            uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
            with:
-              pattern: omp-binary-*
+              pattern: reactor-binary-*
               path: packages/coding-agent/binaries
               merge-multiple: true
          - name: Create GitHub Release
@@ -713,7 +713,7 @@ jobs:
            with:
               tag_name: ${{ needs.release_metadata.outputs.release-tag }}
               files: |
-                 packages/coding-agent/binaries/omp-*
+                 packages/coding-agent/binaries/reactor-*
               body_path: release-notes.md
               generate_release_notes: true
 
@@ -731,26 +731,26 @@ jobs:
       steps:
          - name: Download published macOS arm64 binary
            run: |
-              curl -fsSL -o omp-darwin-arm64 "https://github.com/${{ github.repository }}/releases/download/${{ needs.release_metadata.outputs.release-tag }}/omp-darwin-arm64"
-              chmod +x omp-darwin-arm64
+              curl -fsSL -o reactor-darwin-arm64 "https://github.com/${{ github.repository }}/releases/download/${{ needs.release_metadata.outputs.release-tag }}/reactor-darwin-arm64"
+              chmod +x reactor-darwin-arm64
          - name: Verify published macOS arm64 binary
            run: |
-              codesign -dvvv ./omp-darwin-arm64
-              codesign --verify --strict --verbose=4 ./omp-darwin-arm64
+              codesign -dvvv ./reactor-darwin-arm64
+              codesign --verify --strict --verbose=4 ./reactor-darwin-arm64
               runtime_dir="$(mktemp -d)"
-              HOME="$runtime_dir/home" XDG_DATA_HOME="$runtime_dir/xdg" ./omp-darwin-arm64 --version
-              HOME="$runtime_dir/home" XDG_DATA_HOME="$runtime_dir/xdg" ./omp-darwin-arm64 --smoke-test
+              HOME="$runtime_dir/home" XDG_DATA_HOME="$runtime_dir/xdg" ./reactor-darwin-arm64 --version
+              HOME="$runtime_dir/home" XDG_DATA_HOME="$runtime_dir/xdg" ./reactor-darwin-arm64 --smoke-test
          - name: Assert signed release is not ad-hoc
            if: env.MACOS_SIGNING == 'true'
            run: |
-              if codesign -dvvv ./omp-darwin-arm64 2>&1 | grep -qE "flags=.*adhoc|Signature=adhoc"; then
+              if codesign -dvvv ./reactor-darwin-arm64 2>&1 | grep -qE "flags=.*adhoc|Signature=adhoc"; then
                 echo "published binary is still ad-hoc signed (Developer ID signing did not run)" >&2
                 exit 1
               fi
               # Gatekeeper assessment: a notarized Developer ID binary is accepted.
               # Informational — a bare (unstapled) Mach-O relies on the online ticket
               # lookup, so surface the result without gating the release on it.
-              spctl -a -t exec -vv ./omp-darwin-arm64 || echo "spctl non-zero (expected for unstapled bare binary; ticket served online)"
+              spctl -a -t exec -vv ./reactor-darwin-arm64 || echo "spctl non-zero (expected for unstapled bare binary; ticket served online)"
 
    release_npm:
       name: Publish to npm
@@ -786,15 +786,15 @@ jobs:
               path: ~/.bun/install/cache
               key: bun-${{ runner.os }}-${{ hashFiles('**/bun.lock') }}
          - run: bun install --frozen-lockfile
-         # The pi-coding-agent prepack executes workspace code (bundle-dist
-         # imports the pi-utils barrel, which loads the pi-natives addon), so
+         # The coding-agent prepack executes workspace code (bundle-dist
+         # imports the utils barrel, which loads the reactor-natives addon), so
          # this job needs the linux x64 native addons just like `test` does.
          # Release runs always rebuild natives in this same run, so the
          # default run-id resolves the artifacts.
          - name: Download native addons
            uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
            with:
-              pattern: pi-natives-linux-x64-*-h${{ needs.native_artifact_lookup.outputs.source-hash }}
+              pattern: reactor-natives-linux-x64-*-h${{ needs.native_artifact_lookup.outputs.source-hash }}
               path: packages/natives/native
               merge-multiple: true
          - name: Publish to npm
@@ -837,13 +837,13 @@ jobs:
            env:
               GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
            run: |
-              bun scripts/ci-update-brew-formula.ts "${{ needs.release_metadata.outputs.release-tag }}" --out homebrew-tap/Formula/omp.rb
+              bun scripts/ci-update-brew-formula.ts "${{ needs.release_metadata.outputs.release-tag }}" --out homebrew-tap/Formula/reactor.rb
               cd homebrew-tap
-              if git diff --quiet -- Formula/omp.rb; then
+              if git diff --quiet -- Formula/reactor.rb; then
                 echo "formula already up to date for ${{ needs.release_metadata.outputs.release-tag }}"
                 exit 0
               fi
               git -c user.name="github-actions[bot]" \
                   -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
-                  commit -m "omp ${{ needs.release_metadata.outputs.release-tag }}" -- Formula/omp.rb
+                  commit -m "reactor ${{ needs.release_metadata.outputs.release-tag }}" -- Formula/reactor.rb
               git push origin HEAD:main

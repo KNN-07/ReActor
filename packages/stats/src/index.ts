@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 
 import { parseArgs } from "node:util";
-import { formatDuration, formatNumber, formatPercent } from "@oh-my-pi/pi-utils";
+import { formatDuration, formatNumber, formatPercent } from "@reactor/utils";
 import { getDashboardStats, getTotalMessageCount, syncAllSessions } from "./aggregator";
 import { closeDb } from "./db";
 import { startServer } from "./server";
@@ -111,10 +111,10 @@ async function main(): Promise<void> {
 
 	if (values.help) {
 		console.log(`
-omp-stats - AI Usage Statistics Dashboard
+reactor-stats - AI Usage Statistics Dashboard
 
 Usage:
-  omp-stats [options]
+  reactor-stats [options]
 
 Options:
   -p, --port <port>  Port for the dashboard server (default: 3847)
@@ -123,10 +123,10 @@ Options:
   -h, --help         Show this help message
 
 Examples:
-  omp-stats              # Start dashboard server
-  omp-stats --json       # Print stats as JSON
-  omp-stats --port 8080  # Start on custom port
-  omp-stats --sync       # Sync and show summary
+  reactor-stats              # Start dashboard server
+  reactor-stats --json       # Print stats as JSON
+  reactor-stats --port 8080  # Start on custom port
+  reactor-stats --sync       # Sync and show summary
 `);
 		return;
 	}

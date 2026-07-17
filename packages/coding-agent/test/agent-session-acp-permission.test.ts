@@ -6,23 +6,23 @@
  * behavior they have in the TUI.
  */
 import { afterEach, beforeEach, expect, it, spyOn } from "bun:test";
-import { Agent, type AgentTool } from "@oh-my-pi/pi-agent-core";
-import { createMockModel, type MockModelOptions } from "@oh-my-pi/pi-ai/providers/mock";
-import { AssistantMessageEventStream } from "@oh-my-pi/pi-ai/utils/event-stream";
-import { getBundledModel } from "@oh-my-pi/pi-catalog/models";
-import { type SettingPath, Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { EditTool } from "@oh-my-pi/pi-coding-agent/edit";
-import { AgentSession } from "@oh-my-pi/pi-coding-agent/session/agent-session";
+import { Agent, type AgentTool } from "@reactor/agent-core";
+import { createMockModel, type MockModelOptions } from "@reactor/ai/providers/mock";
+import { AssistantMessageEventStream } from "@reactor/ai/utils/event-stream";
+import { getBundledModel } from "@reactor/catalog/models";
+import { type SettingPath, Settings } from "@reactor/coding-agent/config/settings";
+import { EditTool } from "@reactor/coding-agent/edit";
+import { AgentSession } from "@reactor/coding-agent/session/agent-session";
 import type {
 	ClientBridge,
 	ClientBridgePermissionOutcome,
 	ClientBridgePermissionToolCall,
-} from "@oh-my-pi/pi-coding-agent/session/client-bridge";
-import { convertToLlm } from "@oh-my-pi/pi-coding-agent/session/messages";
-import { SessionManager } from "@oh-my-pi/pi-coding-agent/session/session-manager";
-import type { ToolSession } from "@oh-my-pi/pi-coding-agent/tools";
-import { XdevRegistry } from "@oh-my-pi/pi-coding-agent/tools/xdev";
-import { TempDir } from "@oh-my-pi/pi-utils";
+} from "@reactor/coding-agent/session/client-bridge";
+import { convertToLlm } from "@reactor/coding-agent/session/messages";
+import { SessionManager } from "@reactor/coding-agent/session/session-manager";
+import type { ToolSession } from "@reactor/coding-agent/tools";
+import { XdevRegistry } from "@reactor/coding-agent/tools/xdev";
+import { TempDir } from "@reactor/utils";
 import { type } from "arktype";
 
 // ---------------------------------------------------------------------------

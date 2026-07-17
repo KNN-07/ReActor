@@ -29,13 +29,13 @@ Key integration points:
 ```text
          Generic helper order (`config.ts`)
 ┌───────────────────────────────────────┐
-│ 1) ~/.omp/agent, ~/.claude, ...       │
-│ 2) <cwd>/.omp, <cwd>/.claude, ...     │
+│ 1) ~/.reactor/agent, ~/.claude, ...       │
+│ 2) <cwd>/.reactor, <cwd>/.claude, ...     │
 └───────────────────────────────────────┘
                     │
                     ▼
         capability providers enumerate items
- (native provider scans project .omp before user .omp;
+ (native provider scans project .reactor before user .reactor;
   other providers have their own loading rules)
                     │
                     ▼
@@ -52,36 +52,36 @@ Key integration points:
 
 `src/config.ts` defines a fixed source priority list:
 
-1. `.omp` (native)
+1. `.reactor` (native)
 2. `.claude`
 3. `.codex`
 4. `.gemini`
 
 User-level bases:
 
-- `~/.omp/agent`
+- `~/.reactor/agent`
 - `~/.claude`
 - `~/.codex`
 - `~/.gemini`
 
 Project-level bases:
 
-- `<cwd>/.omp`
+- `<cwd>/.reactor`
 - `<cwd>/.claude`
 - `<cwd>/.codex`
 - `<cwd>/.gemini`
 
-`CONFIG_DIR_NAME` is `.omp` (`packages/utils/src/dirs.ts`).
+`CONFIG_DIR_NAME` is `.reactor` (`packages/utils/src/dirs.ts`).
 
 ## Profiles
 
-A named profile (`omp --profile <name>`, the `--alias` shortcut, or `OMP_PROFILE` / `PI_PROFILE`) relocates the OMP user base. When a profile is active, every OMP-native user-level path written here as `~/.omp/agent/...` resolves to `~/.omp/profiles/<name>/agent/...` instead.
+A named profile (`reactor --profile <name>`, the `--alias` shortcut, or `REACTOR_PROFILE` / `REACTOR_PROFILE`) relocates the ReActor user base. When a profile is active, every ReActor-native user-level path written here as `~/.reactor/agent/...` resolves to `~/.reactor/profiles/<name>/agent/...` instead.
 
-The relocation is uniform across the native provider (`builtin.ts`) and the generic `config.ts` helpers, so it covers slash commands, rules, prompts, instructions, hooks, tools, extensions, settings, skills, and MCP, plus the top-level `SYSTEM.md` / `RULES.md` / `AGENTS.md` files and runtime state (sessions, blobs, `agent.db`). A profile sees only its own OMP config, never the default profile's `~/.omp/agent`.
+The relocation is uniform across the native provider (`builtin.ts`) and the generic `config.ts` helpers, so it covers slash commands, rules, prompts, instructions, hooks, tools, extensions, settings, skills, and MCP, plus the top-level `SYSTEM.md` / `RULES.md` / `AGENTS.md` files and runtime state (sessions, blobs, `agent.db`). A profile sees only its own ReActor config, never the default profile's `~/.reactor/agent`.
 
-Keybindings are the one exception: a named profile merges the default profile's `~/.omp/agent/keybindings.*` under its own `~/.omp/profiles/<name>/agent/keybindings.*`, with the profile file overriding per binding ([#4867](https://github.com/can1357/oh-my-pi/issues/4867)). Keybindings describe the terminal/keyboard in front of the user, which doesn't change with the active profile, so user-level remaps keep working in every profile unless the profile explicitly overrides them. The inherited file is read-only for the profile process — legacy-format migration of the default profile's file only happens when the default profile itself runs.
+Keybindings are the one exception: a named profile merges the default profile's `~/.reactor/agent/keybindings.*` under its own `~/.reactor/profiles/<name>/agent/keybindings.*`, with the profile file overriding per binding ([#4867](https://github.com/KNN-07/ReActor/issues/4867)). Keybindings describe the terminal/keyboard in front of the user, which doesn't change with the active profile, so user-level remaps keep working in every profile unless the profile explicitly overrides them. The inherited file is read-only for the profile process — legacy-format migration of the default profile's file only happens when the default profile itself runs.
 
-The other source bases are not profile-scoped and load identically under every profile: the external-tool bases (`~/.claude`, `~/.codex`, `~/.gemini`) belong to those tools, and the project-level bases (`<cwd>/.omp`, `<cwd>/.claude`, ...) are keyed to the working directory. Throughout this document, read `~/.omp/agent` as shorthand for the active profile's agent directory.
+The other source bases are not profile-scoped and load identically under every profile: the external-tool bases (`~/.claude`, `~/.codex`, `~/.gemini`) belong to those tools, and the project-level bases (`<cwd>/.reactor`, `<cwd>/.claude`, ...) are keyed to the working directory. Throughout this document, read `~/.reactor/agent` as shorthand for the active profile's agent directory.
 
 ## Important constraint
 
@@ -113,7 +113,7 @@ Searches for the first existing file across ordered bases, returns first match (
 
 ## `findAllNearestProjectConfigDirs(subpath, cwd)`
 
-Walks parent directories upward and returns the **nearest existing directory per source base** (`.omp`, `.claude`, `.codex`, `.gemini`), then sorts results by source priority.
+Walks parent directories upward and returns the **nearest existing directory per source base** (`.reactor`, `.claude`, `.codex`, `.gemini`), then sorts results by source priority.
 
 Use this when project config should be inherited from ancestor directories (monorepo/nested workspace behavior).
 
@@ -147,9 +147,9 @@ Legacy migration still supported:
 
 The runtime settings model is layered:
 
-1. Global settings: `~/.omp/agent/config.yml`
+1. Global settings: `~/.reactor/agent/config.yml`
 2. Project settings: discovered via settings capability (`settings.json` and `config.yml` from providers)
-3. CLI config overlays: `omp --config <path>` / repeated `--config` files, loaded as `config.yml`-style YAML for this process only
+3. CLI config overlays: `reactor --config <path>` / repeated `--config` files, loaded as `config.yml`-style YAML for this process only
 4. Runtime overrides: in-memory, non-persistent
 5. Schema defaults: from `SETTINGS_SCHEMA`
 
@@ -166,7 +166,7 @@ Write behavior:
 
 On startup, if `config.yml` is missing:
 
-1. Migrate from `~/.omp/agent/settings.json` (renamed to `.bak` on success)
+1. Migrate from `~/.reactor/agent/settings.json` (renamed to `.bak` on success)
 2. Merge with legacy DB settings from `agent.db`
 3. Write merged result to `config.yml`
 
@@ -186,7 +186,7 @@ Most non-core config loading flows through the capability registry (`src/capabil
 
 Providers are sorted by numeric priority (higher first). Example priorities:
 
-- Native OMP (`builtin.ts`): `100`
+- Native ReActor (`builtin.ts`): `100`
 - Claude: `80`
 - Codex / agents / Claude marketplace: `70`
 - Gemini: `60`
@@ -194,7 +194,7 @@ Providers are sorted by numeric priority (higher first). Example priorities:
 ```text
 Provider precedence (higher wins)
 
-native (.omp)          priority 100
+native (.reactor)          priority 100
 claude                 priority  80
 codex / agents / ...   priority  70
 gemini                 priority  60
@@ -218,22 +218,22 @@ Relevant keys:
 
 ---
 
-## 6) Native `.omp` provider behavior (`packages/coding-agent/src/discovery/builtin.ts`)
+## 6) Native `.reactor` provider behavior (`packages/coding-agent/src/discovery/builtin.ts`)
 
 Native provider (`id: native`) reads native config from:
 
-- project: `<cwd>/.omp/...`
-- user: `~/.omp/agent/...`
+- project: `<cwd>/.reactor/...`
+- user: `~/.reactor/agent/...`
 
 ### Directory admission rules
 
 - Slash commands, rules, prompts, instructions, hooks, tools, extensions, extension modules, and settings use a project/user root only when the root directory exists and is non-empty.
-- Skills scan `<ancestor>/.omp/skills` for each ancestor from the current working directory up to the repo root/home boundary, plus `~/.omp/agent/skills`, without requiring the root `.omp` directory itself to be non-empty.
-- `SYSTEM.md` and `AGENTS.md` read user-level files directly and use nearest-ancestor project `.omp` lookup for project files, but the project `.omp` directory must be non-empty. See [`docs/system-prompt-customization.md`](./system-prompt-customization.md) for the full `SYSTEM.md` / `APPEND_SYSTEM.md` contract (replace vs. append, templating).
+- Skills scan `<ancestor>/.reactor/skills` for each ancestor from the current working directory up to the repo root/home boundary, plus `~/.reactor/agent/skills`, without requiring the root `.reactor` directory itself to be non-empty.
+- `SYSTEM.md` and `AGENTS.md` read user-level files directly and use nearest-ancestor project `.reactor` lookup for project files, but the project `.reactor` directory must be non-empty. See [`docs/system-prompt-customization.md`](./system-prompt-customization.md) for the full `SYSTEM.md` / `APPEND_SYSTEM.md` contract (replace vs. append, templating).
 
 ### Scope-specific loading
 
-- Skills: `<ancestor>/.omp/skills/*/SKILL.md` and `~/.omp/agent/skills/*/SKILL.md`
+- Skills: `<ancestor>/.reactor/skills/*/SKILL.md` and `~/.reactor/agent/skills/*/SKILL.md`
 - Slash commands: `commands/*.md`
 - Rules: `rules/*.{md,mdc}`
 - Prompts: `prompts/*.md`
@@ -246,7 +246,7 @@ Native provider (`id: native`) reads native config from:
 
 ### Nearest-project lookup nuance
 
-## For `SYSTEM.md` and `AGENTS.md`, native provider uses nearest-ancestor project `.omp` directory search (walk-up) and still requires the project `.omp` dir to be non-empty.
+## For `SYSTEM.md` and `AGENTS.md`, native provider uses nearest-ancestor project `.reactor` directory search (walk-up) and still requires the project `.reactor` dir to be non-empty.
 
 ## 7) How major subsystems consume config
 
@@ -260,12 +260,12 @@ Native provider (`id: native`) reads native config from:
 Create `TITLE_SYSTEM.md` in the same config locations as `SYSTEM.md` / `APPEND_SYSTEM.md`:
 
 ```text
-# ~/.omp/agent/TITLE_SYSTEM.md
+# ~/.reactor/agent/TITLE_SYSTEM.md
 Generate a session name using lowercase `<type>:<primary-objective>`.
 ```
 
 - Missing `TITLE_SYSTEM.md` keeps the bundled title prompts.
-- Discovery uses the same project-then-user config directory pattern as `SYSTEM.md`: project `.omp/TITLE_SYSTEM.md` first, then user `~/.omp/agent/TITLE_SYSTEM.md` and the other supported config bases.
+- Discovery uses the same project-then-user config directory pattern as `SYSTEM.md`: project `.reactor/TITLE_SYSTEM.md` first, then user `~/.reactor/agent/TITLE_SYSTEM.md` and the other supported config bases.
 - The override replaces only the automatic session-title generation system prompt; normal `SYSTEM.md` / `APPEND_SYSTEM.md` prompt customization is unaffected.
 - The online path asks the title model to wrap the title in `<title>...</title>` and parses it leniently from text (a plain sentence, a truncated/unclosed tag, or a stray `{"title": "..."}` JSON echo all still work). A `TITLE_SYSTEM.md` override gets the wrap-in-`<title>` instruction appended after it. The local tiny-title path keeps the `<title>...</title>` prefill/stop wrapper and uses this file as its system turn.
 

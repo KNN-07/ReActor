@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import * as path from "node:path";
-import { isRecord, readJsonl } from "@oh-my-pi/pi-utils";
+import { isRecord, readJsonl } from "@reactor/utils";
 
 /**
  * Regression test for issue #5194: a non-JSON stdin line crashed the whole RPC
@@ -15,7 +15,7 @@ describe("RPC mode malformed stdin", () => {
 			["bun", cliPath, "--mode", "rpc", "--provider", "anthropic", "--model", "claude-sonnet-4-5"],
 			{
 				cwd: path.join(import.meta.dir, ".."),
-				env: { ...Bun.env, PI_NO_TITLE: "1" },
+				env: { ...Bun.env, REACTOR_NO_TITLE: "1" },
 				stdin: "pipe",
 				stdout: "pipe",
 				stderr: "pipe",

@@ -7,9 +7,9 @@ import {
 	IndexedSessionStorage,
 	type SessionStorageBackend,
 	type SessionStorageIndexEntry,
-} from "@oh-my-pi/pi-coding-agent/session/indexed-session-storage";
-import { FileSessionStorage } from "@oh-my-pi/pi-coding-agent/session/session-storage";
-import { type SessionTitleUpdate, serializeTitleSlot } from "@oh-my-pi/pi-coding-agent/session/session-title-slot";
+} from "@reactor/coding-agent/session/indexed-session-storage";
+import { FileSessionStorage } from "@reactor/coding-agent/session/session-storage";
+import { type SessionTitleUpdate, serializeTitleSlot } from "@reactor/coding-agent/session/session-title-slot";
 
 class ControlledTitleUpdateBackend implements SessionStorageBackend {
 	readonly #sessionPath: string;
@@ -92,7 +92,7 @@ describe("FileSessionStorage.deleteSessionWithArtifacts", () => {
 	let storage: FileSessionStorage;
 
 	beforeEach(async () => {
-		tempDir = await fsp.mkdtemp(path.join(os.tmpdir(), "omp-session-storage-"));
+		tempDir = await fsp.mkdtemp(path.join(os.tmpdir(), "reactor-session-storage-"));
 		storage = new FileSessionStorage();
 	});
 
@@ -144,7 +144,7 @@ describe("FileSessionStorage.writeTextSync", () => {
 	let tempDir: string;
 
 	beforeEach(async () => {
-		tempDir = await fsp.mkdtemp(path.join(os.tmpdir(), "omp-session-storage-"));
+		tempDir = await fsp.mkdtemp(path.join(os.tmpdir(), "reactor-session-storage-"));
 	});
 
 	afterEach(async () => {
@@ -170,7 +170,7 @@ describe("FileSessionStorage.updateSessionTitle", () => {
 	let storage: FileSessionStorage;
 
 	beforeEach(async () => {
-		tempDir = await fsp.mkdtemp(path.join(os.tmpdir(), "omp-session-storage-"));
+		tempDir = await fsp.mkdtemp(path.join(os.tmpdir(), "reactor-session-storage-"));
 		storage = new FileSessionStorage();
 	});
 

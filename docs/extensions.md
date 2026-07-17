@@ -19,7 +19,7 @@ For packaged user-facing extension CLIs/features such as `packages/swarm-extensi
 An extension is a TS/JS module exporting a default factory:
 
 ```ts
-import type { ExtensionAPI } from "@oh-my-pi/pi-coding-agent";
+import type { ExtensionAPI } from "@reactor/coding-agent";
 
 export default function myExtension(pi: ExtensionAPI) {
   // register handlers/tools/commands/renderers
@@ -67,7 +67,7 @@ Important constraint from `loader.ts`:
 ## Quick start
 
 ```ts
-import type { ExtensionAPI } from "@oh-my-pi/pi-coding-agent";
+import type { ExtensionAPI } from "@reactor/coding-agent";
 
 export default function (pi: ExtensionAPI) {
   const { z } = pi.zod;
@@ -353,7 +353,7 @@ Current no-op methods in this controller:
 `ctx.ui` is backed by RPC `extension_ui_request` events:
 
 - dialog methods (`select`, `confirm`, `input`, `editor`) round-trip to client responses
-- fire-and-forget methods emit requests (`notify`, `setStatus`, `setWidget` for string arrays, `setEditorText`; `setTitle` emits only when `PI_RPC_EMIT_TITLE=1`)
+- fire-and-forget methods emit requests (`notify`, `setStatus`, `setWidget` for string arrays, `setEditorText`; `setTitle` emits only when `REACTOR_RPC_EMIT_TITLE=1`)
 
 Unsupported/no-op in RPC implementation:
 
@@ -400,7 +400,7 @@ pi.on("session_start", async (_event, ctx) => {
 
 ```ts
 pi.registerMessageRenderer("my-type", (message, { expanded }, theme) => {
-  // return pi-tui Component
+  // return tui Component
 });
 ```
 
@@ -409,7 +409,7 @@ Used by interactive rendering when custom messages are displayed.
 ## Assistant thinking renderer
 
 ```ts
-import { Container, Text } from "@oh-my-pi/pi-tui";
+import { Container, Text } from "@reactor/tui";
 
 pi.registerAssistantThinkingRenderer((context, theme) => {
   const container = new Container();

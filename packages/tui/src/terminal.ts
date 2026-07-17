@@ -8,7 +8,7 @@ import {
 	postmortem,
 	restoreTerminalStderr,
 	suppressTerminalStderr,
-} from "@oh-my-pi/pi-utils";
+} from "@reactor/utils";
 import { setKittyProtocolActive } from "./keys";
 import { StdinBuffer } from "./stdin-buffer";
 import {
@@ -368,12 +368,12 @@ export interface Terminal {
 
 	// The active modified-key reporting sequence to reassert on alternate-screen
 	// entry, or null when no enhanced keyboard mode is active. Optional so custom
-	// Terminals built against older pi-tui versions keep working.
+	// Terminals built against older tui versions keep working.
 	readonly keyboardEnhancementEnterSequence?: string | null;
 
 	// The sequence that cleanly disables the active enhanced keyboard mode on
 	// alternate-screen exit, or null when no exit handshake is required. Optional
-	// so custom Terminals built against older pi-tui versions keep working.
+	// so custom Terminals built against older tui versions keep working.
 	readonly keyboardEnhancementExitSequence?: string | null;
 
 	// Cursor positioning (relative to current position)
@@ -408,7 +408,7 @@ export interface Terminal {
 	 * 2031 notifications. Bounded: one probe per call, no timers. Invoked on the
 	 * user's explicit display-reset gesture (Ctrl+L) so terminals that cannot
 	 * deliver end-to-end Mode 2031 notifications still pick up a light/dark switch
-	 * without a restart. Optional so custom Terminals built against older pi-tui
+	 * without a restart. Optional so custom Terminals built against older tui
 	 * versions keep working.
 	 */
 	refreshAppearance?(): void;
@@ -488,7 +488,7 @@ export class ProcessTerminal implements Terminal {
 	// terminal side effect (writes, probes, raw mode, SIGWINCH, timers) is
 	// suppressed. Defaults on under `bun test` — see isTerminalHeadless().
 	#headless = isTerminalHeadless();
-	#writeLogPath = $env.PI_TUI_WRITE_LOG || "";
+	#writeLogPath = $env.REACTOR_TUI_WRITE_LOG || "";
 	#stdoutErrorCleanup?: () => void;
 	#stdoutErrorHandler = (err: Error) => {
 		this.#markTerminalWriteFailed(err);
@@ -595,7 +595,7 @@ export class ProcessTerminal implements Terminal {
 
 		// Keep unmanaged fd-2 writes (macOS libmalloc/framework diagnostics) off
 		// the viewport while we own the terminal; released in stop(). See
-		// stderr-guard in pi-utils (mirrors openai/codex#24459).
+		// stderr-guard in utils (mirrors openai/codex#24459).
 		suppressTerminalStderr();
 
 		// Save previous state and enable raw mode
@@ -665,7 +665,7 @@ export class ProcessTerminal implements Terminal {
 		// gates the renderer's begin/end markers; 2048 (in-band resize) is enabled
 		// only after the terminal confirms support; 2031 (appearance change
 		// notifications) drives mid-session theme tracking. Xterm ?1010/?1011
-		// are disabled while OMP owns the TTY so typing in the editor does not
+		// are disabled while ReActor owns the TTY so typing in the editor does not
 		// force a reader scrolled into native history back to the tail. Each probe
 		// rides the shared DA1 sentinel, so terminals that ignore DECRQM resolve as
 		// unsupported when the DA1 reply arrives.
@@ -1076,7 +1076,7 @@ export class ProcessTerminal implements Terminal {
 		// single-line OSC 99 form until confirmation, and delivery still uses the
 		// passthrough/BEL path (#3395).
 		if (isInsideTerminalMultiplexer($env)) return false;
-		return !isBunTestRuntime() || $env.PI_TUI_OSC99_PROBE === "1";
+		return !isBunTestRuntime() || $env.REACTOR_TUI_OSC99_PROBE === "1";
 	}
 
 	#queryOsc99Support(): void {
@@ -1086,7 +1086,7 @@ export class ProcessTerminal implements Terminal {
 		this.#osc99ResponseBuffer = "";
 		if (this.#dead || !this.#shouldQueryOsc99Support()) return;
 
-		const id = `omp-probe-${nextOsc99ProbeId++}`;
+		const id = `reactor-probe-${nextOsc99ProbeId++}`;
 		this.#osc99PendingId = id;
 		this.#da1SentinelOwners.push({ kind: "osc99Probe", id });
 		// The probe never runs under a multiplexer (see #shouldQueryOsc99Support),

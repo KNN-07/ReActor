@@ -1,10 +1,10 @@
 import * as path from "node:path";
-import { isEnoent } from "@oh-my-pi/pi-utils/fs-error";
+import { isEnoent } from "@reactor/utils/fs-error";
 
 /** Build-time specifier resolved to bundled legacy Pi module namespaces. */
-export const LEGACY_PI_MODULES_SPECIFIER = "omp-legacy-pi-modules";
+export const LEGACY_REACTOR_MODULES_SPECIFIER = "reactor-legacy-pi-modules";
 
-const VIRTUAL_NAMESPACE = "omp-legacy-pi-modules-build";
+const VIRTUAL_NAMESPACE = "reactor-legacy-pi-modules-build";
 const packageDir = path.resolve(import.meta.dir, "..");
 const repoRoot = path.resolve(packageDir, "..", "..");
 
@@ -16,8 +16,8 @@ interface BundledPackage {
 
 const BUNDLED_PACKAGES: readonly BundledPackage[] = [
 	{ dir: "agent", identifier: "PiAgentCore", rootShim: null },
-	{ dir: "ai", identifier: "PiAi", rootShim: "legacy-pi-ai-shim.ts" },
-	{ dir: "coding-agent", identifier: "PiCodingAgent", rootShim: "legacy-pi-coding-agent-shim.ts" },
+	{ dir: "ai", identifier: "PiAi", rootShim: "legacy-ai-shim.ts" },
+	{ dir: "coding-agent", identifier: "PiCodingAgent", rootShim: "legacy-coding-agent-shim.ts" },
 	{ dir: "natives", identifier: "PiNatives", rootShim: null },
 	{ dir: "tui", identifier: "PiTui", rootShim: null },
 	{ dir: "utils", identifier: "PiUtils", rootShim: null },
@@ -172,7 +172,7 @@ export function __renderLegacyPiVirtualModule(entries: readonly BundledPiEntry[]
 		entry => `const ${entry.binding} = () => import(${JSON.stringify(entry.importSpecifier)});`,
 	);
 	const modules = entries.map(entry => `\t${JSON.stringify(entry.key)}: ${entry.binding},`);
-	return [...loaders, "", "export const BUNDLED_PI_MODULE_LOADERS = {", ...modules, "};", ""].join("\n");
+	return [...loaders, "", "export const BUNDLED_REACTOR_MODULE_LOADERS = {", ...modules, "};", ""].join("\n");
 }
 
 /**
@@ -183,10 +183,10 @@ export function __renderLegacyPiVirtualModule(entries: readonly BundledPiEntry[]
 export async function createLegacyPiVirtualModulePlugin(): Promise<Bun.BunPlugin> {
 	const source = __renderLegacyPiVirtualModule(await collectBundledPiEntries());
 	return {
-		name: "omp:legacy-pi-modules",
+		name: "reactor:legacy-pi-modules",
 		setup(build) {
-			build.onResolve({ filter: /^omp-legacy-pi-modules$/ }, () => ({
-				path: LEGACY_PI_MODULES_SPECIFIER,
+			build.onResolve({ filter: /^reactor-legacy-pi-modules$/ }, () => ({
+				path: LEGACY_REACTOR_MODULES_SPECIFIER,
 				namespace: VIRTUAL_NAMESPACE,
 			}));
 			build.onLoad({ filter: /.*/, namespace: VIRTUAL_NAMESPACE }, () => ({ contents: source, loader: "ts" }));

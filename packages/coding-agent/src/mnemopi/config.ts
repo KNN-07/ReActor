@@ -1,8 +1,8 @@
 import { Database } from "bun:sqlite";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import type { MnemopiOptions } from "@oh-my-pi/pi-mnemopi";
-import { getMemoriesDir, logger } from "@oh-my-pi/pi-utils";
+import type { MnemopiOptions } from "@reactor/mnemopi";
+import { getMemoriesDir, logger } from "@reactor/utils";
 import type { Settings } from "../config/settings";
 
 export type MnemopiLlmMode = "none" | "smol" | "remote";
@@ -56,10 +56,10 @@ export function loadMnemopiConfig(settings: Settings, agentDir: string): Mnemopi
 	// other than the multilingual variant falls back to the English default.
 	const variantModel =
 		embeddingVariant === "multilingual" ? "intfloat/multilingual-e5-large" : "BAAI/bge-base-en-v1.5";
-	// Precedence: explicit `mnemopi.embeddingModel` setting > `MNEMOPI_EMBEDDING_MODEL`
+	// Precedence: explicit `mnemopi.embeddingModel` setting > `REACTOR_MNEMOPI_EMBEDDING_MODEL`
 	// env (documented model-level override) > variant-derived default. Without the env
 	// term a variant default would silently shadow a user's configured env model.
-	const embeddingModel = embeddingOverride?.trim() || Bun.env.MNEMOPI_EMBEDDING_MODEL?.trim() || variantModel;
+	const embeddingModel = embeddingOverride?.trim() || Bun.env.REACTOR_MNEMOPI_EMBEDDING_MODEL?.trim() || variantModel;
 	return {
 		dbPath,
 		baseBank: scope.baseBank,

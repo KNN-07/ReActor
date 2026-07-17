@@ -1,5 +1,5 @@
 //! Behavioral contract tests driving [`crate::run`] under a
-//! [`pi_uutils_ctx::scope`], the way the shell host does.
+//! [`reactor_uutils_ctx::scope`], the way the shell host does.
 
 use std::{
 	collections::HashMap,
@@ -50,8 +50,8 @@ fn run_xargs(
 		.iter()
 		.map(|(k, v)| ((*k).to_owned(), (*v).to_owned()))
 		.collect();
-	let code = pi_uutils_ctx::scope(
-		pi_uutils_ctx::ScopeIo {
+	let code = reactor_uutils_ctx::scope(
+		reactor_uutils_ctx::ScopeIo {
 			stdin: Box::new(io::Cursor::new(stdin.to_vec())),
 			stdin_fd: None,
 			stdin_is_search_input: false,

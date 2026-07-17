@@ -1,20 +1,20 @@
 import { afterEach, beforeAll, describe, expect, test, vi } from "bun:test";
-import type { AgentMessage } from "@oh-my-pi/pi-agent-core";
-import type { ImageContent, TextContent } from "@oh-my-pi/pi-ai";
-import { resetSettingsForTest, Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
+import type { AgentMessage } from "@reactor/agent-core";
+import type { ImageContent, TextContent } from "@reactor/ai";
+import { resetSettingsForTest, Settings } from "@reactor/coding-agent/config/settings";
 import type {
 	ExtensionActions,
 	ExtensionCommandContextActions,
 	ExtensionContextActions,
 	ExtensionUIContext,
-} from "@oh-my-pi/pi-coding-agent/extensibility/extensions";
-import { ExtensionUiController } from "@oh-my-pi/pi-coding-agent/modes/controllers/extension-ui-controller";
-import { initTheme } from "@oh-my-pi/pi-coding-agent/modes/theme/theme";
-import type { InteractiveModeContext } from "@oh-my-pi/pi-coding-agent/modes/types";
-import { UiHelpers } from "@oh-my-pi/pi-coding-agent/modes/utils/ui-helpers";
-import { buildSessionContext, type SessionContext } from "@oh-my-pi/pi-coding-agent/session/session-context";
-import type { CustomMessageEntry, SessionEntry } from "@oh-my-pi/pi-coding-agent/session/session-entries";
-import { Container } from "@oh-my-pi/pi-tui";
+} from "@reactor/coding-agent/extensibility/extensions";
+import { ExtensionUiController } from "@reactor/coding-agent/modes/controllers/extension-ui-controller";
+import { initTheme } from "@reactor/coding-agent/modes/theme/theme";
+import type { InteractiveModeContext } from "@reactor/coding-agent/modes/types";
+import { UiHelpers } from "@reactor/coding-agent/modes/utils/ui-helpers";
+import { buildSessionContext, type SessionContext } from "@reactor/coding-agent/session/session-context";
+import type { CustomMessageEntry, SessionEntry } from "@reactor/coding-agent/session/session-entries";
+import { Container } from "@reactor/tui";
 
 /**
  * Issue #1955: `sendMessage` with `display: true` renders twice during

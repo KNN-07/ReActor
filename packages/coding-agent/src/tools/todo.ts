@@ -1,8 +1,8 @@
-import type { AgentTool, AgentToolContext, AgentToolResult, AgentToolUpdateCallback } from "@oh-my-pi/pi-agent-core";
-import type { ToolExample } from "@oh-my-pi/pi-ai";
-import type { Component } from "@oh-my-pi/pi-tui";
-import { Text } from "@oh-my-pi/pi-tui";
-import { prompt } from "@oh-my-pi/pi-utils";
+import type { AgentTool, AgentToolContext, AgentToolResult, AgentToolUpdateCallback } from "@reactor/agent-core";
+import type { ToolExample } from "@reactor/ai";
+import type { Component } from "@reactor/tui";
+import { Text } from "@reactor/tui";
+import { prompt } from "@reactor/utils";
 import { type } from "arktype";
 import chalk from "chalk";
 import type { RenderResultOptions } from "../extensibility/custom-tools/types";

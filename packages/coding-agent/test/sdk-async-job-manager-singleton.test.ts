@@ -2,12 +2,12 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from "bun:test";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { AsyncJobManager } from "@oh-my-pi/pi-coding-agent/async/job-manager";
-import { ModelRegistry } from "@oh-my-pi/pi-coding-agent/config/model-registry";
-import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { createAgentSession } from "@oh-my-pi/pi-coding-agent/sdk";
-import { AuthStorage } from "@oh-my-pi/pi-coding-agent/session/auth-storage";
-import { removeSyncWithRetries, Snowflake } from "@oh-my-pi/pi-utils";
+import { AsyncJobManager } from "@reactor/coding-agent/async/job-manager";
+import { ModelRegistry } from "@reactor/coding-agent/config/model-registry";
+import { Settings } from "@reactor/coding-agent/config/settings";
+import { createAgentSession } from "@reactor/coding-agent/sdk";
+import { AuthStorage } from "@reactor/coding-agent/session/auth-storage";
+import { removeSyncWithRetries, Snowflake } from "@reactor/utils";
 
 describe("AsyncJobManager singleton across concurrent top-level sessions", () => {
 	const tempDirs: string[] = [];

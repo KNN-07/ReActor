@@ -1,5 +1,5 @@
 /**
- * Regression for the [#3751](https://github.com/can1357/oh-my-pi/pull/3751)
+ * Regression for the [#3751](https://github.com/KNN-07/ReActor/pull/3751)
  * chatgpt-codex follow-up: the per-LLM-turn provider concurrency wrapper
  * (`wrapStreamFnWithProviderConcurrency`) was only attached to
  * `Agent.streamFn` / `Agent.sideStreamFn`, so direct compaction oneshots
@@ -20,20 +20,20 @@
  *     unrelated provider call.
  */
 import { afterEach, describe, expect, it, vi } from "bun:test";
-import type { StreamFn } from "@oh-my-pi/pi-agent-core";
+import type { StreamFn } from "@reactor/agent-core";
 import {
 	type CompactionPreparation,
 	compact,
 	createFileOps,
 	DEFAULT_COMPACTION_SETTINGS,
-} from "@oh-my-pi/pi-agent-core/compaction";
-import type { AgentMessage } from "@oh-my-pi/pi-agent-core/types";
-import type { AssistantMessage, Model } from "@oh-my-pi/pi-ai";
-import * as ai from "@oh-my-pi/pi-ai";
-import { AssistantMessageEventStream } from "@oh-my-pi/pi-ai/utils/event-stream";
-import { getBundledModel } from "@oh-my-pi/pi-catalog/models";
-import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { wrapStreamFnWithProviderConcurrency } from "@oh-my-pi/pi-coding-agent/task/provider-concurrency";
+} from "@reactor/agent-core/compaction";
+import type { AgentMessage } from "@reactor/agent-core/types";
+import type { AssistantMessage, Model } from "@reactor/ai";
+import * as ai from "@reactor/ai";
+import { AssistantMessageEventStream } from "@reactor/ai/utils/event-stream";
+import { getBundledModel } from "@reactor/catalog/models";
+import { Settings } from "@reactor/coding-agent/config/settings";
+import { wrapStreamFnWithProviderConcurrency } from "@reactor/coding-agent/task/provider-concurrency";
 
 interface Deferred {
 	promise: Promise<void>;

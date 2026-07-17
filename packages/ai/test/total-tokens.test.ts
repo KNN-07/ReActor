@@ -13,9 +13,9 @@
  */
 
 import { describe, expect, it } from "bun:test";
-import { complete } from "@oh-my-pi/pi-ai/stream";
-import type { Api, Context, Model, OptionsForApi, Usage } from "@oh-my-pi/pi-ai/types";
-import { getBundledModel } from "@oh-my-pi/pi-catalog/models";
+import { complete } from "@reactor/ai/stream";
+import type { Api, Context, Model, OptionsForApi, Usage } from "@reactor/ai/types";
+import { getBundledModel } from "@reactor/catalog/models";
 import { e2eApiKey, resolveApiKey } from "./oauth";
 
 // Resolve OAuth tokens at module level (async, runs before tests)

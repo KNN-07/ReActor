@@ -1,8 +1,8 @@
 import { describe, expect, it } from "bun:test";
-import { getThemeByName } from "@oh-my-pi/pi-coding-agent/modes/theme/theme";
+import { getThemeByName } from "@reactor/coding-agent/modes/theme/theme";
 
-import { getSessionAccentHex } from "@oh-my-pi/pi-coding-agent/utils/session-color";
-import { hexToHsv, relativeLuminance } from "@oh-my-pi/pi-utils";
+import { getSessionAccentHex } from "@reactor/coding-agent/utils/session-color";
+import { hexToHsv, relativeLuminance } from "@reactor/utils";
 
 const NO_THEME_COLORS: string[] = [];
 

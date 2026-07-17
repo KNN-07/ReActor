@@ -1,15 +1,15 @@
 import { afterEach, describe, expect, it } from "bun:test";
 import * as http2 from "node:http2";
 import { create, toBinary } from "@bufbuild/protobuf";
-import { streamCursor } from "@oh-my-pi/pi-ai/providers/cursor";
-import type { Context, Model } from "@oh-my-pi/pi-ai/types";
-import { buildModel } from "@oh-my-pi/pi-catalog/build";
+import { streamCursor } from "@reactor/ai/providers/cursor";
+import type { Context, Model } from "@reactor/ai/types";
+import { buildModel } from "@reactor/catalog/build";
 import {
 	AgentServerMessageSchema,
 	InteractionUpdateSchema,
 	TextDeltaUpdateSchema,
 	TurnEndedUpdateSchema,
-} from "@oh-my-pi/pi-catalog/discovery/cursor-gen/agent_pb";
+} from "@reactor/catalog/discovery/cursor-gen/agent_pb";
 
 const CONNECT_END_STREAM_FLAG = 0b00000010;
 

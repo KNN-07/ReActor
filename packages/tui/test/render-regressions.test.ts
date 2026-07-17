@@ -1,4 +1,4 @@
-process.env.PI_TUI_SCROLLBACK_REBUILD = "true";
+process.env.REACTOR_TUI_SCROLLBACK_REBUILD = "true";
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "bun:test";
 import {
@@ -8,7 +8,7 @@ import {
 	setTerminalScreenToScrollback,
 	TERMINAL,
 	TUI,
-} from "@oh-my-pi/pi-tui";
+} from "@reactor/tui";
 import { VirtualTerminal } from "./virtual-terminal";
 
 class MutableLinesComponent implements Component {
@@ -223,7 +223,7 @@ describe("TUI terminal-state regressions", () => {
 		// Resize classification now depends on TERM_PROGRAM (Warp takes the
 		// in-place path), so neutralize the ambient terminal identity to keep
 		// these direct-terminal assertions deterministic on any dev machine.
-		for (const key of ["TERM_PROGRAM", "PI_TUI_RESIZE_IN_PLACE"]) {
+		for (const key of ["TERM_PROGRAM", "REACTOR_TUI_RESIZE_IN_PLACE"]) {
 			savedTerminalEnv[key] = Bun.env[key];
 			delete Bun.env[key];
 		}
@@ -989,7 +989,7 @@ describe("TUI terminal-state regressions", () => {
 				"        ├─────────┘         └────────┘                     │",
 				"        ▼                                                  │",
 				"┌──────────────┐     ┌────────────┐                        │",
-				"│      ai      │     │ pi-natives │◄───────────────────────┘",
+				"│      ai      │     │ reactor-natives │◄───────────────────────┘",
 				"└──────────────┘     └────────────┘",
 			];
 			const working: string[] = [];
@@ -1137,7 +1137,7 @@ describe("TUI terminal-state regressions", () => {
 				"        ├─────────┘         └────────┘                     │",
 				"        ▼                                                  │",
 				"┌──────────────┐     ┌────────────┐                        │",
-				"│      ai      │     │ pi-natives │◄───────────────────────┘",
+				"│      ai      │     │ reactor-natives │◄───────────────────────┘",
 				"└──────────────┘     └────────────┘",
 			];
 			tui.addChild(new MutableLinesComponent(lines));
@@ -1336,14 +1336,14 @@ describe("TUI terminal-state regressions", () => {
 			for (let r = 0; r < 6; r++) term.write(`STALE-ROW-${r} leftover content\r\n`);
 			await term.flush();
 			const tui = new TUI(term);
-			tui.addChild(new MutableLinesComponent(["omp line 1", "omp line 2"]));
+			tui.addChild(new MutableLinesComponent(["reactor line 1", "reactor line 2"]));
 
 			try {
 				tui.start();
 				await settle(term);
 				const viewport = term.getViewport().join("\n");
 				expect(viewport).not.toContain("STALE-ROW");
-				expect(viewport).toContain("omp line 1");
+				expect(viewport).toContain("reactor line 1");
 			} finally {
 				tui.stop();
 				setTerminalScreenToScrollback(saved);
@@ -1403,9 +1403,9 @@ describe("TUI terminal-state regressions", () => {
 			await withEnvPatch(
 				{
 					TERM_FEATURES: "Sy",
-					PI_NO_SYNC_OUTPUT: undefined,
-					PI_FORCE_SYNC_OUTPUT: undefined,
-					PI_TUI_SYNC_OUTPUT: undefined,
+					REACTOR_NO_SYNC_OUTPUT: undefined,
+					REACTOR_FORCE_SYNC_OUTPUT: undefined,
+					REACTOR_TUI_SYNC_OUTPUT: undefined,
 				},
 				async () => {
 					const term = new PrivateModeProbeTerminal(20, 3);
@@ -3142,7 +3142,7 @@ describe("TUI terminal-state regressions", () => {
 			const term = new VirtualTerminal(20, 5);
 			const tui = new TUI(term);
 			let stopped = false;
-			tui.addChild(new MutableLinesComponent(["omp0", "omp1", "omp2"]));
+			tui.addChild(new MutableLinesComponent(["reactor0", "reactor1", "reactor2"]));
 
 			try {
 				tui.start();
@@ -3153,7 +3153,7 @@ describe("TUI terminal-state regressions", () => {
 				term.write("bash$ ");
 				await term.flush();
 
-				expect(visible(term)).toEqual(["omp0", "omp1", "omp2", "bash$", ""]);
+				expect(visible(term)).toEqual(["reactor0", "reactor1", "reactor2", "bash$", ""]);
 			} finally {
 				if (!stopped) tui.stop();
 			}
@@ -4019,9 +4019,9 @@ describe("TUI terminal-state regressions", () => {
 		// these wrapper-bracketing assertions stay deterministic. In CI an unknown
 		// TERM disables sync output by default, which would emit no BSU/ESU pairs.
 		const SYNC_ENV: Record<string, string | undefined> = {
-			PI_FORCE_SYNC_OUTPUT: "1",
-			PI_NO_SYNC_OUTPUT: undefined,
-			PI_TUI_SYNC_OUTPUT: undefined,
+			REACTOR_FORCE_SYNC_OUTPUT: "1",
+			REACTOR_NO_SYNC_OUTPUT: undefined,
+			REACTOR_TUI_SYNC_OUTPUT: undefined,
 		};
 		const savedSyncEnv: Record<string, string | undefined> = {};
 

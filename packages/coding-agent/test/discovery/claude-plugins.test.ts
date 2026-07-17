@@ -2,20 +2,20 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "bun:test";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
-import { loadCapability } from "@oh-my-pi/pi-coding-agent/capability";
-import { clearCache as clearFsCache } from "@oh-my-pi/pi-coding-agent/capability/fs";
+import { loadCapability } from "@reactor/coding-agent/capability";
+import { clearCache as clearFsCache } from "@reactor/coding-agent/capability/fs";
 import {
 	clearClaudePluginRootsCache,
 	listClaudePluginRoots,
 	parseClaudePluginsRegistry,
-} from "@oh-my-pi/pi-coding-agent/discovery/helpers";
-import { loadSlashCommands } from "@oh-my-pi/pi-coding-agent/extensibility/slash-commands";
-import { discoverAgents } from "@oh-my-pi/pi-coding-agent/task/discovery";
-import { removeWithRetries } from "@oh-my-pi/pi-utils";
-import "@oh-my-pi/pi-coding-agent/discovery/claude-plugins";
-import { type MCPServer, mcpCapability } from "@oh-my-pi/pi-coding-agent/capability/mcp";
-import type { Skill } from "@oh-my-pi/pi-coding-agent/capability/skill";
-import type { SlashCommand } from "@oh-my-pi/pi-coding-agent/capability/slash-command";
+} from "@reactor/coding-agent/discovery/helpers";
+import { loadSlashCommands } from "@reactor/coding-agent/extensibility/slash-commands";
+import { discoverAgents } from "@reactor/coding-agent/task/discovery";
+import { removeWithRetries } from "@reactor/utils";
+import "@reactor/coding-agent/discovery/claude-plugins";
+import { type MCPServer, mcpCapability } from "@reactor/coding-agent/capability/mcp";
+import type { Skill } from "@reactor/coding-agent/capability/skill";
+import type { SlashCommand } from "@reactor/coding-agent/capability/slash-command";
 
 describe("parseClaudePluginsRegistry", () => {
 	test("parses valid registry", () => {
@@ -435,11 +435,11 @@ describe("listClaudePluginRoots", () => {
 	test("expands env placeholders in marketplace plugin MCP url and headers", async () => {
 		const pluginsDir = path.join(tempDir, ".claude", "plugins");
 		const pluginPath = path.join(tempDir, "plugins", "context7");
-		const originalApiKey = process.env.OMP_PLUGIN_MCP_API_KEY;
-		const originalUrl = process.env.OMP_PLUGIN_MCP_URL;
+		const originalApiKey = process.env.REACTOR_PLUGIN_MCP_API_KEY;
+		const originalUrl = process.env.REACTOR_PLUGIN_MCP_URL;
 		const envPlaceholder = (name: string): string => ["$", "{", name, ":-}"].join("");
-		process.env.OMP_PLUGIN_MCP_API_KEY = "ctx7sk-test-key";
-		process.env.OMP_PLUGIN_MCP_URL = "https://mcp.context7.example";
+		process.env.REACTOR_PLUGIN_MCP_API_KEY = "ctx7sk-test-key";
+		process.env.REACTOR_PLUGIN_MCP_URL = "https://mcp.context7.example";
 
 		try {
 			await fs.mkdir(pluginsDir, { recursive: true });
@@ -466,9 +466,9 @@ describe("listClaudePluginRoots", () => {
 				JSON.stringify({
 					context7: {
 						type: "http",
-						url: `${envPlaceholder("OMP_PLUGIN_MCP_URL")}/mcp`,
+						url: `${envPlaceholder("REACTOR_PLUGIN_MCP_URL")}/mcp`,
 						headers: {
-							CONTEXT7_API_KEY: envPlaceholder("OMP_PLUGIN_MCP_API_KEY"),
+							CONTEXT7_API_KEY: envPlaceholder("REACTOR_PLUGIN_MCP_API_KEY"),
 						},
 					},
 				}),
@@ -484,10 +484,10 @@ describe("listClaudePluginRoots", () => {
 			expect(server?.url).toBe("https://mcp.context7.example/mcp");
 			expect(server?.headers).toEqual({ CONTEXT7_API_KEY: "ctx7sk-test-key" });
 		} finally {
-			if (originalApiKey === undefined) delete process.env.OMP_PLUGIN_MCP_API_KEY;
-			else process.env.OMP_PLUGIN_MCP_API_KEY = originalApiKey;
-			if (originalUrl === undefined) delete process.env.OMP_PLUGIN_MCP_URL;
-			else process.env.OMP_PLUGIN_MCP_URL = originalUrl;
+			if (originalApiKey === undefined) delete process.env.REACTOR_PLUGIN_MCP_API_KEY;
+			else process.env.REACTOR_PLUGIN_MCP_API_KEY = originalApiKey;
+			if (originalUrl === undefined) delete process.env.REACTOR_PLUGIN_MCP_URL;
+			else process.env.REACTOR_PLUGIN_MCP_URL = originalUrl;
 		}
 	});
 

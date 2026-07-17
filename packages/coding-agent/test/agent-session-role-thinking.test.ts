@@ -1,20 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "bun:test";
 import * as path from "node:path";
-import { Agent } from "@oh-my-pi/pi-agent-core";
-import { Effort } from "@oh-my-pi/pi-ai";
-import { getBundledModel } from "@oh-my-pi/pi-catalog/models";
-import * as autoThinkingClassifier from "@oh-my-pi/pi-coding-agent/auto-thinking/classifier";
-import { ModelRegistry } from "@oh-my-pi/pi-coding-agent/config/model-registry";
-import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { AgentSession } from "@oh-my-pi/pi-coding-agent/session/agent-session";
-import { AuthStorage } from "@oh-my-pi/pi-coding-agent/session/auth-storage";
-import { SessionManager } from "@oh-my-pi/pi-coding-agent/session/session-manager";
-import {
-	AUTO_THINKING,
-	clampAutoThinkingEffort,
-	resolveProvisionalAutoLevel,
-} from "@oh-my-pi/pi-coding-agent/thinking";
-import { TempDir } from "@oh-my-pi/pi-utils";
+import { Agent } from "@reactor/agent-core";
+import { Effort } from "@reactor/ai";
+import { getBundledModel } from "@reactor/catalog/models";
+import * as autoThinkingClassifier from "@reactor/coding-agent/auto-thinking/classifier";
+import { ModelRegistry } from "@reactor/coding-agent/config/model-registry";
+import { Settings } from "@reactor/coding-agent/config/settings";
+import { AgentSession } from "@reactor/coding-agent/session/agent-session";
+import { AuthStorage } from "@reactor/coding-agent/session/auth-storage";
+import { SessionManager } from "@reactor/coding-agent/session/session-manager";
+import { AUTO_THINKING, clampAutoThinkingEffort, resolveProvisionalAutoLevel } from "@reactor/coding-agent/thinking";
+import { TempDir } from "@reactor/utils";
 import { createAssistantMessage } from "./helpers/agent-session-setup";
 
 describe("AgentSession role model thinking behavior", () => {

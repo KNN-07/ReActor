@@ -7,13 +7,13 @@
  * SQLite store, never POSTs the broker sentinel to an OpenAI token endpoint.
  */
 import * as os from "node:os";
-import { type AuthStorage, type FetchImpl, type Model, type OAuthAccess, withOAuthAccess } from "@oh-my-pi/pi-ai";
-import { decodeJwt } from "@oh-my-pi/pi-ai/oauth/openai-codex";
-import { applyCodexResponsesLiteShape } from "@oh-my-pi/pi-ai/providers/openai-codex/request-transformer";
-import { createOpenAICodexCompatibilityMetadata } from "@oh-my-pi/pi-ai/providers/openai-codex-responses";
-import { getBundledModels } from "@oh-my-pi/pi-catalog/models";
-import { CODEX_CLIENT_VERSION, OPENAI_HEADER_VALUES, OPENAI_HEADERS } from "@oh-my-pi/pi-catalog/wire/codex";
-import { $env, readSseJson } from "@oh-my-pi/pi-utils";
+import { type AuthStorage, type FetchImpl, type Model, type OAuthAccess, withOAuthAccess } from "@reactor/ai";
+import { decodeJwt } from "@reactor/ai/oauth/openai-codex";
+import { applyCodexResponsesLiteShape } from "@reactor/ai/providers/openai-codex/request-transformer";
+import { createOpenAICodexCompatibilityMetadata } from "@reactor/ai/providers/openai-codex-responses";
+import { getBundledModels } from "@reactor/catalog/models";
+import { CODEX_CLIENT_VERSION, OPENAI_HEADER_VALUES, OPENAI_HEADERS } from "@reactor/catalog/wire/codex";
+import { $env, readSseJson } from "@reactor/utils";
 import packageJson from "../../../../package.json" with { type: "json" };
 import type { SearchResponse, SearchSource } from "../../../web/search/types";
 import { SearchProviderError } from "../../../web/search/types";
@@ -59,7 +59,7 @@ function getBundledCodexModels(): CodexSearchModel[] {
 }
 
 function getConfiguredModel(): CodexModelCandidate | undefined {
-	const configuredModel = $env.PI_CODEX_WEB_SEARCH_MODEL?.trim();
+	const configuredModel = $env.REACTOR_CODEX_WEB_SEARCH_MODEL?.trim();
 	if (!configuredModel) return undefined;
 
 	const catalogModel = getBundledCodexModels().find(model => model.id === configuredModel);
@@ -532,7 +532,7 @@ async function callCodexSearch(
  * Executes a web search using OpenAI Codex's built-in web search tool.
  *
  * Default-model behavior:
- * - If `PI_CODEX_WEB_SEARCH_MODEL` is set, use it exactly once and surface any
+ * - If `REACTOR_CODEX_WEB_SEARCH_MODEL` is set, use it exactly once and surface any
  *   upstream error verbatim.
  * - Otherwise prefer ChatGPT-account-safe bundled defaults (GPT-5.6 Luna,
  *   Terra, Sol, GPT-5.5, …) and retry the next candidate only when Codex
@@ -544,7 +544,7 @@ export async function searchCodex(params: SearchParams): Promise<SearchResponse>
 	const seed = await findCodexAuth(params.authStorage, params.sessionId, params.signal);
 	if (!seed) {
 		throw new Error(
-			"No Codex OAuth credentials found. Login with 'omp /login openai-codex' to enable Codex web search.",
+			"No Codex OAuth credentials found. Login with 'reactor /login openai-codex' to enable Codex web search.",
 		);
 	}
 

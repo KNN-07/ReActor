@@ -9,17 +9,17 @@
  */
 import { afterEach, describe, expect, it, vi } from "bun:test";
 import * as path from "node:path";
-import { Agent, type AgentMessage, type AgentTool } from "@oh-my-pi/pi-agent-core";
-import { z } from "@oh-my-pi/pi-ai";
-import { createMockModel, type MockModel, type MockResponse } from "@oh-my-pi/pi-ai/providers/mock";
-import { ModelRegistry } from "@oh-my-pi/pi-coding-agent/config/model-registry";
-import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import type { IrcMessage } from "@oh-my-pi/pi-coding-agent/irc/bus";
-import { AgentSession } from "@oh-my-pi/pi-coding-agent/session/agent-session";
-import { AuthStorage } from "@oh-my-pi/pi-coding-agent/session/auth-storage";
-import { convertToLlm } from "@oh-my-pi/pi-coding-agent/session/messages";
-import { SessionManager } from "@oh-my-pi/pi-coding-agent/session/session-manager";
-import { TempDir } from "@oh-my-pi/pi-utils";
+import { Agent, type AgentMessage, type AgentTool } from "@reactor/agent-core";
+import { z } from "@reactor/ai";
+import { createMockModel, type MockModel, type MockResponse } from "@reactor/ai/providers/mock";
+import { ModelRegistry } from "@reactor/coding-agent/config/model-registry";
+import { Settings } from "@reactor/coding-agent/config/settings";
+import type { IrcMessage } from "@reactor/coding-agent/irc/bus";
+import { AgentSession } from "@reactor/coding-agent/session/agent-session";
+import { AuthStorage } from "@reactor/coding-agent/session/auth-storage";
+import { convertToLlm } from "@reactor/coding-agent/session/messages";
+import { SessionManager } from "@reactor/coding-agent/session/session-manager";
+import { TempDir } from "@reactor/utils";
 
 const yieldToolSchema = z.object({ result: z.unknown() });
 const recordToolSchema = z.object({ value: z.string() });

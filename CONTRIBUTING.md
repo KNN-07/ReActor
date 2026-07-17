@@ -1,4 +1,4 @@
-# Contributing to oh-my-pi
+# Contributing to ReActor
 
 Thanks for your interest in contributing. This project uses a lightweight
 **vouch** system to decide who can open pull requests. Please read this before
@@ -43,6 +43,28 @@ collaborators with admin/maintain/write can run these commands.
 | Denounced | PR closed |
 
 Pushing more commits to an open, vouched PR is fine — it remains vouched.
+
+## ReActor development workflow
+
+The canonical product name is `reactor`: use the `reactor` binary, `@reactor/*`
+workspace scope, `.reactor` project/user state, and `REACTOR_*` environment
+variables. Legacy legacy command aliases and data fallbacks are intentionally not shipped.
+
+Reliable autonomy is opt-in. Start it with `reactor run "<objective>"` or
+`/react start <objective>`; inspect, pause, resume, and stop it with the matching
+`/react` commands. Continuations are bounded and restart recovery always pauses.
+
+Upstream synchronization is declarative and reviewable:
+
+```sh
+bun run sync:upstream --to <upstream-sha>
+# review and resolve the left-uncommitted patch
+bun run sync:upstream:finalize
+```
+
+The current upstream pin and rename map live in `.upstream/`. The sync command
+requires a clean worktree, creates a `sync/oh-my-pi-*` branch, preserves protected
+ReActor-only paths, and leaves the result uncommitted until all release gates pass.
 
 ## The VOUCHED.td file
 

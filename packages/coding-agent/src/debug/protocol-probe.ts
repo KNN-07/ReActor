@@ -26,7 +26,7 @@ import {
 	TERMINAL,
 	Text,
 	type TextSizingScale,
-} from "@oh-my-pi/pi-tui";
+} from "@reactor/tui";
 import { DynamicBorder } from "../modes/components/dynamic-border";
 import { theme } from "../modes/theme/theme";
 
@@ -184,7 +184,7 @@ class RawLines implements Component {
 export interface ProtocolProbeOptions {
 	image: SampleImage;
 	imageBudget: ImageBudget;
-	/** Whether the desktop notification was suppressed (e.g. `PI_NOTIFICATIONS=off`). */
+	/** Whether the desktop notification was suppressed (e.g. `REACTOR_NOTIFICATIONS=off`). */
 	notificationSuppressed: boolean;
 }
 
@@ -217,7 +217,7 @@ export class ProtocolProbeComponent extends Container {
 			new Text(
 				[
 					`${theme.fg("muted", "Hyperlinks (OSC 8)")} — ${yesNo(hyperlinksOn)}`,
-					`  \x1b]8;;https://github.com/can1357/oh-my-pi\x07oh-my-pi repo\x1b]8;;\x07`,
+					`  \x1b]8;;https://github.com/KNN-07/ReActor\x07ReActor repo\x1b]8;;\x07`,
 				].join("\n"),
 				1,
 				0,
@@ -253,7 +253,7 @@ export class ProtocolProbeComponent extends Container {
 
 		// Notifications: fired by the caller; this line reports the outcome.
 		const notifyStatus = options.notificationSuppressed
-			? theme.fg("warning", "suppressed (PI_NOTIFICATIONS)")
+			? theme.fg("warning", "suppressed (REACTOR_NOTIFICATIONS)")
 			: theme.fg("success", "sent — check your desktop / titlebar");
 		this.addChild(
 			new Text(

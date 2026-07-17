@@ -1,15 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "bun:test";
 import * as path from "node:path";
-import { Agent } from "@oh-my-pi/pi-agent-core";
-import { ModelRegistry } from "@oh-my-pi/pi-coding-agent/config/model-registry";
-import { resetSettingsForTest, Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { InteractiveMode } from "@oh-my-pi/pi-coding-agent/modes/interactive-mode";
-import { enableAutoTheme, initTheme, previewTheme, setTheme } from "@oh-my-pi/pi-coding-agent/modes/theme/theme";
-import { AgentSession } from "@oh-my-pi/pi-coding-agent/session/agent-session";
-import { AuthStorage } from "@oh-my-pi/pi-coding-agent/session/auth-storage";
-import { SessionManager } from "@oh-my-pi/pi-coding-agent/session/session-manager";
-import { TUI } from "@oh-my-pi/pi-tui";
-import { TempDir } from "@oh-my-pi/pi-utils";
+import { Agent } from "@reactor/agent-core";
+import { ModelRegistry } from "@reactor/coding-agent/config/model-registry";
+import { resetSettingsForTest, Settings } from "@reactor/coding-agent/config/settings";
+import { InteractiveMode } from "@reactor/coding-agent/modes/interactive-mode";
+import { enableAutoTheme, initTheme, previewTheme, setTheme } from "@reactor/coding-agent/modes/theme/theme";
+import { AgentSession } from "@reactor/coding-agent/session/agent-session";
+import { AuthStorage } from "@reactor/coding-agent/session/auth-storage";
+import { SessionManager } from "@reactor/coding-agent/session/session-manager";
+import { TUI } from "@reactor/tui";
+import { TempDir } from "@reactor/utils";
 import { VirtualTerminal } from "../../tui/test/virtual-terminal";
 
 const MULTIPLEXER_ENV_KEYS = ["TMUX", "STY", "ZELLIJ", "CMUX_WORKSPACE_ID", "CMUX_SURFACE_ID", "TERM"] as const;

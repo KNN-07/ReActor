@@ -1,10 +1,10 @@
 /**
  * Extension runner - executes extensions and manages their lifecycle.
  */
-import type { AgentMessage } from "@oh-my-pi/pi-agent-core";
-import type { CredentialDisabledEvent, ImageContent, Model, ProviderResponseMetadata } from "@oh-my-pi/pi-ai";
-import type { KeyId } from "@oh-my-pi/pi-tui";
-import { logger } from "@oh-my-pi/pi-utils";
+import type { AgentMessage } from "@reactor/agent-core";
+import type { CredentialDisabledEvent, ImageContent, Model, ProviderResponseMetadata } from "@reactor/ai";
+import type { KeyId } from "@reactor/tui";
+import { logger } from "@reactor/utils";
 import type { ModelRegistry } from "../../config/model-registry";
 import type { Settings } from "../../config/settings";
 import type { LocalProtocolOptions } from "../../internal-urls/local-protocol";
@@ -320,7 +320,7 @@ export class ExtensionRunner {
 		this.#initialized = true;
 
 		// Drain events buffered by emitCredentialDisabled() before initialize ran. The
-		// spread adds the `type` discriminator — `event` is the pi-ai shape (no `type`).
+		// spread adds the `type` discriminator — `event` is the ai shape (no `type`).
 		// Deferred by one microtask so callers that register an onError listener
 		// synchronously after initialize() see handler errors routed through it.
 		const pending = this.#pendingCredentialDisabled.splice(0);

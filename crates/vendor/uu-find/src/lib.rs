@@ -5,11 +5,11 @@
 // https://opensource.org/licenses/MIT.
 
 //! Vendored, patched `find` from uutils/findutils, wired to run in-process as a
-//! brush shell builtin via [`pi_uutils_ctx`].
+//! brush shell builtin via [`reactor_uutils_ctx`].
 
 pub mod find;
 
-/// In-process builtin entry point. The host installs a [`pi_uutils_ctx`] scope
+/// In-process builtin entry point. The host installs a [`reactor_uutils_ctx`] scope
 /// (stdio + working directory + environment) on a dedicated blocking thread,
 /// then calls this.
 ///

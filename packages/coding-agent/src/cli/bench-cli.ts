@@ -1,4 +1,4 @@
-import type { ResolvedThinkingLevel } from "@oh-my-pi/pi-agent-core";
+import type { ResolvedThinkingLevel } from "@reactor/agent-core";
 import type {
 	Api,
 	ApiKeyResolver,
@@ -12,11 +12,11 @@ import type {
 	ServiceTier,
 	ServiceTierByFamily,
 	SimpleStreamOptions,
-} from "@oh-my-pi/pi-ai";
-import { resolveModelServiceTier, streamSimple } from "@oh-my-pi/pi-ai";
-import { buildModelProviderPriorityRank } from "@oh-my-pi/pi-catalog/identity";
-import { replaceTabs, truncateToWidth } from "@oh-my-pi/pi-tui";
-import { formatDuration, getProjectDir } from "@oh-my-pi/pi-utils";
+} from "@reactor/ai";
+import { resolveModelServiceTier, streamSimple } from "@reactor/ai";
+import { buildModelProviderPriorityRank } from "@reactor/catalog/identity";
+import { replaceTabs, truncateToWidth } from "@reactor/tui";
+import { formatDuration, getProjectDir } from "@reactor/utils";
 import chalk from "chalk";
 import type { ApiKeyResolverModel } from "../config/api-key-resolver";
 import { ModelRegistry } from "../config/model-registry";
@@ -225,7 +225,7 @@ async function runBenchRequest(
 			serviceTier: options.serviceTier,
 			providerSessionState,
 			preferWebsockets: true,
-			// pi-ai opts every OpenRouter request into response caching (1h TTL).
+			// ai opts every OpenRouter request into response caching (1h TTL).
 			// Bench sends a byte-identical request each run, so within the TTL
 			// OpenRouter replays the cached generation with zeroed usage — the run
 			// shows "tokens 0, TPS 0.0" at line speed. Opt back out so every run
@@ -493,7 +493,7 @@ export async function runBenchCommand(command: BenchCommandArgs, deps: BenchDepe
 	const now = deps.now ?? (() => performance.now());
 	const interactive = deps.stdoutIsTTY ?? process.stdout.isTTY === true;
 	if (command.models.length === 0) {
-		throw new Error("Pass at least one model selector, e.g. `omp bench opus gpt-5.2`");
+		throw new Error("Pass at least one model selector, e.g. `reactor bench opus gpt-5.2`");
 	}
 
 	const runtime = await (deps.createRuntime ?? createDefaultRuntime)();
@@ -528,7 +528,7 @@ export async function runBenchCommand(command: BenchCommandArgs, deps: BenchDepe
 			if (!preflightKey) {
 				const failure: BenchRunFailure = {
 					ok: false,
-					error: `No credentials for provider "${model.provider}". Run \`omp\` and use /login, or set the provider API key.`,
+					error: `No credentials for provider "${model.provider}". Run \`reactor\` and use /login, or set the provider API key.`,
 				};
 				results.push(failure);
 				if (!json) writeStdout(`${formatRunLine(failure, 0, runs)}\n`);

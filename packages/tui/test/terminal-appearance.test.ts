@@ -1,13 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "bun:test";
-import { extractPrintableText } from "@oh-my-pi/pi-tui/keys";
-import { ProcessTerminal } from "@oh-my-pi/pi-tui/terminal";
+import { extractPrintableText } from "@reactor/tui/keys";
+import { ProcessTerminal } from "@reactor/tui/terminal";
 import {
 	type CellDimensions,
 	getCellDimensions,
 	getTerminalInfo,
 	setCellDimensions,
-} from "@oh-my-pi/pi-tui/terminal-capabilities";
-import { setTerminalHeadless } from "@oh-my-pi/pi-utils";
+} from "@reactor/tui/terminal-capabilities";
+import { setTerminalHeadless } from "@reactor/utils";
 
 const stdinIsTtyDescriptor = Object.getOwnPropertyDescriptor(process.stdin, "isTTY");
 const stdoutIsTtyDescriptor = Object.getOwnPropertyDescriptor(process.stdout, "isTTY");

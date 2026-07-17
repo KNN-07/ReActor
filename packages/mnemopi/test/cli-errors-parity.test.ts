@@ -2,20 +2,20 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { cmdExport, cmdImport, cmdRemember, runCli } from "@oh-my-pi/pi-mnemopi/cli";
+import { cmdExport, cmdImport, cmdRemember, runCli } from "@reactor/mnemopi/cli";
 
 let root: string;
 
 beforeEach(() => {
 	root = mkdtempSync(join(tmpdir(), "mnemopi-ts-cli-errors-parity-"));
-	process.env.MNEMOPI_DATA_DIR = root;
-	process.env.MNEMOPI_NO_EMBEDDINGS = "1";
+	process.env.REACTOR_MNEMOPI_DATA_DIR = root;
+	process.env.REACTOR_MNEMOPI_NO_EMBEDDINGS = "1";
 });
 
 afterEach(() => {
 	rmSync(root, { recursive: true, force: true });
-	delete process.env.MNEMOPI_DATA_DIR;
-	delete process.env.MNEMOPI_NO_EMBEDDINGS;
+	delete process.env.REACTOR_MNEMOPI_DATA_DIR;
+	delete process.env.REACTOR_MNEMOPI_NO_EMBEDDINGS;
 });
 
 function capture() {

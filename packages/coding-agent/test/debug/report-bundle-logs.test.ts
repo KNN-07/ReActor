@@ -2,10 +2,10 @@ import { afterEach, describe, expect, it } from "bun:test";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
-import { createReportBundle } from "@oh-my-pi/pi-coding-agent/debug/report-bundle";
-import { getConfigRootDir, getLogsDir, removeWithRetries, setAgentDir } from "@oh-my-pi/pi-utils";
+import { createReportBundle } from "@reactor/coding-agent/debug/report-bundle";
+import { getConfigRootDir, getLogsDir, removeWithRetries, setAgentDir } from "@reactor/utils";
 
-const originalAgentDir = process.env.PI_CODING_AGENT_DIR;
+const originalAgentDir = process.env.REACTOR_CODING_AGENT_DIR;
 const originalXdgStateHome = process.env.XDG_STATE_HOME;
 const fallbackAgentDir = path.join(getConfigRootDir(), "agent");
 let cleanupRoot: string | undefined;
@@ -20,7 +20,7 @@ afterEach(async () => {
 		setAgentDir(originalAgentDir);
 	} else {
 		setAgentDir(fallbackAgentDir);
-		delete process.env.PI_CODING_AGENT_DIR;
+		delete process.env.REACTOR_CODING_AGENT_DIR;
 	}
 	if (cleanupRoot) {
 		await removeWithRetries(cleanupRoot);
@@ -30,18 +30,18 @@ afterEach(async () => {
 
 describe("report bundle logs", () => {
 	it("collects every same-day PID log, not only the current process", async () => {
-		cleanupRoot = await fs.mkdtemp(path.join(os.tmpdir(), "omp-report-logs-"));
+		cleanupRoot = await fs.mkdtemp(path.join(os.tmpdir(), "reactor-report-logs-"));
 		const xdgStateHome = path.join(cleanupRoot, "state");
-		await fs.mkdir(path.join(xdgStateHome, "omp"), { recursive: true });
+		await fs.mkdir(path.join(xdgStateHome, "reactor"), { recursive: true });
 		process.env.XDG_STATE_HOME = xdgStateHome;
 		setAgentDir(fallbackAgentDir);
 
 		const logsDir = getLogsDir();
 		await fs.mkdir(logsDir, { recursive: true });
 		const today = new Date().toISOString().slice(0, 10);
-		const crashedName = `omp.${today}.4242.log`;
+		const crashedName = `reactor.${today}.4242.log`;
 		const rotatedName = `${crashedName}.1`;
-		const currentName = `omp.${today}.${process.pid}.log`;
+		const currentName = `reactor.${today}.${process.pid}.log`;
 		await Bun.write(path.join(logsDir, crashedName), '{"pid":4242,"message":"fatal in crashed pid"}\n');
 		await fs.utimes(path.join(logsDir, crashedName), 1, 1);
 		await Bun.write(path.join(logsDir, rotatedName), '{"pid":4242,"message":"earlier rotated crash output"}\n');

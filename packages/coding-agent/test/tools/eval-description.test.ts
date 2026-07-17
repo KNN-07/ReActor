@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
-import type { Tool as AiTool } from "@oh-my-pi/pi-ai";
-import { toolWireSchema } from "@oh-my-pi/pi-ai/utils/schema";
-import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import type { ToolSession } from "@oh-my-pi/pi-coding-agent/tools";
-import { EvalTool, getEvalToolDescription } from "@oh-my-pi/pi-coding-agent/tools/eval";
+import type { Tool as AiTool } from "@reactor/ai";
+import { toolWireSchema } from "@reactor/ai/utils/schema";
+import { Settings } from "@reactor/coding-agent/config/settings";
+import type { ToolSession } from "@reactor/coding-agent/tools";
+import { EvalTool, getEvalToolDescription } from "@reactor/coding-agent/tools/eval";
 
 function makeSession(opts: { spawns?: string | null; backends?: Record<string, boolean> }): ToolSession {
 	const settings = Settings.isolated();
@@ -65,9 +65,9 @@ describe("eval tool description", () => {
 });
 
 describe("eval tool dynamic schema", () => {
-	// resolveEvalBackends lets PI_* env flags override settings; neutralize them per-test
+	// resolveEvalBackends lets REACTOR_* env flags override settings; neutralize them per-test
 	// so the schema is driven purely by the isolated settings (and restore to avoid leaks).
-	const EVAL_ENV_FLAGS = ["PI_PY", "PI_JS", "PI_RB", "PI_JL"] as const;
+	const EVAL_ENV_FLAGS = ["REACTOR_PY", "REACTOR_JS", "REACTOR_RB", "REACTOR_JL"] as const;
 	let savedEnv: Record<string, string | undefined>;
 	beforeEach(() => {
 		savedEnv = {};

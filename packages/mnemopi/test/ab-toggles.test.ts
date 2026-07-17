@@ -2,14 +2,14 @@ import { afterEach, describe, expect, it } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { PolyphonicRecallEngine } from "@oh-my-pi/pi-mnemopi/core/polyphonic-recall";
+import { PolyphonicRecallEngine } from "@reactor/mnemopi/core/polyphonic-recall";
 
 const roots: string[] = [];
 const toggleNames = [
-	"MNEMOPI_VOICE_VECTOR",
-	"MNEMOPI_VOICE_GRAPH",
-	"MNEMOPI_VOICE_FACT",
-	"MNEMOPI_VOICE_TEMPORAL",
+	"REACTOR_MNEMOPI_VOICE_VECTOR",
+	"REACTOR_MNEMOPI_VOICE_GRAPH",
+	"REACTOR_MNEMOPI_VOICE_FACT",
+	"REACTOR_MNEMOPI_VOICE_TEMPORAL",
 ] as const;
 const savedEnv: Partial<Record<(typeof toggleNames)[number], string>> = {};
 
@@ -48,10 +48,10 @@ describe("A/B polyphonic voice toggles", () => {
 		const falsyValues = ["0", "false", "no", "off", "FALSE", "Off", " 0 ", "\toff\t"];
 		for (const value of falsyValues) {
 			withEngine(engine => {
-				process.env.MNEMOPI_VOICE_VECTOR = value;
-				process.env.MNEMOPI_VOICE_GRAPH = value;
-				process.env.MNEMOPI_VOICE_FACT = value;
-				process.env.MNEMOPI_VOICE_TEMPORAL = value;
+				process.env.REACTOR_MNEMOPI_VOICE_VECTOR = value;
+				process.env.REACTOR_MNEMOPI_VOICE_GRAPH = value;
+				process.env.REACTOR_MNEMOPI_VOICE_FACT = value;
+				process.env.REACTOR_MNEMOPI_VOICE_TEMPORAL = value;
 				expect(engine.vectorVoice(new Float32Array([1, 0, 0]))).toEqual([]);
 				expect(engine.graphVoice("Alice owns the service")).toEqual([]);
 				expect(engine.factVoice("deploy service")).toEqual([]);
@@ -65,13 +65,13 @@ describe("A/B polyphonic voice toggles", () => {
 		for (const value of enabledValues) {
 			withEngine(engine => {
 				if (value === undefined) {
-					delete process.env.MNEMOPI_VOICE_GRAPH;
-					delete process.env.MNEMOPI_VOICE_FACT;
-					delete process.env.MNEMOPI_VOICE_TEMPORAL;
+					delete process.env.REACTOR_MNEMOPI_VOICE_GRAPH;
+					delete process.env.REACTOR_MNEMOPI_VOICE_FACT;
+					delete process.env.REACTOR_MNEMOPI_VOICE_TEMPORAL;
 				} else {
-					process.env.MNEMOPI_VOICE_GRAPH = value;
-					process.env.MNEMOPI_VOICE_FACT = value;
-					process.env.MNEMOPI_VOICE_TEMPORAL = value;
+					process.env.REACTOR_MNEMOPI_VOICE_GRAPH = value;
+					process.env.REACTOR_MNEMOPI_VOICE_FACT = value;
+					process.env.REACTOR_MNEMOPI_VOICE_TEMPORAL = value;
 				}
 				expect(Array.isArray(engine.graphVoice("Alice owns the service"))).toBe(true);
 				expect(Array.isArray(engine.factVoice("deploy service"))).toBe(true);
@@ -82,10 +82,10 @@ describe("A/B polyphonic voice toggles", () => {
 
 	it("documents every in-scope polyphonic voice toggle in the source contract", () => {
 		withEngine(engine => {
-			process.env.MNEMOPI_VOICE_VECTOR = "0";
-			process.env.MNEMOPI_VOICE_GRAPH = "0";
-			process.env.MNEMOPI_VOICE_FACT = "0";
-			process.env.MNEMOPI_VOICE_TEMPORAL = "0";
+			process.env.REACTOR_MNEMOPI_VOICE_VECTOR = "0";
+			process.env.REACTOR_MNEMOPI_VOICE_GRAPH = "0";
+			process.env.REACTOR_MNEMOPI_VOICE_FACT = "0";
+			process.env.REACTOR_MNEMOPI_VOICE_TEMPORAL = "0";
 			expect(engine.recall("recent Alice deploy", new Float32Array([1, 0, 0]), 10)).toEqual([]);
 		});
 	});

@@ -1,4 +1,4 @@
-import { isRetryableError, isUnexpectedSocketCloseMessage } from "@oh-my-pi/pi-utils";
+import { isRetryableError, isUnexpectedSocketCloseMessage } from "@reactor/utils";
 import {
 	isRetryableStreamEnvelopeError,
 	isTransientStreamParseError,

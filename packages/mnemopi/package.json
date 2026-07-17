@@ -1,9 +1,10 @@
 {
   "type": "module",
-  "name": "@oh-my-pi/pi-mnemopi",
-  "version": "17.0.2",
-  "description": "Local SQLite memory engine for Oh My Pi agents",
-  "homepage": "https://omp.sh",
+  "name": "@reactor/mnemopi",
+	"private": true,
+  "version": "0.1.0",
+  "description": "Local SQLite memory engine for ReActor agents",
+  "homepage": "https://reactor.sh",
   "author": "Can Boluk",
   "contributors": [
     "Abdias J"
@@ -11,11 +12,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/can1357/oh-my-pi.git",
+    "url": "git+https://github.com/KNN-07/ReActor.git",
     "directory": "packages/mnemopi"
   },
   "bugs": {
-    "url": "https://github.com/can1357/oh-my-pi/issues"
+    "url": "https://github.com/KNN-07/ReActor/issues"
   },
   "keywords": [
     "memory",
@@ -39,9 +40,9 @@
     "fmt": "biome format --write ."
   },
   "dependencies": {
-    "@oh-my-pi/pi-ai": "catalog:",
-    "@oh-my-pi/pi-catalog": "catalog:",
-    "@oh-my-pi/pi-utils": "catalog:",
+    "@reactor/ai": "workspace:*",
+    "@reactor/catalog": "workspace:*",
+    "@reactor/utils": "workspace:*",
     "lru-cache": "catalog:"
   },
   "peerDependencies": {

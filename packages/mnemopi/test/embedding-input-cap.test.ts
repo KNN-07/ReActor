@@ -1,11 +1,7 @@
 import { afterEach, describe, expect, it } from "bun:test";
 import "./setup";
-import {
-	embed,
-	resetEmbeddingProviderForTests,
-	setEmbeddingProviderForTests,
-} from "@oh-my-pi/pi-mnemopi/core/embeddings";
-import { withMnemopiRuntimeOptions } from "@oh-my-pi/pi-mnemopi/core/runtime-options";
+import { embed, resetEmbeddingProviderForTests, setEmbeddingProviderForTests } from "@reactor/mnemopi/core/embeddings";
+import { withMnemopiRuntimeOptions } from "@reactor/mnemopi/core/runtime-options";
 
 /**
  * Regression coverage for issue #3126: `MnemopiSessionState.retainMessages`
@@ -13,7 +9,7 @@ import { withMnemopiRuntimeOptions } from "@oh-my-pi/pi-mnemopi/core/runtime-opt
  * overflow whatever ctx the embedding server was started with — llama.cpp
  * rejects oversized requests with `request (N tokens) exceeds the available
  * context size`, OpenAI silently right-truncates. `embed()` now caps each
- * input to `MNEMOPI_EMBEDDING_MAX_INPUT_CHARS` (default 8192) before the
+ * input to `REACTOR_MNEMOPI_EMBEDDING_MAX_INPUT_CHARS` (default 8192) before the
  * provider sees it.
  */
 function captureProvider(): {
@@ -30,7 +26,7 @@ function captureProvider(): {
 	};
 }
 
-const ENV_KEY = "MNEMOPI_EMBEDDING_MAX_INPUT_CHARS";
+const ENV_KEY = "REACTOR_MNEMOPI_EMBEDDING_MAX_INPUT_CHARS";
 
 function withEnvValue<T>(value: string | undefined, fn: () => Promise<T>): Promise<T> {
 	const previous = process.env[ENV_KEY];
@@ -60,7 +56,7 @@ describe("embed() input cap (#3126)", () => {
 		expect(seenHuge?.length).toBe(8192);
 	});
 
-	it("honors MNEMOPI_EMBEDDING_MAX_INPUT_CHARS env override", async () => {
+	it("honors REACTOR_MNEMOPI_EMBEDDING_MAX_INPUT_CHARS env override", async () => {
 		const provider = captureProvider();
 		setEmbeddingProviderForTests(provider);
 

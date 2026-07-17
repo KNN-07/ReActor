@@ -1,6 +1,6 @@
 /**
  * ArkType schemas for the Anthropic Messages API request shape we accept on the
- * gateway. Maps canonical wire variants to our internal normalized omp Context
+ * gateway. Maps canonical wire variants to our internal normalized reactor Context
  * and options.
  */
 
@@ -15,10 +15,10 @@ import type {
 	ToolChoice,
 } from "./anthropic-wire";
 
-// `cache_control` is accepted and translated to pi-ai's per-request
+// `cache_control` is accepted and translated to ai's per-request
 // `cacheRetention` (any `ttl: "1h"` marker upgrades the request to "long";
 // any other ephemeral marker maps to "short"). The walker doesn't try to
-// preserve per-block breakpoints — pi-ai's anthropic provider re-applies them
+// preserve per-block breakpoints — ai's anthropic provider re-applies them
 // against the rebuilt outbound request anyway.
 export const cacheControlSchema = type({
 	type: "'ephemeral'",

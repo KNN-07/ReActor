@@ -14,7 +14,7 @@
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { configureProviderMaxInFlightRequests } from "@oh-my-pi/pi-ai/stream";
+import { configureProviderMaxInFlightRequests } from "@reactor/ai/stream";
 import {
 	getAgentDbPath,
 	getAgentDir,
@@ -25,7 +25,7 @@ import {
 	MAIN_CONFIG_FILENAMES,
 	procmgr,
 	setWorktreesDir,
-} from "@oh-my-pi/pi-utils";
+} from "@reactor/utils";
 import { JSONC, YAML } from "bun";
 import { invalidate as invalidateCapabilityFsCache } from "../capability/fs";
 import { type Settings as SettingsCapabilityItem, settingsCapability } from "../capability/settings";
@@ -1063,7 +1063,7 @@ export class Settings {
 					merged = this.#deepMerge(merged, item.data as RawSettings);
 				}
 			}
-			const nativeProject = await this.#loadYaml(path.join(this.#cwd, ".omp", "config.yml"));
+			const nativeProject = await this.#loadYaml(path.join(this.#cwd, ".reactor", "config.yml"));
 			const nativeModelRoles = getByPath(nativeProject, ["modelRoles"]);
 			if (nativeModelRoles !== undefined) {
 				merged = this.#deepMerge(merged, { modelRoles: nativeModelRoles });
@@ -1214,7 +1214,7 @@ export class Settings {
 			todoObj.eager = todoObj.eager ? "always" : "default";
 		}
 
-		// task.isolation.mode: legacy values from before the pi-iso PAL refactor.
+		// task.isolation.mode: legacy values from before the reactor-iso PAL refactor.
 		// `worktree` was git worktree → now lives under `rcopy`. `fuse-overlay`
 		// and `fuse-projfs` are now the platform-named `overlayfs` / `projfs`
 		// kinds; the PAL falls back internally when the chosen one isn't
@@ -1362,7 +1362,7 @@ export class Settings {
 					!("bankId" in hindsightObj) &&
 					typeof agentName === "string" &&
 					agentName.trim().length > 0 &&
-					agentName !== "omp"
+					agentName !== "reactor"
 				) {
 					hindsightObj.bankId = agentName;
 				}
@@ -1687,7 +1687,7 @@ export class Settings {
 	async #saveProjectNow(): Promise<void> {
 		if (!this.#persist || this.#modifiedProjectModelRoles.size === 0) return;
 
-		const projectConfigPath = path.join(this.#cwd, ".omp", "config.yml");
+		const projectConfigPath = path.join(this.#cwd, ".reactor", "config.yml");
 		const modifiedModelRoles = [...this.#modifiedProjectModelRoles];
 		this.#modifiedProjectModelRoles.clear();
 

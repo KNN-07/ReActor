@@ -10,14 +10,14 @@ import {
 	type RequestPermissionResponse,
 	type SessionNotification,
 } from "@agentclientprotocol/sdk";
-import type { Model } from "@oh-my-pi/pi-ai";
-import { buildModel } from "@oh-my-pi/pi-catalog/build";
-import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { createAcpConnection } from "@oh-my-pi/pi-coding-agent/modes/acp/acp-mode";
-import type { AgentSession } from "@oh-my-pi/pi-coding-agent/session/agent-session";
-import { AuthStorage } from "@oh-my-pi/pi-coding-agent/session/auth-storage";
-import { SessionManager } from "@oh-my-pi/pi-coding-agent/session/session-manager";
-import { TempDir } from "@oh-my-pi/pi-utils";
+import type { Model } from "@reactor/ai";
+import { buildModel } from "@reactor/catalog/build";
+import { Settings } from "@reactor/coding-agent/config/settings";
+import { createAcpConnection } from "@reactor/coding-agent/modes/acp/acp-mode";
+import type { AgentSession } from "@reactor/coding-agent/session/agent-session";
+import { AuthStorage } from "@reactor/coding-agent/session/auth-storage";
+import { SessionManager } from "@reactor/coding-agent/session/session-manager";
+import { TempDir } from "@reactor/utils";
 
 const TEST_MODEL: Model = buildModel({
 	id: "claude-sonnet-4-20250514",
@@ -156,7 +156,7 @@ async function closeTransport(writable: WritableStream<unknown>): Promise<void> 
 
 describe("ACP lazy startup", () => {
 	it("applies schema defaults for ACP background jobs and preserves explicit overrides", async () => {
-		const { runRootCommand } = await import("@oh-my-pi/pi-coding-agent/main");
+		const { runRootCommand } = await import("@reactor/coding-agent/main");
 
 		type ObservedBackgroundSettings = {
 			asyncEnabled: boolean;
@@ -166,7 +166,7 @@ describe("ACP lazy startup", () => {
 		};
 
 		const runAcpStartup = async (settings: Settings): Promise<ObservedBackgroundSettings> => {
-			using tempDir = TempDir.createSync("@omp-acp-background-settings-");
+			using tempDir = TempDir.createSync("@reactor-acp-background-settings-");
 			const cwd = tempDir.path();
 			const authStorage = await AuthStorage.create(path.join(cwd, "auth.db"));
 			let observed: ObservedBackgroundSettings | undefined;
@@ -247,7 +247,7 @@ describe("ACP lazy startup", () => {
 		// configured value (caller, project, --config overlay, or global) with the
 		// schema default. The fix (re-)added an `isConfigured` guard so explicit
 		// configuration survives, and the schema default only fills holes.
-		const { runRootCommand } = await import("@oh-my-pi/pi-coding-agent/main");
+		const { runRootCommand } = await import("@reactor/coding-agent/main");
 
 		const explicit = {
 			"task.isolation.mode": "rcopy",
@@ -279,7 +279,7 @@ describe("ACP lazy startup", () => {
 		type ObservedSettings = Record<string, unknown>;
 
 		const runProtocolStartup = async (mode: "rpc" | "rpc-ui" | "acp"): Promise<ObservedSettings> => {
-			using tempDir = TempDir.createSync("@omp-protocol-host-defaulted-");
+			using tempDir = TempDir.createSync("@reactor-protocol-host-defaulted-");
 			const cwd = tempDir.path();
 			const authStorage = await AuthStorage.create(path.join(cwd, "auth.db"));
 			const settings = Settings.isolated({ ...explicit, ...rpcOnlyExplicit });
@@ -336,7 +336,7 @@ describe("ACP lazy startup", () => {
 	});
 
 	it("honors explicit todo settings for protocol hosts", async () => {
-		const { runRootCommand } = await import("@oh-my-pi/pi-coding-agent/main");
+		const { runRootCommand } = await import("@reactor/coding-agent/main");
 
 		type ObservedTodoSettings = {
 			enabled: boolean;
@@ -345,7 +345,7 @@ describe("ACP lazy startup", () => {
 		};
 
 		const runProtocolStartup = async (mode: "rpc" | "rpc-ui" | "acp"): Promise<ObservedTodoSettings> => {
-			using tempDir = TempDir.createSync("@omp-protocol-todo-settings-");
+			using tempDir = TempDir.createSync("@reactor-protocol-todo-settings-");
 			const cwd = tempDir.path();
 			const authStorage = await AuthStorage.create(path.join(cwd, "auth.db"));
 			const settings = Settings.isolated({
@@ -441,7 +441,7 @@ describe("ACP lazy startup", () => {
 			expect(initializeResponse).toEqual(
 				expect.objectContaining({
 					protocolVersion: 1,
-					agentInfo: expect.objectContaining({ name: "oh-my-pi" }),
+					agentInfo: expect.objectContaining({ name: "ReActor" }),
 				}),
 			);
 			expect(createCalls).toBe(0);
@@ -461,7 +461,7 @@ describe("ACP lazy startup", () => {
 	});
 
 	it("applies CLI runtime API keys after ACP lazy session creation resolves extension models", async () => {
-		using tempDir = TempDir.createSync("@omp-acp-lazy-api-key-");
+		using tempDir = TempDir.createSync("@reactor-acp-lazy-api-key-");
 		const cwd = tempDir.path();
 
 		await Bun.write(
@@ -488,8 +488,8 @@ describe("ACP lazy startup", () => {
 		const authStorage = await AuthStorage.create(path.join(cwd, "auth.db"));
 		try {
 			const settings = Settings.isolated({ "marketplace.autoUpdate": "off" });
-			const { runRootCommand } = await import("@oh-my-pi/pi-coding-agent/main");
-			const { createAgentSession } = await import("@oh-my-pi/pi-coding-agent/sdk");
+			const { runRootCommand } = await import("@reactor/coding-agent/main");
+			const { createAgentSession } = await import("@reactor/coding-agent/sdk");
 			let session: AgentSession | undefined;
 
 			const stopped = runRootCommand(

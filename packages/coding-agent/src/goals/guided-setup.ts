@@ -1,6 +1,6 @@
-import { instrumentedCompleteSimple, resolveTelemetry } from "@oh-my-pi/pi-agent-core";
-import type { Tool } from "@oh-my-pi/pi-ai";
-import { prompt, Snowflake } from "@oh-my-pi/pi-utils";
+import { instrumentedCompleteSimple, resolveTelemetry } from "@reactor/agent-core";
+import type { Tool } from "@reactor/ai";
+import { prompt, Snowflake } from "@reactor/utils";
 import { extractTextContent, extractToolCall, parseJsonPayload } from "../commit/utils";
 import guidedGoalInterviewPrompt from "../prompts/goals/guided-goal-interview.md" with { type: "text" };
 import guidedGoalSystemPrompt from "../prompts/goals/guided-goal-system.md" with { type: "text" };

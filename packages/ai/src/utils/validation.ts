@@ -22,7 +22,7 @@
  * keeps the schema in charge of acceptance — we never invent values, only
  * massage shapes the LLM almost got right.
  */
-import { structuredCloneJSON } from "@oh-my-pi/pi-utils";
+import { structuredCloneJSON } from "@reactor/utils";
 import { type Type, type } from "arktype";
 import type { ZodType } from "zod/v4";
 import type { $ZodIssue as ZodIssue } from "zod/v4/core";
@@ -1265,7 +1265,7 @@ function parsedArrayMatchesArrayBranch(schema: Record<string, unknown>, value: u
  * against the schema's array branch. Conservative: array-shaped strings like
  * `"[1]"` stay on the string branch when the array branch is `string[]`.
  *
- * See https://github.com/can1357/oh-my-pi/issues/1788.
+ * See https://github.com/KNN-07/ReActor/issues/1788.
  */
 function normalizeStringEncodedArrayUnions(schema: unknown, value: unknown): { value: unknown; changed: boolean } {
 	if (value === null || value === undefined) return { value, changed: false };

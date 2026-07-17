@@ -1,12 +1,12 @@
 /**
  * Shell CLI command handlers.
  *
- * Handles `omp shell` subcommand for testing the native brush-core shell.
+ * Handles `reactor shell` subcommand for testing the native brush-core shell.
  */
 import * as path from "node:path";
 import { createInterface } from "node:readline/promises";
-import { Shell } from "@oh-my-pi/pi-natives";
-import { APP_NAME, getProjectDir } from "@oh-my-pi/pi-utils";
+import { Shell } from "@reactor/natives";
+import { APP_NAME, getProjectDir } from "@reactor/utils";
 import chalk from "chalk";
 import { Settings } from "../config/settings";
 import { buildMinimizerOptions } from "../exec/bash-executor";

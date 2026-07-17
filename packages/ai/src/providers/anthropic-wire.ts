@@ -1,12 +1,12 @@
 /**
  * Anthropic Messages API wire types.
  *
- * Hand-maintained against https://docs.anthropic.com/en/api/messages so pi-ai
+ * Hand-maintained against https://docs.anthropic.com/en/api/messages so ai
  * does not depend on `@anthropic-ai/sdk` for type information. Only the shapes
  * this package actually reads or writes are modeled; fields we never touch are
  * intentionally omitted. Names mirror the SDK so call sites read the same.
  *
- * Unlike the SDK, beta fields pi-ai uses (`speed`, `context_management`,
+ * Unlike the SDK, beta fields ai uses (`speed`, `context_management`,
  * `output_config.effort`/`task_budget`, `thinking.display`, cache-control
  * `scope`, tool `strict`/`eager_input_streaming`, mid-conversation `system`
  * role) are first-class here instead of being patched in via casts.

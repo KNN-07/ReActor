@@ -1,11 +1,11 @@
 /**
- * `omp auth-gateway` command handlers.
+ * `reactor auth-gateway` command handlers.
  *
  * Boots a forward-proxy server that lets less-trusted clients (the macOS
- * usage widget, robomp containers, …) make provider API calls without ever
+ * usage widget, reactor-worker containers, …) make provider API calls without ever
  * seeing the access token. The gateway is itself a broker client and
  * resolves credentials through the configured broker (via the same
- * `OMP_AUTH_BROKER_URL` / `auth.broker.url` precedence used elsewhere).
+ * `REACTOR_AUTH_BROKER_URL` / `auth.broker.url` precedence used elsewhere).
  *
  * Sub-verbs:
  *   - `serve [--bind=…]` — boots the gateway against the configured broker.
@@ -23,11 +23,11 @@ import {
 	type CredentialCompletionResult,
 	completeSimple,
 	type Model,
-} from "@oh-my-pi/pi-ai";
-import { AuthBrokerClient, RemoteAuthCredentialStore, type SnapshotResponse } from "@oh-my-pi/pi-ai/auth-broker";
-import { DEFAULT_AUTH_GATEWAY_BIND, startAuthGateway } from "@oh-my-pi/pi-ai/auth-gateway";
-import { type GeneratedProvider, getBundledModels, getBundledProviders } from "@oh-my-pi/pi-catalog/models";
-import { getConfigRootDir, isEnoent, VERSION } from "@oh-my-pi/pi-utils";
+} from "@reactor/ai";
+import { AuthBrokerClient, RemoteAuthCredentialStore, type SnapshotResponse } from "@reactor/ai/auth-broker";
+import { DEFAULT_AUTH_GATEWAY_BIND, startAuthGateway } from "@reactor/ai/auth-gateway";
+import { type GeneratedProvider, getBundledModels, getBundledProviders } from "@reactor/catalog/models";
+import { getConfigRootDir, isEnoent, VERSION } from "@reactor/utils";
 import chalk from "chalk";
 import { type AuthBrokerClientConfig, resolveAuthBrokerConfig } from "../session/auth-broker-config";
 
@@ -139,7 +139,7 @@ async function runServe(flags: AuthGatewayCommandArgs["flags"]): Promise<void> {
 	const brokerConfig = await resolveAuthBrokerConfig();
 	if (!brokerConfig) {
 		throw new Error(
-			"`omp auth-gateway serve` requires OMP_AUTH_BROKER_URL (or `auth.broker.url`/`auth.broker.token` in config.yml). The gateway is itself a broker client.",
+			"`reactor auth-gateway serve` requires REACTOR_AUTH_BROKER_URL (or `auth.broker.url`/`auth.broker.token` in config.yml). The gateway is itself a broker client.",
 		);
 	}
 	const bind = flags.bind ?? DEFAULT_AUTH_GATEWAY_BIND;
@@ -159,9 +159,9 @@ async function runServe(flags: AuthGatewayCommandArgs["flags"]): Promise<void> {
 	});
 	await storage.reload();
 
-	// Build the model resolver + catalog from pi-ai's bundled metadata, scoped
+	// Build the model resolver + catalog from ai's bundled metadata, scoped
 	// to providers we hold credentials for. Format handlers ask `resolveModel`
-	// to translate a client-requested `model` field into a pi-ai `Model<Api>`
+	// to translate a client-requested `model` field into a ai `Model<Api>`
 	// before dispatch; `listModels` powers `/v1/models`.
 	const snapshot = storage.exportSnapshot();
 	const providersWithCreds = new Set<string>();
@@ -266,7 +266,7 @@ async function runStatus(flags: AuthGatewayCommandArgs["flags"]): Promise<void> 
 		if (flags.json) {
 			process.stdout.write(`${JSON.stringify(status)}\n`);
 		} else {
-			process.stdout.write(`${chalk.yellow("No broker configured.")} Set OMP_AUTH_BROKER_URL.\n`);
+			process.stdout.write(`${chalk.yellow("No broker configured.")} Set REACTOR_AUTH_BROKER_URL.\n`);
 			process.stdout.write(
 				`token: ${status.tokenPresent ? chalk.green("present") : chalk.red("missing")} at ${status.tokenFile}\n`,
 			);
@@ -300,7 +300,7 @@ async function runStatus(flags: AuthGatewayCommandArgs["flags"]): Promise<void> 
 			);
 			if (!tokenPresent) {
 				process.stdout.write(
-					"Run `omp auth-gateway token` or `omp auth-gateway serve` to create a bearer token.\n",
+					"Run `reactor auth-gateway token` or `reactor auth-gateway serve` to create a bearer token.\n",
 				);
 			}
 		}
@@ -365,7 +365,7 @@ const STRUCTURED_API_KEY_PROVIDERS: ReadonlySet<string> = new Set([
  * Provider API types that strict-mode chat probes intentionally skip:
  * - `bedrock-converse-stream` resolves credentials from the AWS env/profile, not the broker bearer.
  * - `google-vertex` uses Application Default Credentials; the broker bearer is not the right key.
- * - `cursor-agent` and `pi-native` (gateway forwarding) have transport quirks
+ * - `cursor-agent` and `reactor-native` (gateway forwarding) have transport quirks
  *   that make a bearer-only "ping" a poor signal.
  */
 const STRICT_PROBE_SKIPPED_APIS: ReadonlySet<Api> = new Set<Api>([
@@ -394,14 +394,14 @@ const RETRYABLE_MODEL_ERROR_RE =
 /**
  * Rank bundled models for a provider in probe order: cheapest first, then by
  * id for determinism. Filters out non-bearer-auth APIs (Vertex/Bedrock),
- * pi-native transport (would loop through the gateway), and placeholder /
+ * reactor-native transport (would loop through the gateway), and placeholder /
  * router entries with negative/missing cost.
  */
 function pickProbeCandidates(provider: string): Model<Api>[] {
 	const bundled = getBundledModels(provider as GeneratedProvider);
 	if (bundled.length === 0) return [];
 	const candidates = bundled.filter(model => {
-		if (model.transport === "pi-native") return false;
+		if (model.transport === "reactor-native") return false;
 		if (STRICT_PROBE_SKIPPED_APIS.has(model.api)) return false;
 		if (!model.input.includes("text")) return false;
 		const totalCost = (model.cost?.input ?? 0) + (model.cost?.output ?? 0);
@@ -519,7 +519,7 @@ function formatCompletionStatus(completion: CredentialCompletionResult | undefin
 }
 
 /**
- * `omp auth-gateway check` — probe each broker-supplied credential and print
+ * `reactor auth-gateway check` — probe each broker-supplied credential and print
  * per-credential auth health. Use this when the gateway is returning 401s and
  * you need to find which row in a multi-account pool is the bad one. The
  * aggregate `/v1/usage` endpoint silently drops failed credentials, so a
@@ -534,7 +534,7 @@ async function runCheck(flags: AuthGatewayCommandArgs["flags"]): Promise<void> {
 	const brokerConfig = await resolveAuthBrokerConfig();
 	if (!brokerConfig) {
 		throw new Error(
-			"`omp auth-gateway check` requires OMP_AUTH_BROKER_URL (or `auth.broker.url`/`auth.broker.token` in config.yml). It probes the same credentials the gateway would serve.",
+			"`reactor auth-gateway check` requires REACTOR_AUTH_BROKER_URL (or `auth.broker.url`/`auth.broker.token` in config.yml). It probes the same credentials the gateway would serve.",
 		);
 	}
 

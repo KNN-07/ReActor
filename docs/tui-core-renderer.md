@@ -232,17 +232,17 @@ per-terminal optimization.
 `(env, platform)` and unit-testable.
 
 - `shouldEnableSynchronizedOutputByDefault(env, id)` → DEC 2026 default.
-  Precedence: user opt-out (`PI_NO_SYNC_OUTPUT`/`PI_TUI_SYNC_OUTPUT=0`) → user
-  force-on (`PI_FORCE_SYNC_OUTPUT=1`/`PI_TUI_SYNC_OUTPUT=1`) → `TERM_FEATURES`
+  Precedence: user opt-out (`REACTOR_NO_SYNC_OUTPUT`/`REACTOR_TUI_SYNC_OUTPUT=0`) → user
+  force-on (`REACTOR_FORCE_SYNC_OUTPUT=1`/`REACTOR_TUI_SYNC_OUTPUT=1`) → `TERM_FEATURES`
   advertises `Sy` → `WT_SESSION` → known direct terminals → off for risky
   multiplexers and unknowns. Reconciled at runtime by the DECRQM mode-2026
   report; a user override still wins.
 - `detectRectangularSgrSupport(id, env)` → DECCARA fills: kitty only, off in
-  multiplexers and under `PI_NO_DECCARA`.
+  multiplexers and under `REACTOR_NO_DECCARA`.
 - `supportsScreenToScrollback` → kitty's ED22 (used once, on the initial
   paint, to preserve the pre-existing shell screen).
 
-The old ED3-risk classifier (`eagerEraseScrollbackRisk`, `PI_TUI_ED3_SAFE`,
+The old ED3-risk classifier (`eagerEraseScrollbackRisk`, `REACTOR_TUI_ED3_SAFE`,
 `submitPinsViewportToTail`) is gone: behavior no longer depends on which
 terminal is rendering, so there is no risk class to detect. Env sniffing now
 only selects *optimizations* (sync output, DECCARA, images), where a miss is
@@ -255,7 +255,7 @@ cosmetic, not corrupting.
 `visibleWidth` / `truncateToWidth` / `sliceByColumn` / `wrapTextWithAnsi`
 (`utils.ts`) all agree on **one UAX#11 width model**. Slicing, truncation,
 wrapping, and segment extraction run on the native engine
-(`@oh-my-pi/pi-natives`, Rust `unicode-width`); `visibleWidth` measures with
+(`@reactor/natives`, Rust `unicode-width`); `visibleWidth` measures with
 `Bun.stringWidth` **pinned to that same model** (`STRING_WIDTH_OPTS`:
 `countAnsiEscapeCodes: false`, `ambiguousIsNarrow: true`) — a JSC builtin that
 shares the native width tables without the per-call N-API box the native
@@ -332,8 +332,8 @@ line), so demotion never shrinks the block and never shifts committed content
 below it.
 
 **Rule:** never re-emit full base64 per frame. Kitty Unicode placeholders are
-default-on only for kitty/ghostty (`PI_NO_KITTY_PLACEHOLDERS` /
-`PI_KITTY_PLACEHOLDERS`).
+default-on only for kitty/ghostty (`REACTOR_NO_KITTY_PLACEHOLDERS` /
+`REACTOR_KITTY_PLACEHOLDERS`).
 
 ---
 
@@ -341,19 +341,19 @@ default-on only for kitty/ghostty (`PI_NO_KITTY_PLACEHOLDERS` /
 
 | Var | Effect |
 |---|---|
-| `PI_NO_SYNC_OUTPUT=1` | Disable DEC 2026 BSU/ESU wrappers (autowrap discipline stays on). |
-| `PI_TUI_SYNC_OUTPUT=0\|1` / `PI_FORCE_SYNC_OUTPUT=1` | Force sync output off / on. |
-| `PI_NO_DECCARA` | Disable Kitty DECCARA rectangular-fill optimization. |
-| `PI_FORCE_IMAGE_PROTOCOL=kitty\|iterm2\|sixel\|off` | Override image protocol detection. |
-| `PI_NO_KITTY_PLACEHOLDERS=1` / `PI_KITTY_PLACEHOLDERS=1` | Force Kitty Unicode placeholders off / on. |
-| `PI_HARDWARE_CURSOR=1` | Show the real hardware cursor instead of a rendered one. |
-| `PI_NOTIFICATIONS=off\|0\|false` | Suppress terminal notifications. |
-| `PI_DEBUG_REDRAW=1` | Log the chosen render intent + ledger state per frame to the debug log. |
-| `PI_TUI_RESIZE_IN_PLACE=1\|0` | Force resize to repaint in place (no alt-screen borrow, no ED3 rewrap) on / off. Default-on for terminals that re-report size on alt-screen toggles (Warp). |
+| `REACTOR_NO_SYNC_OUTPUT=1` | Disable DEC 2026 BSU/ESU wrappers (autowrap discipline stays on). |
+| `REACTOR_TUI_SYNC_OUTPUT=0\|1` / `REACTOR_FORCE_SYNC_OUTPUT=1` | Force sync output off / on. |
+| `REACTOR_NO_DECCARA` | Disable Kitty DECCARA rectangular-fill optimization. |
+| `REACTOR_FORCE_IMAGE_PROTOCOL=kitty\|iterm2\|sixel\|off` | Override image protocol detection. |
+| `REACTOR_NO_KITTY_PLACEHOLDERS=1` / `REACTOR_KITTY_PLACEHOLDERS=1` | Force Kitty Unicode placeholders off / on. |
+| `REACTOR_HARDWARE_CURSOR=1` | Show the real hardware cursor instead of a rendered one. |
+| `REACTOR_NOTIFICATIONS=off\|0\|false` | Suppress terminal notifications. |
+| `REACTOR_DEBUG_REDRAW=1` | Log the chosen render intent + ledger state per frame to the debug log. |
+| `REACTOR_TUI_RESIZE_IN_PLACE=1\|0` | Force resize to repaint in place (no alt-screen borrow, no ED3 rewrap) on / off. Default-on for terminals that re-report size on alt-screen toggles (Warp). |
 
-Removed with the old engine: `PI_TUI_ED3_SAFE` (no ED3-risk lever exists),
-`PI_CLEAR_ON_SHRINK` (shrinks always clear exactly), `PI_TUI_DEBUG` (per-render
-dump superseded by `PI_DEBUG_REDRAW` ledger logging and the stress harness
+Removed with the old engine: `REACTOR_TUI_ED3_SAFE` (no ED3-risk lever exists),
+`REACTOR_CLEAR_ON_SHRINK` (shrinks always clear exactly), `REACTOR_TUI_DEBUG` (per-render
+dump superseded by `REACTOR_DEBUG_REDRAW` ledger logging and the stress harness
 replay/reduce tooling).
 
 ---

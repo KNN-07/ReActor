@@ -2,22 +2,22 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleToolCall, TOOLS } from "@oh-my-pi/pi-mnemopi/mcp-tools";
+import { handleToolCall, TOOLS } from "@reactor/mnemopi/mcp-tools";
 
 let dataDir: string;
 
 beforeEach(() => {
 	dataDir = mkdtempSync(join(tmpdir(), "mnemopi-provider-tools-"));
-	process.env.MNEMOPI_DATA_DIR = dataDir;
-	process.env.MNEMOPI_NO_EMBEDDINGS = "1";
-	delete process.env.MNEMOPI_MCP_BANK;
+	process.env.REACTOR_MNEMOPI_DATA_DIR = dataDir;
+	process.env.REACTOR_MNEMOPI_NO_EMBEDDINGS = "1";
+	delete process.env.REACTOR_MNEMOPI_MCP_BANK;
 });
 
 afterEach(() => {
 	rmSync(dataDir, { recursive: true, force: true });
-	delete process.env.MNEMOPI_DATA_DIR;
-	delete process.env.MNEMOPI_NO_EMBEDDINGS;
-	delete process.env.MNEMOPI_MCP_BANK;
+	delete process.env.REACTOR_MNEMOPI_DATA_DIR;
+	delete process.env.REACTOR_MNEMOPI_NO_EMBEDDINGS;
+	delete process.env.REACTOR_MNEMOPI_MCP_BANK;
 });
 
 function toolNames(): Set<string> {

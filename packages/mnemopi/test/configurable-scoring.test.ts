@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, it } from "bun:test";
-import { normalizedRecallWeights } from "@oh-my-pi/pi-mnemopi/config";
-import { BeamMemory } from "@oh-my-pi/pi-mnemopi/core/beam";
+import { normalizedRecallWeights } from "@reactor/mnemopi/config";
+import { BeamMemory } from "@reactor/mnemopi/core/beam";
 
 const beams: BeamMemory[] = [];
 const ORIGINAL_ENV = {
-	MNEMOPI_VEC_WEIGHT: process.env.MNEMOPI_VEC_WEIGHT,
-	MNEMOPI_FTS_WEIGHT: process.env.MNEMOPI_FTS_WEIGHT,
-	MNEMOPI_IMPORTANCE_WEIGHT: process.env.MNEMOPI_IMPORTANCE_WEIGHT,
+	REACTOR_MNEMOPI_VEC_WEIGHT: process.env.REACTOR_MNEMOPI_VEC_WEIGHT,
+	REACTOR_MNEMOPI_FTS_WEIGHT: process.env.REACTOR_MNEMOPI_FTS_WEIGHT,
+	REACTOR_MNEMOPI_IMPORTANCE_WEIGHT: process.env.REACTOR_MNEMOPI_IMPORTANCE_WEIGHT,
 };
 
 function restoreEnv(): void {
@@ -30,9 +30,9 @@ afterEach(() => {
 
 describe("configurable recall scoring", () => {
 	it("normalizes defaults, explicit weights, zeros, and negative inputs", () => {
-		delete process.env.MNEMOPI_VEC_WEIGHT;
-		delete process.env.MNEMOPI_FTS_WEIGHT;
-		delete process.env.MNEMOPI_IMPORTANCE_WEIGHT;
+		delete process.env.REACTOR_MNEMOPI_VEC_WEIGHT;
+		delete process.env.REACTOR_MNEMOPI_FTS_WEIGHT;
+		delete process.env.REACTOR_MNEMOPI_IMPORTANCE_WEIGHT;
 		expect(normalizedRecallWeights()).toEqual([0.5, 0.3, 0.2]);
 		expect(normalizedRecallWeights(1, 1, 1)).toEqual([1 / 3, 1 / 3, 1 / 3]);
 		expect(normalizedRecallWeights(0.6, 0.3, 0.1)).toEqual([0.6, 0.3, 0.1]);
@@ -45,9 +45,9 @@ describe("configurable recall scoring", () => {
 	});
 
 	it("reads environment weights when no explicit config is supplied", () => {
-		process.env.MNEMOPI_VEC_WEIGHT = "0.7";
-		process.env.MNEMOPI_FTS_WEIGHT = "0.2";
-		process.env.MNEMOPI_IMPORTANCE_WEIGHT = "0.1";
+		process.env.REACTOR_MNEMOPI_VEC_WEIGHT = "0.7";
+		process.env.REACTOR_MNEMOPI_FTS_WEIGHT = "0.2";
+		process.env.REACTOR_MNEMOPI_IMPORTANCE_WEIGHT = "0.1";
 
 		expect(normalizedRecallWeights()).toEqual([0.7, 0.2, 0.1]);
 	});
@@ -74,9 +74,9 @@ describe("configurable recall scoring", () => {
 	});
 
 	it("lets environment weights affect BeamMemory defaults", async () => {
-		process.env.MNEMOPI_VEC_WEIGHT = "0.1";
-		process.env.MNEMOPI_FTS_WEIGHT = "0.1";
-		process.env.MNEMOPI_IMPORTANCE_WEIGHT = "0.8";
+		process.env.REACTOR_MNEMOPI_VEC_WEIGHT = "0.1";
+		process.env.REACTOR_MNEMOPI_FTS_WEIGHT = "0.1";
+		process.env.REACTOR_MNEMOPI_IMPORTANCE_WEIGHT = "0.8";
 		const beam = makeBeam();
 		beam.remember("Content A shared lexical anchor", { importance: 0.2, source: "test" });
 		beam.remember("Content B shared lexical anchor", { importance: 0.9, source: "test" });
@@ -91,9 +91,9 @@ describe("configurable recall scoring", () => {
 	});
 
 	it("explicit BeamMemory config overrides environment weights", async () => {
-		process.env.MNEMOPI_VEC_WEIGHT = "0.1";
-		process.env.MNEMOPI_FTS_WEIGHT = "0.1";
-		process.env.MNEMOPI_IMPORTANCE_WEIGHT = "0.8";
+		process.env.REACTOR_MNEMOPI_VEC_WEIGHT = "0.1";
+		process.env.REACTOR_MNEMOPI_FTS_WEIGHT = "0.1";
+		process.env.REACTOR_MNEMOPI_IMPORTANCE_WEIGHT = "0.8";
 		const beam = new BeamMemory({
 			sessionId: "scoring",
 			dbPath: ":memory:",

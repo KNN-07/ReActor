@@ -1,5 +1,5 @@
 import type { Database, SQLQueryBindings } from "bun:sqlite";
-import { logger } from "@oh-my-pi/pi-utils";
+import { logger } from "@reactor/utils";
 import { transaction } from "../../db";
 import { toUtcIso } from "../../util/datetime";
 import { generateId } from "../../util/ids";
@@ -62,7 +62,7 @@ const TRUST_TIERS: Record<string, true> = {
 	EXTERNAL_WRITE: true,
 	IMPORTED: true,
 };
-const SCRATCHPAD_MAX_ITEMS = Number.parseInt(process.env.MNEMOPI_SP_MAX ?? "1000", 10);
+const SCRATCHPAD_MAX_ITEMS = Number.parseInt(process.env.REACTOR_MNEMOPI_SP_MAX ?? "1000", 10);
 
 function metadataJson(metadata: Metadata | null | undefined): string | null {
 	return metadata == null ? null : JSON.stringify(metadata);
@@ -277,7 +277,7 @@ function addTemporalAnnotations(beam: BeamMemoryState, memoryId: string, timesta
 }
 
 function proactiveLinkingAllowed(beam: BeamMemoryState): boolean {
-	const override = process.env.MNEMOPI_PROACTIVE_LINKING;
+	const override = process.env.REACTOR_MNEMOPI_PROACTIVE_LINKING;
 	return override === undefined ? beam.config.proactiveLinking === true : override === "1";
 }
 
@@ -362,7 +362,7 @@ const EMBED_REBUILD_BATCH = 128;
  * Runs once per store open; a fresh store (no embeddings) or an already-current
  * store is a no-op. The destructive wipe is skipped whenever it could not be
  * rebuilt — embeddings disabled via the runtime option OR the
- * `MNEMOPI_NO_EMBEDDINGS` env, or an unresolved (empty) active model — so a
+ * `REACTOR_MNEMOPI_NO_EMBEDDINGS` env, or an unresolved (empty) active model — so a
  * stale-but-valid corpus is never destroyed without a replacement. MUST run
  * inside the active runtime-options scope so `currentEmbeddingModel()` /
  * `embeddingsDisabled()` reflect the per-instance configuration.

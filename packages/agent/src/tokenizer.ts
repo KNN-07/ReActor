@@ -1,6 +1,6 @@
-import { countTokens as countTokensNat } from "@oh-my-pi/pi-natives";
+import { countTokens as countTokensNat } from "@reactor/natives";
 
-const accurate = process.env.PI_TOKENIZER_ACCURATE === "1" && Bun.env.NODE_ENV !== "test";
+const accurate = process.env.REACTOR_TOKENIZER_ACCURATE === "1" && Bun.env.NODE_ENV !== "test";
 
 function estimateTokens(text: string) {
 	return (Buffer.byteLength(text, "utf-8") + 3) >> 2;

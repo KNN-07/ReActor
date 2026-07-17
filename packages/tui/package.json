@@ -1,9 +1,10 @@
 {
   "type": "module",
-  "name": "@oh-my-pi/pi-tui",
-  "version": "17.0.2",
+  "name": "@reactor/tui",
+	"private": true,
+  "version": "0.1.0",
   "description": "Terminal User Interface library with differential rendering for efficient text-based applications",
-  "homepage": "https://omp.sh",
+  "homepage": "https://reactor.sh",
   "author": "Can Boluk",
   "contributors": [
     "Mario Zechner"
@@ -11,11 +12,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/can1357/oh-my-pi.git",
+    "url": "git+https://github.com/KNN-07/ReActor.git",
     "directory": "packages/tui"
   },
   "bugs": {
-    "url": "https://github.com/can1357/oh-my-pi/issues"
+    "url": "https://github.com/KNN-07/ReActor/issues"
   },
   "keywords": [
     "tui",
@@ -37,8 +38,8 @@
     "fmt": "biome format --write ."
   },
   "dependencies": {
-    "@oh-my-pi/pi-natives": "catalog:",
-    "@oh-my-pi/pi-utils": "catalog:",
+    "@reactor/natives": "workspace:*",
+    "@reactor/utils": "workspace:*",
     "lru-cache": "catalog:",
     "marked": "catalog:"
   },

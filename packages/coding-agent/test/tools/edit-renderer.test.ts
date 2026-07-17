@@ -2,16 +2,16 @@ import { beforeAll, describe, expect, it } from "bun:test";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
-import { InMemorySnapshotStore } from "@oh-my-pi/hashline";
-import type { AgentTool } from "@oh-my-pi/pi-agent-core";
-import { renderGalleryState, resolveFixture } from "@oh-my-pi/pi-coding-agent/cli/gallery-cli";
-import { resetSettingsForTest, Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { editToolRenderer } from "@oh-my-pi/pi-coding-agent/edit/renderer";
-import { renderDiff } from "@oh-my-pi/pi-coding-agent/modes/components/diff";
-import { ToolExecutionComponent } from "@oh-my-pi/pi-coding-agent/modes/components/tool-execution";
-import * as themeModule from "@oh-my-pi/pi-coding-agent/modes/theme/theme";
-import { Text, type TUI, visibleWidth } from "@oh-my-pi/pi-tui";
-import { removeWithRetries } from "@oh-my-pi/pi-utils";
+import type { AgentTool } from "@reactor/agent-core";
+import { renderGalleryState, resolveFixture } from "@reactor/coding-agent/cli/gallery-cli";
+import { resetSettingsForTest, Settings } from "@reactor/coding-agent/config/settings";
+import { editToolRenderer } from "@reactor/coding-agent/edit/renderer";
+import { renderDiff } from "@reactor/coding-agent/modes/components/diff";
+import { ToolExecutionComponent } from "@reactor/coding-agent/modes/components/tool-execution";
+import * as themeModule from "@reactor/coding-agent/modes/theme/theme";
+import { InMemorySnapshotStore } from "@reactor/hashline";
+import { Text, type TUI, visibleWidth } from "@reactor/tui";
+import { removeWithRetries } from "@reactor/utils";
 import chalk from "chalk";
 
 beforeAll(async () => {
@@ -131,7 +131,7 @@ describe("editToolRenderer", () => {
 			{
 				input: [
 					"*** Begin Patch",
-					"[crates/pi-natives/src/shell.rs]",
+					"[crates/reactor-natives/src/shell.rs]",
 					"INS.TAIL:",
 					"+pub fn streaming_preview() {",
 				].join("\n"),
@@ -142,7 +142,7 @@ describe("editToolRenderer", () => {
 		);
 
 		const rendered = Bun.stripANSI(component.render(160).join("\n"));
-		expect(rendered).toContain("crates/pi-natives/src/shell.rs");
+		expect(rendered).toContain("crates/reactor-natives/src/shell.rs");
 		expect(rendered).not.toContain("INS.TAIL:");
 		expect(rendered).not.toContain("+pub fn streaming_preview() {");
 		expect(rendered).not.toContain("*** Begin Patch");

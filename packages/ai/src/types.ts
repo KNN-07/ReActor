@@ -1,5 +1,5 @@
-export * from "@oh-my-pi/pi-catalog/effort";
-export * from "@oh-my-pi/pi-catalog/types";
+export * from "@reactor/catalog/effort";
+export * from "@reactor/catalog/types";
 
 import type {
 	DeleteArgs,
@@ -17,10 +17,10 @@ import type {
 	ShellResult,
 	WriteArgs,
 	WriteResult,
-} from "@oh-my-pi/pi-catalog/discovery/cursor-gen/agent_pb";
-import type { Effort } from "@oh-my-pi/pi-catalog/effort";
-import { isOpenAIModelId } from "@oh-my-pi/pi-catalog/identity/family";
-import type { Api, FetchImpl, KnownApi, Model, Provider, ThinkingBudgets, Usage } from "@oh-my-pi/pi-catalog/types";
+} from "@reactor/catalog/discovery/cursor-gen/agent_pb";
+import type { Effort } from "@reactor/catalog/effort";
+import { isOpenAIModelId } from "@reactor/catalog/identity/family";
+import type { Api, FetchImpl, KnownApi, Model, Provider, ThinkingBudgets, Usage } from "@reactor/catalog/types";
 import type { Type } from "arktype";
 import type { ZodType, z } from "zod/v4";
 import type { ApiKey } from "./auth-retry";
@@ -45,7 +45,7 @@ export type { StopDetails } from "./providers/anthropic-wire";
 export type { AssistantMessageEventStream } from "./utils/event-stream";
 
 /**
- * Ceiling on the output-token count omp requests from any OpenAI-family endpoint
+ * Ceiling on the output-token count reactor requests from any OpenAI-family endpoint
  * (openai-responses, azure/xai responses, and openai-completions). Mirrors
  * Anthropic's {@link CLAUDE_CODE_MAX_OUTPUT_TOKENS}.
  *
@@ -328,7 +328,7 @@ export interface CodexCompactionContext {
 	/** Stable only for one logical compaction, including parallel summary calls. */
 	operationId: string;
 	trigger: "manual" | "auto";
-	reason: "user_requested" | "context_limit" | "model_downshift" | "comp_hash_changed";
+	reason: "user_requested" | "context_limit" | "model_downshift" | "creactor_hash_changed";
 	phase: "standalone_turn" | "pre_turn" | "mid_turn";
 	strategy: "memento" | "prefix_compaction";
 }
@@ -336,7 +336,7 @@ export interface CodexCompactionContext {
 /** Canonical nested metadata serialized into the Codex turn envelope. */
 export interface CodexCompactionMetadata {
 	trigger: "manual" | "auto";
-	reason: "user_requested" | "context_limit" | "model_downshift" | "comp_hash_changed";
+	reason: "user_requested" | "context_limit" | "model_downshift" | "creactor_hash_changed";
 	implementation: "responses" | "responses_compaction_v2" | "responses_compact";
 	phase: "standalone_turn" | "pre_turn" | "mid_turn";
 	strategy: "memento" | "prefix_compaction";
@@ -427,7 +427,7 @@ export interface StreamOptions {
 	/**
 	 * Optional per-provider concurrent request cap for LLM stream calls. Keys are
 	 * provider ids (`model.provider`); positive numeric values cap in-flight
-	 * requests across local OMP processes that share the same config root. Omitted
+	 * requests across local ReActor processes that share the same config root. Omitted
 	 * providers are unlimited. Non-chat provider APIs that bypass stream helpers
 	 * are not covered.
 	 */
@@ -458,11 +458,11 @@ export interface StreamOptions {
 	 * in the iterator while waiting for the first semantic stream event. Set to
 	 * `0` to disable both layers for this request. After the first semantic
 	 * event arrives, `streamIdleTimeoutMs` governs inter-event stalls. Falls
-	 * back to `PI_STREAM_FIRST_EVENT_TIMEOUT_MS` and then to a 100s default.
+	 * back to `REACTOR_STREAM_FIRST_EVENT_TIMEOUT_MS` and then to a 100s default.
 	 * OpenAI-family transports additionally honor
-	 * `PI_OPENAI_STREAM_FIRST_EVENT_TIMEOUT_MS` as the most-specific override and
+	 * `REACTOR_OPENAI_STREAM_FIRST_EVENT_TIMEOUT_MS` as the most-specific override and
 	 * floor the first-event budget at the resolved idle (per-call
-	 * `streamIdleTimeoutMs` or `PI_OPENAI_STREAM_IDLE_TIMEOUT_MS`) so slow local
+	 * `streamIdleTimeoutMs` or `REACTOR_OPENAI_STREAM_IDLE_TIMEOUT_MS`) so slow local
 	 * OpenAI-compatible servers are not undercut during prompt processing.
 	 *
 	 * Iterator-level honored by: every built-in provider (via the lazy-stream
@@ -476,7 +476,7 @@ export interface StreamOptions {
 	 * milliseconds. Once the first event arrives, this guards against silent
 	 * mid-stream stalls (broker dies, half-open socket, model produces no real
 	 * progress for too long). Set to `0` to disable. Falls back to
-	 * `PI_STREAM_IDLE_TIMEOUT_MS` (alias: `PI_OPENAI_STREAM_IDLE_TIMEOUT_MS`)
+	 * `REACTOR_STREAM_IDLE_TIMEOUT_MS` (alias: `REACTOR_OPENAI_STREAM_IDLE_TIMEOUT_MS`)
 	 * and then to a 120s default.
 	 */
 	streamIdleTimeoutMs?: number;

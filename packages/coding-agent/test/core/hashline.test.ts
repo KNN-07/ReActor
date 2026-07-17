@@ -2,12 +2,7 @@ import { beforeAll, describe, expect, it } from "bun:test";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
-import {
-	type InMemorySnapshotStore as FileReadCache,
-	formatHashlineHeader,
-	MismatchError as HashlineMismatchError,
-} from "@oh-my-pi/hashline";
-import { resetSettingsForTest, Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
+import { resetSettingsForTest, Settings } from "@reactor/coding-agent/config/settings";
 import {
 	canonicalSnapshotKey,
 	type ExecuteHashlineSingleOptions,
@@ -15,10 +10,15 @@ import {
 	getFileSnapshotStore as getFileReadCache,
 	HashlineFilesystem,
 	hashlineEditParamsSchema,
-} from "@oh-my-pi/pi-coding-agent/edit";
-import { resolveLocalUrlToPath } from "@oh-my-pi/pi-coding-agent/internal-urls";
-import type { ToolSession } from "@oh-my-pi/pi-coding-agent/tools";
-import { removeWithRetries } from "@oh-my-pi/pi-utils";
+} from "@reactor/coding-agent/edit";
+import { resolveLocalUrlToPath } from "@reactor/coding-agent/internal-urls";
+import type { ToolSession } from "@reactor/coding-agent/tools";
+import {
+	type InMemorySnapshotStore as FileReadCache,
+	formatHashlineHeader,
+	MismatchError as HashlineMismatchError,
+} from "@reactor/hashline";
+import { removeWithRetries } from "@reactor/utils";
 import { type Type, type } from "arktype";
 
 beforeAll(async () => {
@@ -512,7 +512,7 @@ describe("hashline — filename+tag path recovery", () => {
 			const root = canonicalSnapshotKey(tempDir);
 			const inside = path.join(root, "pkg", "test", "file.ts");
 			// A sibling of the working tree stands in for the artifact sandbox / vault.
-			const outside = path.join(canonicalSnapshotKey(os.tmpdir()), "omp-artifacts", "file.ts");
+			const outside = path.join(canonicalSnapshotKey(os.tmpdir()), "reactor-artifacts", "file.ts");
 
 			// Internal-URL authored targets are approved at "read"; never redirect to a "write".
 			expect(guardFs.allowTagPathRecovery("local://file.ts", inside)).toBe(false);

@@ -7,10 +7,10 @@
  * state, while the advisor config overlay embeds it as a plain "pick one
  * model" list.
  */
-import { ThinkingLevel } from "@oh-my-pi/pi-agent-core";
-import type { Model } from "@oh-my-pi/pi-ai";
-import { buildModel } from "@oh-my-pi/pi-catalog/build";
-import { modelsAreEqual } from "@oh-my-pi/pi-catalog/models";
+import { ThinkingLevel } from "@reactor/agent-core";
+import type { Model } from "@reactor/ai";
+import { buildModel } from "@reactor/catalog/build";
+import { modelsAreEqual } from "@reactor/catalog/models";
 import {
 	type Component,
 	fuzzyRank,
@@ -20,8 +20,8 @@ import {
 	type SgrMouseEvent,
 	truncateToWidth,
 	visibleWidth,
-} from "@oh-my-pi/pi-tui";
-import { formatNumber } from "@oh-my-pi/pi-utils";
+} from "@reactor/tui";
+import { formatNumber } from "@reactor/utils";
 import { getModelMatchPreferences, resolveModelRoleValue } from "../../config/model-resolver";
 import { getKnownRoleIds, getRoleInfo, MODEL_ROLE_IDS } from "../../config/model-roles";
 import type { Settings } from "../../config/settings";

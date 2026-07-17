@@ -1,18 +1,19 @@
 {
   "type": "module",
-  "name": "@oh-my-pi/pi-utils",
-  "version": "17.0.2",
+  "name": "@reactor/utils",
+	"private": true,
+  "version": "0.1.0",
   "description": "Shared utilities for pi packages",
-  "homepage": "https://omp.sh",
+  "homepage": "https://reactor.sh",
   "author": "Can Boluk",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/can1357/oh-my-pi.git",
+    "url": "git+https://github.com/KNN-07/ReActor.git",
     "directory": "packages/utils"
   },
   "bugs": {
-    "url": "https://github.com/can1357/oh-my-pi/issues"
+    "url": "https://github.com/KNN-07/ReActor/issues"
   },
   "keywords": [
     "utilities",
@@ -31,7 +32,7 @@
     "fmt": "biome format --write ."
   },
   "dependencies": {
-    "@oh-my-pi/pi-natives": "catalog:",
+    "@reactor/natives": "workspace:*",
     "handlebars": "catalog:",
     "winston": "catalog:",
     "winston-daily-rotate-file": "catalog:"

@@ -1,10 +1,10 @@
 import { dirname } from "node:path";
-import type { AgentMessage } from "@oh-my-pi/pi-agent-core";
-import type * as MnemopiNs from "@oh-my-pi/pi-mnemopi";
-import type { Mnemopi, RecallResult } from "@oh-my-pi/pi-mnemopi";
-import type * as MnemopiCoreNs from "@oh-my-pi/pi-mnemopi/core";
-import type { LocalModelInitializer } from "@oh-my-pi/pi-mnemopi/core";
-import { logger } from "@oh-my-pi/pi-utils";
+import type { AgentMessage } from "@reactor/agent-core";
+import type * as MnemopiNs from "@reactor/mnemopi";
+import type { Mnemopi, RecallResult } from "@reactor/mnemopi";
+import type * as MnemopiCoreNs from "@reactor/mnemopi/core";
+import type { LocalModelInitializer } from "@reactor/mnemopi/core";
+import { logger } from "@reactor/utils";
 import {
 	composeRecallQuery,
 	formatCurrentTime,
@@ -41,7 +41,7 @@ function installLocalModelInitializer(setInitializer: (initializer: LocalModelIn
 }
 
 /**
- * Lazily load `@oh-my-pi/pi-mnemopi` (memoized) and route fastembed loads
+ * Lazily load `@reactor/mnemopi` (memoized) and route fastembed loads
  * through the dedicated embeddings subprocess. The override is installed once
  * — before any consumer gets the chance to call `embed()` — so
  * `onnxruntime-node`'s NAPI constructor + finalizer never run inside the
@@ -51,16 +51,16 @@ function installLocalModelInitializer(setInitializer: (initializer: LocalModelIn
  */
 export async function loadMnemopi(): Promise<typeof MnemopiNs> {
 	if (!mnemopiMod) {
-		mnemopiMod = await import("@oh-my-pi/pi-mnemopi");
+		mnemopiMod = await import("@reactor/mnemopi");
 		installLocalModelInitializer(mnemopiMod.setLocalModelInitializer);
 	}
 	return mnemopiMod;
 }
 
-/** Lazily load `@oh-my-pi/pi-mnemopi/core` (memoized). */
+/** Lazily load `@reactor/mnemopi/core` (memoized). */
 export async function loadMnemopiCore(): Promise<typeof MnemopiCoreNs> {
 	if (!mnemopiCoreMod) {
-		mnemopiCoreMod = await import("@oh-my-pi/pi-mnemopi/core");
+		mnemopiCoreMod = await import("@reactor/mnemopi/core");
 		installLocalModelInitializer(mnemopiCoreMod.setLocalModelInitializer);
 	}
 	return mnemopiCoreMod;
@@ -601,7 +601,7 @@ export class MnemopiSessionState {
 // `per-project-tagged` is implemented by opening both the project bank and the
 // shared bank, then merging recall results while keeping writes project-local.
 function createScopedResources(config: MnemopiBackendConfig): MnemopiScopedResources {
-	// Env vars (MNEMOPI_POLYPHONIC_RECALL / MNEMOPI_ENHANCED_RECALL) still override
+	// Env vars (REACTOR_MNEMOPI_POLYPHONIC_RECALL / REACTOR_MNEMOPI_ENHANCED_RECALL) still override
 	// these config-driven defaults inside the core gates. Proactive linking is
 	// per-memory instance below so concurrent sessions cannot clobber each other.
 	requireMnemopi().configureRecallFeatures({

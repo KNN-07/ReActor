@@ -2,18 +2,18 @@ import { Database } from "bun:sqlite";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
-import { formatHashlineHeader, formatNumberedLine, formatNumberedLines } from "@oh-my-pi/hashline";
 import type {
 	AgentTool,
 	AgentToolContext,
 	AgentToolResult,
 	AgentToolUpdateCallback,
 	ToolTier,
-} from "@oh-my-pi/pi-agent-core";
-import type { ImageContent, TextContent } from "@oh-my-pi/pi-ai";
-import { glob, type SummaryResult, summarizeCode } from "@oh-my-pi/pi-natives";
-import type { Component } from "@oh-my-pi/pi-tui";
-import { Text } from "@oh-my-pi/pi-tui";
+} from "@reactor/agent-core";
+import type { ImageContent, TextContent } from "@reactor/ai";
+import { formatHashlineHeader, formatNumberedLine, formatNumberedLines } from "@reactor/hashline";
+import { glob, type SummaryResult, summarizeCode } from "@reactor/natives";
+import type { Component } from "@reactor/tui";
+import { Text } from "@reactor/tui";
 import {
 	getRemoteDir,
 	type ImageMetadata,
@@ -22,7 +22,7 @@ import {
 	prompt,
 	readImageMetadata,
 	untilAborted,
-} from "@oh-my-pi/pi-utils";
+} from "@reactor/utils";
 import { type } from "arktype";
 import { LRUCache } from "lru-cache/raw";
 import {
@@ -1116,7 +1116,7 @@ export class ReadTool implements AgentTool<typeof readSchema, ReadToolDetails> {
 			const sessionFile = this.session.getSessionFile();
 			root = sessionFile?.endsWith(".jsonl")
 				? sessionFile.slice(0, -6)
-				: path.join(os.tmpdir(), "omp-read-pdf-images");
+				: path.join(os.tmpdir(), "reactor-read-pdf-images");
 		}
 		const basename = path.basename(absolutePdfPath).replace(/[^A-Za-z0-9._-]/g, "_");
 		return path.join(root, "read-pdf-images", `${basename}-${Bun.hash(absolutePdfPath).toString(36)}`);
@@ -2204,7 +2204,7 @@ export class ReadTool implements AgentTool<typeof readSchema, ReadToolDetails> {
 			return executeReadUrl(this.session, { path: parsedUrlTarget.path, raw: urlRaw }, signal);
 		}
 
-		// Handle internal URLs (agent://, artifact://, memory://, skill://, rule://, local://, mcp://, omp://, issue://, pr://).
+		// Handle internal URLs (agent://, artifact://, memory://, skill://, rule://, local://, mcp://, reactor://, issue://, pr://).
 		// Use the internal-URL-aware splitter so malformed selectors are peeled
 		// off the URL and surfaced via parseSel rather than confusing handlers.
 		const internalRouter = InternalUrlRouter.instance();

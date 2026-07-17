@@ -3,14 +3,14 @@ import { describe, expect, it } from "bun:test";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
-import { buildModel } from "@oh-my-pi/pi-catalog/build";
-import { isOfficialAnthropicApiUrl } from "@oh-my-pi/pi-catalog/compat/anthropic";
-import { buildOpenAICompat, buildOpenAIResponsesCompat } from "@oh-my-pi/pi-catalog/compat/openai";
-import { writeModelCache } from "@oh-my-pi/pi-catalog/model-cache";
-import { resolveProviderModels } from "@oh-my-pi/pi-catalog/model-manager";
-import { getBundledModel } from "@oh-my-pi/pi-catalog/models";
-import { openrouterModelManagerOptions } from "@oh-my-pi/pi-catalog/provider-models/openai-compat";
-import type { ModelSpec } from "@oh-my-pi/pi-catalog/types";
+import { buildModel } from "@reactor/catalog/build";
+import { isOfficialAnthropicApiUrl } from "@reactor/catalog/compat/anthropic";
+import { buildOpenAICompat, buildOpenAIResponsesCompat } from "@reactor/catalog/compat/openai";
+import { writeModelCache } from "@reactor/catalog/model-cache";
+import { resolveProviderModels } from "@reactor/catalog/model-manager";
+import { getBundledModel } from "@reactor/catalog/models";
+import { openrouterModelManagerOptions } from "@reactor/catalog/provider-models/openai-compat";
+import type { ModelSpec } from "@reactor/catalog/types";
 
 function completionsSpec(overrides: Partial<ModelSpec<"openai-completions">> = {}): ModelSpec<"openai-completions"> {
 	return {
@@ -373,7 +373,7 @@ describe("openai-completions wire-quirk compat detection", () => {
 
 describe("OpenRouter model discovery", () => {
 	it("keeps refreshed OpenRouter models on the OpenRouter pseudo API", async () => {
-		const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "pi-catalog-openrouter-refresh-"));
+		const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "catalog-openrouter-refresh-"));
 		const dbPath = path.join(tempDir, "models.db");
 		const routing = { only: ["anthropic"], order: ["anthropic"] };
 		const staticModel = openrouterSpec({ compat: { openRouterRouting: routing } });
@@ -427,7 +427,7 @@ describe("OpenRouter model discovery", () => {
 	});
 
 	it("ignores legacy OpenRouter chat-completions cache rows", async () => {
-		const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "pi-catalog-openrouter-legacy-cache-"));
+		const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "catalog-openrouter-legacy-cache-"));
 		const dbPath = path.join(tempDir, "models.db");
 		const legacyModel = buildModel(
 			completionsSpec({
@@ -458,7 +458,7 @@ describe("OpenRouter model discovery", () => {
 
 describe("model cache spec round trip", () => {
 	it("persists sparse specs and rebuilds resolved models on cache reads", async () => {
-		const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "pi-catalog-model-cache-"));
+		const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "catalog-model-cache-"));
 		const dbPath = path.join(tempDir, "models.db");
 		const sparse = { supportsDeveloperRole: true } as const;
 		const spec = completionsSpec({ provider: "spec-cache-test", compat: sparse });
@@ -505,7 +505,7 @@ describe("model cache spec round trip", () => {
 	});
 
 	it("uses current static limits for same-id cache rows when the static fingerprint changed", async () => {
-		const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "pi-catalog-static-fingerprint-"));
+		const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "catalog-static-fingerprint-"));
 		const dbPath = path.join(tempDir, "models.db");
 		const staleSameId = buildModel(
 			completionsSpec({

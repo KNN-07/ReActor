@@ -1,6 +1,6 @@
 import * as path from "node:path";
 import { createInterface } from "node:readline/promises";
-import { $env, getProjectDir, isEnoent, prompt } from "@oh-my-pi/pi-utils";
+import { $env, getProjectDir, isEnoent, prompt } from "@reactor/utils";
 import { applyChangelogProposals } from "../../commit/changelog";
 import { detectChangelogBoundaries } from "../../commit/changelog/detect";
 import { parseUnreleasedSection } from "../../commit/changelog/parse";
@@ -88,7 +88,7 @@ export async function runAgenticCommit(args: CommitCommandArgs): Promise<void> {
 	} else {
 		process.stdout.write("  └─ (none found)\n");
 	}
-	const forceFallback = $env.PI_COMMIT_TEST_FALLBACK?.toLowerCase() === "true";
+	const forceFallback = $env.REACTOR_COMMIT_TEST_FALLBACK?.toLowerCase() === "true";
 	if (forceFallback) {
 		process.stdout.write("● Forcing fallback commit generation...\n");
 		const fallbackProposal = generateFallbackProposal(numstat);
@@ -177,7 +177,7 @@ async function completeAgentCommitState(
 ): Promise<void> {
 	let usedFallback = false;
 	if (!commitState.proposal && !commitState.splitProposal) {
-		if ($env.PI_COMMIT_NO_FALLBACK?.toLowerCase() !== "true") {
+		if ($env.REACTOR_COMMIT_NO_FALLBACK?.toLowerCase() !== "true") {
 			process.stdout.write("● Agent did not provide proposal, using fallback...\n");
 			commitState.proposal = generateFallbackProposal(ctx.numstat);
 			usedFallback = true;

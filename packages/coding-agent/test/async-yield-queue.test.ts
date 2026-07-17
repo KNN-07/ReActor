@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import type { AgentMessage } from "@oh-my-pi/pi-agent-core";
-import { type AsyncJob, AsyncJobManager } from "@oh-my-pi/pi-coding-agent/async";
-import type { CustomMessage } from "@oh-my-pi/pi-coding-agent/session/messages";
-import { YieldQueue } from "@oh-my-pi/pi-coding-agent/session/yield-queue";
-import type { ToolSession } from "@oh-my-pi/pi-coding-agent/tools";
+import type { AgentMessage } from "@reactor/agent-core";
+import { type AsyncJob, AsyncJobManager } from "@reactor/coding-agent/async";
+import type { CustomMessage } from "@reactor/coding-agent/session/messages";
+import { YieldQueue } from "@reactor/coding-agent/session/yield-queue";
+import type { ToolSession } from "@reactor/coding-agent/tools";
 import { type CoordinationDetails, HubTool } from "../src/tools/hub";
 
 type AsyncEntry = {

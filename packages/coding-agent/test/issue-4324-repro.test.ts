@@ -1,5 +1,5 @@
 /**
- * Regression for https://github.com/can1357/oh-my-pi/issues/4324
+ * Regression for https://github.com/KNN-07/ReActor/issues/4324
  *
  * The Kokoro TTS worker crash-loops with `exit code 7`, but every worker
  * subprocess was spawned with `stderr: "ignore"` — so the native crash message
@@ -11,11 +11,11 @@
  * after `onExit`, it drains the pipe, keeps the last 16 KiB in a bounded ring,
  * and appends that tail to the `Error` surfaced to `onError` handlers. These
  * tests pin that contract so the exit-code-7 crash (and the next one) actually
- * shows up in `~/.omp/logs/omp.log` without regressing idle-worker shutdown.
+ * shows up in `~/.reactor/logs/reactor.log` without regressing idle-worker shutdown.
  */
 import { describe, expect, it } from "bun:test";
 import * as path from "node:path";
-import { createWorkerSubprocess, type SpawnedSubprocess } from "@oh-my-pi/pi-coding-agent/subprocess/worker-client";
+import { createWorkerSubprocess, type SpawnedSubprocess } from "@reactor/coding-agent/subprocess/worker-client";
 
 interface FakeWorkerOutbound {
 	type: "pong";
@@ -86,7 +86,7 @@ describe("issue #4324 — worker subprocess stderr survives to the exit error", 
 		const workerScript =
 			"const p = process.ppid; const lock = new Int32Array(new SharedArrayBuffer(4)); while (process.ppid === p) Atomics.wait(lock, 0, 0, 100);";
 		const wrapperScript = `
-			const { createWorkerSubprocess } = await import("@oh-my-pi/pi-coding-agent/subprocess/worker-client");
+			const { createWorkerSubprocess } = await import("@reactor/coding-agent/subprocess/worker-client");
 			createWorkerSubprocess({
 				spawnCommand: { cmd: [process.execPath, "-e", ${JSON.stringify(workerScript)}] },
 				env: {},

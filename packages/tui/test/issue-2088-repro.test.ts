@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "bun:test";
-import { type Component, TUI } from "@oh-my-pi/pi-tui";
+import { type Component, TUI } from "@reactor/tui";
 import { VirtualTerminal } from "./virtual-terminal";
 
-// Regression test for https://github.com/can1357/oh-my-pi/issues/2088
+// Regression test for https://github.com/KNN-07/ReActor/issues/2088
 //
 // Closing a tmux horizontal split widens the surviving pane. SIGWINCH fires
 // on the host process before tmux finishes repainting the pane buffer at
@@ -125,10 +125,10 @@ const CMUX_SOCKET_ONLY_ENV: Record<string, string | undefined> = {
 // under CI-in-tmux) would misclassify this "direct terminal" case.
 NO_MULTIPLEXER_ENV.TERM = "xterm-256color";
 // Resize classification also keys off TERM_PROGRAM (Warp takes the in-place
-// path) and PI_TUI_RESIZE_IN_PLACE, so neutralize them to keep this
+// path) and REACTOR_TUI_RESIZE_IN_PLACE, so neutralize them to keep this
 // direct-terminal case deterministic.
 NO_MULTIPLEXER_ENV.TERM_PROGRAM = undefined;
-NO_MULTIPLEXER_ENV.PI_TUI_RESIZE_IN_PLACE = undefined;
+NO_MULTIPLEXER_ENV.REACTOR_TUI_RESIZE_IN_PLACE = undefined;
 
 describe("issue #2088: tmux pane-resize race produces viewport flash", () => {
 	let monotonicNow = 0;

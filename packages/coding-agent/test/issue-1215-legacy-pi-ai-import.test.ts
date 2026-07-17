@@ -1,13 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { loadExtensions } from "@oh-my-pi/pi-coding-agent/extensibility/extensions/loader";
-import { TempDir } from "@oh-my-pi/pi-utils";
+import { loadExtensions } from "@reactor/coding-agent/extensibility/extensions/loader";
+import { TempDir } from "@reactor/utils";
 
 // Tool name registered by the synthetic extension below.
 const TOOL_NAME = "schedule_prompt_test";
 
-describe("issue #1215: legacy @mariozechner/pi-ai imports survive getResolvedSpecifier failure", () => {
+describe("issue #1215: legacy @mariozechner/ai imports survive getResolvedSpecifier failure", () => {
 	let projectDir: TempDir;
 	let extensionPath: string;
 
@@ -19,11 +19,11 @@ describe("issue #1215: legacy @mariozechner/pi-ai imports survive getResolvedSpe
 
 		// Mirrors the import pattern used by pi-schedule-prompt@0.3.0, which was
 		// the reporter's failing plugin. z is a runtime value re-exported from
-		// @oh-my-pi/pi-ai so using it forces the import to be resolved at load time.
+		// @reactor/ai so using it forces the import to be resolved at load time.
 		fs.writeFileSync(
 			extensionPath,
 			[
-				'import { z } from "@mariozechner/pi-ai";',
+				'import { z } from "@mariozechner/ai";',
 				"",
 				"export default function(pi) {",
 				"\tpi.registerTool({",

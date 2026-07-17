@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from "bun:test";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { filterProcessEnv, parseEnvFile } from "@oh-my-pi/pi-utils/env";
+import { filterProcessEnv, parseEnvFile } from "@reactor/utils/env";
 
 const tempDirs: string[] = [];
 
@@ -13,7 +13,7 @@ afterEach(() => {
 });
 
 function writeTempEnv(content: string): string {
-	const dir = fs.mkdtempSync(path.join(os.tmpdir(), "pi-utils-env-"));
+	const dir = fs.mkdtempSync(path.join(os.tmpdir(), "utils-env-"));
 	tempDirs.push(dir);
 	const filePath = path.join(dir, ".env");
 	fs.writeFileSync(filePath, content);
@@ -41,12 +41,11 @@ describe("parseEnvFile", () => {
 		});
 	});
 
-	it("mirrors valid OMP_ variables to PI_ variables", () => {
-		const filePath = writeTempEnv("OMP_FEATURE=enabled\nOMP_BAD=before\0after\n");
+	it("mirrors valid REACTOR_ variables to REACTOR_ variables", () => {
+		const filePath = writeTempEnv("REACTOR_FEATURE=enabled\nREACTOR_BAD=before\0after\n");
 
 		expect(parseEnvFile(filePath)).toEqual({
-			OMP_FEATURE: "enabled",
-			PI_FEATURE: "enabled",
+			REACTOR_FEATURE: "enabled",
 		});
 	});
 });

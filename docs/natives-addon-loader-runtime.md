@@ -1,6 +1,6 @@
 # Natives Addon Loader Runtime
 
-This document covers the runtime loader shipped by `@oh-my-pi/pi-natives`: how `native/index.js` decides which `.node` file to require, how compiled-binary embedded payloads are extracted, and what startup failures report.
+This document covers the runtime loader shipped by `@reactor/natives`: how `native/index.js` decides which `.node` file to require, how compiled-binary embedded payloads are extracted, and what startup failures report.
 
 ## Implementation files
 
@@ -29,22 +29,22 @@ At module initialization, `native/index.js` computes:
 - **Platform tag**: `${process.platform}-${process.arch}` (for example `darwin-arm64`).
 - **Package version**: from `packages/natives/package.json`.
 - **Core directories**:
-  - `leafPackageDir`: directory of the platform leaf package, resolved via `require.resolve("@oh-my-pi/pi-natives-<tag>/package.json")`; `null` when no leaf is installed (e.g. local dev) and forced to `null` in compiled-binary mode.
+  - `leafPackageDir`: directory of the platform leaf package, resolved via `require.resolve("@reactor/natives-<tag>/package.json")`; `null` when no leaf is installed (e.g. local dev) and forced to `null` in compiled-binary mode.
   - `nativeDir`: package-local `packages/natives/native`.
   - `execDir`: directory containing `process.execPath`.
   - `versionedDir`: `<getNativesDir()>/<packageVersion>`.
   - `userDataDir` fallback:
-    - Windows: `%LOCALAPPDATA%/omp` or `%USERPROFILE%/AppData/Local/omp`.
+    - Windows: `%LOCALAPPDATA%/reactor` or `%USERPROFILE%/AppData/Local/reactor`.
     - Non-Windows: `~/.local/bin`.
 - **Natives cache root** (`getNativesDir()`):
-  - if `$XDG_DATA_HOME/omp` exists, `$XDG_DATA_HOME/omp/natives`;
-  - otherwise `~/.omp/natives`.
+  - if `$XDG_DATA_HOME/reactor` exists, `$XDG_DATA_HOME/reactor/natives`;
+  - otherwise `~/.reactor/natives`.
 - **Compiled-binary mode** (`detectCompiledBinary`): true if any of:
   - embedded-addon manifest is non-null,
-  - `PI_COMPILED` env var is set,
+  - `REACTOR_COMPILED` env var is set,
   - `import.meta.url` contains Bun embedded markers (`$bunfs`, `~BUN`, `%7EBUN`).
 - **Windows staging mode** (`shouldStageNodeModulesAddon`): true only on Windows, in non-compiled mode, when `nativeDir` is inside `node_modules`.
-- **Variant override**: `PI_NATIVE_VARIANT` (`modern`/`baseline` only; invalid values ignored).
+- **Variant override**: `REACTOR_NATIVE_VARIANT` (`modern`/`baseline` only; invalid values ignored).
 - **Selected variant**: explicit override, otherwise runtime AVX2 detection on x64 (`modern` if AVX2, else `baseline`).
 
 ## Platform support and tag resolution
@@ -63,7 +63,7 @@ Unsupported platforms are not rejected before probing. The loader first tries th
 
 ### x64 behavior
 
-1. `PI_NATIVE_VARIANT=modern|baseline` wins when valid.
+1. `REACTOR_NATIVE_VARIANT=modern|baseline` wins when valid.
 2. Otherwise AVX2 support is detected:
    - Linux: scan `/proc/cpuinfo` for `avx2`.
    - macOS: `sysctl -n machdep.cpu.leaf7_features`, then `machdep.cpu.features`.
@@ -72,20 +72,20 @@ Unsupported platforms are not rejected before probing. The loader first tries th
 
 ### Non-x64 behavior
 
-No variant suffix is used; the filename is `pi_natives.<platform>-<arch>.node`.
+No variant suffix is used; the filename is `reactor_natives.<platform>-<arch>.node`.
 
 ### Filename construction
 
 `loader-state.js#getAddonFilenames` returns:
 
-- Non-x64 or no variant: `pi_natives.<tag>.node`
+- Non-x64 or no variant: `reactor_natives.<tag>.node`
 - x64 + `modern`:
-  1. `pi_natives.<tag>-modern.node`
-  2. `pi_natives.<tag>-baseline.node`
-  3. `pi_natives.<tag>.node`
+  1. `reactor_natives.<tag>-modern.node`
+  2. `reactor_natives.<tag>-baseline.node`
+  3. `reactor_natives.<tag>.node`
 - x64 + `baseline`:
-  1. `pi_natives.<tag>-baseline.node`
-  2. `pi_natives.<tag>.node`
+  1. `reactor_natives.<tag>-baseline.node`
+  2. `reactor_natives.<tag>.node`
 
 The default unsuffixed fallback remains part of the x64 candidate list.
 
@@ -181,7 +181,7 @@ If all candidates fail and `platformTag` is not supported, the loader throws:
 
 If the platform is supported but no candidate can be loaded, the final error includes:
 
-- `Failed to load pi_natives native addon for <platformTag>` or `<platformTag> (<variant>)`
+- `Failed to load reactor_natives native addon for <platformTag>` or `<platformTag> (<variant>)`
 - every attempted path with the corresponding `require(...)` or sentinel-validation error
 - mode-specific remediation hints
 
@@ -192,12 +192,12 @@ Compiled mode diagnostics include:
 - expected versioned cache target paths (`<versionedDir>/<filename>`),
 - remediation to delete the versioned cache and rerun,
 - direct release download `curl` commands for each expected filename.
-- release sentinel mismatch details when a loadable `.node` belongs to another `@oh-my-pi/pi-natives` version.
+- release sentinel mismatch details when a loadable `.node` belongs to another `@reactor/natives` version.
 
 ### Non-compiled startup failures
 
 Normal package/runtime diagnostics include:
 
-- reinstall hint (`bun install @oh-my-pi/pi-natives`),
+- reinstall hint (`bun install @reactor/natives`),
 - local rebuild command (`bun --cwd=packages/natives run build`),
 - optional x64 variant build hint (`TARGET_VARIANT=baseline|modern bun --cwd=packages/natives run build`).

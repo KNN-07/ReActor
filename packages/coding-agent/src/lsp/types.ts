@@ -1,4 +1,4 @@
-import type { ptree } from "@oh-my-pi/pi-utils";
+import type { ptree } from "@reactor/utils";
 import { type } from "arktype";
 
 // =============================================================================

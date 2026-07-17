@@ -5,21 +5,21 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "bun:test";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import type { AgentMessage, AgentTool } from "@oh-my-pi/pi-agent-core";
-import type { ImageContent, TextContent } from "@oh-my-pi/pi-ai";
-import { ModelRegistry } from "@oh-my-pi/pi-coding-agent/config/model-registry";
-import { discoverAndLoadExtensions, ExtensionRuntime } from "@oh-my-pi/pi-coding-agent/extensibility/extensions/loader";
+import type { AgentMessage, AgentTool } from "@reactor/agent-core";
+import type { ImageContent, TextContent } from "@reactor/ai";
+import { ModelRegistry } from "@reactor/coding-agent/config/model-registry";
+import { discoverAndLoadExtensions, ExtensionRuntime } from "@reactor/coding-agent/extensibility/extensions/loader";
 import {
 	EXTENSION_HANDLER_TIMEOUT_MS,
 	ExtensionRunner,
 	testSetExtensionHandlerTimeoutMs,
-} from "@oh-my-pi/pi-coding-agent/extensibility/extensions/runner";
-import type { ExtensionError } from "@oh-my-pi/pi-coding-agent/extensibility/extensions/types";
-import { ExtensionToolWrapper } from "@oh-my-pi/pi-coding-agent/extensibility/extensions/wrapper";
-import { Type } from "@oh-my-pi/pi-coding-agent/extensibility/typebox";
-import { AuthStorage } from "@oh-my-pi/pi-coding-agent/session/auth-storage";
-import { SessionManager } from "@oh-my-pi/pi-coding-agent/session/session-manager";
-import { getProjectAgentDir, logger, TempDir } from "@oh-my-pi/pi-utils";
+} from "@reactor/coding-agent/extensibility/extensions/runner";
+import type { ExtensionError } from "@reactor/coding-agent/extensibility/extensions/types";
+import { ExtensionToolWrapper } from "@reactor/coding-agent/extensibility/extensions/wrapper";
+import { Type } from "@reactor/coding-agent/extensibility/typebox";
+import { AuthStorage } from "@reactor/coding-agent/session/auth-storage";
+import { SessionManager } from "@reactor/coding-agent/session/session-manager";
+import { getProjectAgentDir, logger, TempDir } from "@reactor/utils";
 
 describe("ExtensionRunner", () => {
 	let tempDir: TempDir;
@@ -1093,14 +1093,14 @@ describe("ExtensionRunner", () => {
 			const extCode = `
 				export default function(pi) {
 					pi.on("session_start", async (_event, ctx) => {
-						globalThis.__ompMemoryStatus = await ctx.memory.status();
+						globalThis.__reactorMemoryStatus = await ctx.memory.status();
 					});
 				}
 			`;
 			const explicitExtensionPath = path.join(tempDir.path(), "memory-context.ts");
 			fs.writeFileSync(explicitExtensionPath, extCode);
-			const globalState = globalThis as typeof globalThis & { __ompMemoryStatus?: unknown };
-			delete globalState.__ompMemoryStatus;
+			const globalState = globalThis as typeof globalThis & { __reactorMemoryStatus?: unknown };
+			delete globalState.__reactorMemoryStatus;
 
 			const result = await loadTestExtensions([explicitExtensionPath]);
 			const runner = new ExtensionRunner(
@@ -1150,12 +1150,12 @@ describe("ExtensionRunner", () => {
 
 			await runner.emit({ type: "session_start" });
 
-			expect(globalState.__ompMemoryStatus).toMatchObject({
+			expect(globalState.__reactorMemoryStatus).toMatchObject({
 				backend: "mnemopi",
 				active: true,
 				searchable: true,
 			});
-			delete globalState.__ompMemoryStatus;
+			delete globalState.__reactorMemoryStatus;
 		});
 	});
 

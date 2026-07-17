@@ -1,18 +1,19 @@
 {
   "type": "module",
-  "name": "@oh-my-pi/omp-stats",
-  "version": "17.0.2",
+  "name": "@reactor/stats",
+	"private": true,
+  "version": "0.1.0",
   "description": "Local observability dashboard for pi AI usage statistics",
-  "homepage": "https://omp.sh",
+  "homepage": "https://reactor.sh",
   "author": "Can Boluk",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/can1357/oh-my-pi.git",
+    "url": "git+https://github.com/KNN-07/ReActor.git",
     "directory": "packages/stats"
   },
   "bugs": {
-    "url": "https://github.com/can1357/oh-my-pi/issues"
+    "url": "https://github.com/KNN-07/ReActor/issues"
   },
   "keywords": [
     "ai",
@@ -25,7 +26,7 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "bin": {
-    "omp-stats": "./src/index.ts"
+    "reactor-stats": "./src/index.ts"
   },
   "scripts": {
     "gen:stats": "bun scripts/generate-client-bundle.ts --generate",
@@ -39,9 +40,9 @@
     "fmt": "biome format --write ."
   },
   "dependencies": {
-    "@oh-my-pi/pi-ai": "catalog:",
-    "@oh-my-pi/pi-catalog": "catalog:",
-    "@oh-my-pi/pi-utils": "catalog:",
+    "@reactor/ai": "workspace:*",
+    "@reactor/catalog": "workspace:*",
+    "@reactor/utils": "workspace:*",
     "@tailwindcss/node": "catalog:",
     "chart.js": "catalog:",
     "date-fns": "catalog:",

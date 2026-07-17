@@ -1,6 +1,6 @@
-import type { ClipboardImage } from "@oh-my-pi/pi-natives";
-import * as native from "@oh-my-pi/pi-natives";
-import { logger } from "@oh-my-pi/pi-utils";
+import type { ClipboardImage } from "@reactor/natives";
+import * as native from "@reactor/natives";
+import { logger } from "@reactor/utils";
 
 /**
  * Run a subprocess and capture its stdout without blocking the event loop.

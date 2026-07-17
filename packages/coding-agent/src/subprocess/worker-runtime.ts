@@ -8,7 +8,7 @@ import {
 	installRuntimeModuleResolver,
 	isCompiledBinary,
 	resolveRuntimeModule,
-} from "@oh-my-pi/pi-utils";
+} from "@reactor/utils";
 import packageJson from "../../package.json" with { type: "json" };
 
 /**
@@ -27,7 +27,7 @@ import packageJson from "../../package.json" with { type: "json" };
  */
 
 export const TRANSFORMERS_PACKAGE = "@huggingface/transformers";
-const COMPILED_TRANSFORMERS_VERSION = process.env.PI_TINY_TRANSFORMERS_VERSION;
+const COMPILED_TRANSFORMERS_VERSION = process.env.REACTOR_TINY_TRANSFORMERS_VERSION;
 const ONNX_RUNTIME_NODE_PACKAGE = "onnxruntime-node";
 const ONNX_RUNTIME_CUDA_INSTALL = "cuda12";
 const ONNX_RUNTIME_CUDA_PROVIDER_FILES = [
@@ -166,7 +166,7 @@ export function replayCachedReady<K, M>(
  */
 export async function installSharpStubResolver(runtimeDir: string): Promise<string> {
 	const nodeModules = path.join(runtimeDir, "node_modules");
-	const sharpStub = path.join(runtimeDir, "omp-sharp-stub.cjs");
+	const sharpStub = path.join(runtimeDir, "reactor-sharp-stub.cjs");
 	await Bun.write(sharpStub, "module.exports = {};\n");
 	installRuntimeModuleResolver({ runtimeNodeModules: nodeModules, stubs: { sharp: sharpStub } });
 	return nodeModules;
@@ -233,7 +233,7 @@ async function installOnnxRuntimeCudaProviders(packageDir: string, runtimeDir: s
  */
 export async function ensureOnnxRuntimeCudaProviders(
 	runtimeDir: string,
-	device = process.env.PI_TINY_DEVICE,
+	device = process.env.REACTOR_TINY_DEVICE,
 ): Promise<void> {
 	if (!shouldInstallOnnxRuntimeCudaProviders(device)) return;
 	const nodeModules = path.join(runtimeDir, "node_modules");
@@ -303,9 +303,9 @@ interface ConfigurableTransformers {
 }
 
 export interface TransformersRuntimeMetadata {
-	__ompRuntimeNodeModules?: string;
-	__ompTransformersEntry?: string;
-	__ompCudaRepairError?: string;
+	__reactorRuntimeNodeModules?: string;
+	__reactorTransformersEntry?: string;
+	__reactorCudaRepairError?: string;
 }
 
 function attachTransformersRuntimeMetadata<T extends ConfigurableTransformers>(
@@ -313,9 +313,9 @@ function attachTransformersRuntimeMetadata<T extends ConfigurableTransformers>(
 	metadata: TransformersRuntimeMetadata,
 ): T {
 	const runtime = transformers as T & TransformersRuntimeMetadata;
-	runtime.__ompRuntimeNodeModules = metadata.__ompRuntimeNodeModules;
-	runtime.__ompTransformersEntry = metadata.__ompTransformersEntry;
-	runtime.__ompCudaRepairError = metadata.__ompCudaRepairError;
+	runtime.__reactorRuntimeNodeModules = metadata.__reactorRuntimeNodeModules;
+	runtime.__reactorTransformersEntry = metadata.__reactorTransformersEntry;
+	runtime.__reactorCudaRepairError = metadata.__reactorCudaRepairError;
 	return runtime;
 }
 
@@ -336,8 +336,8 @@ function cudaFailureCause(
 	error: unknown,
 	missingFiles: readonly string[],
 ): string {
-	if (metadata.__ompCudaRepairError) {
-		return `ONNX Runtime CUDA provider install failed: ${metadata.__ompCudaRepairError}`;
+	if (metadata.__reactorCudaRepairError) {
+		return `ONNX Runtime CUDA provider install failed: ${metadata.__reactorCudaRepairError}`;
 	}
 	if (missingFiles.length > 0) return `missing ONNX Runtime CUDA provider file(s): ${missingFiles.join(", ")}`;
 	const missingLibrary = missingCudaLibrary(error);
@@ -353,7 +353,7 @@ function cudaFailureHint(
 	error: unknown,
 	missingFiles: readonly string[],
 ): string {
-	if (metadata.__ompCudaRepairError) {
+	if (metadata.__reactorCudaRepairError) {
 		return "restore network access to nuget.org (or pre-populate the tiny side runtime) and rerun; CPU inference remained available";
 	}
 	if (missingFiles.length > 0) return "reinstall the tiny side runtime with ONNX Runtime postinstall enabled";
@@ -367,7 +367,7 @@ function cudaFailureHint(
 }
 
 function resolveOnnxRuntimePackageDir(metadata: TransformersRuntimeMetadata): string | null {
-	const entry = metadata.__ompTransformersEntry;
+	const entry = metadata.__reactorTransformersEntry;
 	if (entry) {
 		try {
 			return path.dirname(createRequire(entry).resolve(`${ONNX_RUNTIME_NODE_PACKAGE}/package.json`));
@@ -375,7 +375,7 @@ function resolveOnnxRuntimePackageDir(metadata: TransformersRuntimeMetadata): st
 			// Fall through to the side-runtime resolver below.
 		}
 	}
-	const nodeModules = metadata.__ompRuntimeNodeModules;
+	const nodeModules = metadata.__reactorRuntimeNodeModules;
 	if (!nodeModules) return null;
 	const manifest = resolveRuntimeModule(nodeModules, `${ONNX_RUNTIME_NODE_PACKAGE}/package.json`);
 	return manifest ? path.dirname(manifest) : null;
@@ -393,16 +393,16 @@ export async function formatOnnxRuntimeCudaDiagnostics(
 	if (!packageDir) {
 		return [
 			"ONNX Runtime CUDA diagnostics:",
-			`  PI_TINY_DEVICE=${requestedDevice} requested CUDAExecutionProvider`,
+			`  REACTOR_TINY_DEVICE=${requestedDevice} requested CUDAExecutionProvider`,
 			"  cause: unable to resolve onnxruntime-node in the tiny-model runtime",
 		].join("\n");
 	}
 	const binDir = path.join(packageDir, LINUX_X64_ONNX_RUNTIME_CUDA_PROVIDER_DIR);
 	const missingFiles = await missingOnnxRuntimeCudaProviderFiles(binDir);
-	const sideRuntime = metadata.__ompRuntimeNodeModules;
+	const sideRuntime = metadata.__reactorRuntimeNodeModules;
 	const lines = [
 		"ONNX Runtime CUDA diagnostics:",
-		`  PI_TINY_DEVICE=${requestedDevice} requested CUDAExecutionProvider`,
+		`  REACTOR_TINY_DEVICE=${requestedDevice} requested CUDAExecutionProvider`,
 		sideRuntime ? `  side runtime: ${sideRuntime}` : `  onnxruntime-node: ${packageDir}`,
 		`  cause: ${cudaFailureCause(metadata, error, missingFiles)}`,
 	];
@@ -453,7 +453,7 @@ export function loadTransformersRuntime<T extends ConfigurableTransformers, K>(
 		if (!isCompiledBinary()) {
 			const entry = sourceRequire.resolve(TRANSFORMERS_PACKAGE);
 			return attachTransformersRuntimeMetadata(configureTransformers(sourceRequire(entry) as T), {
-				__ompTransformersEntry: entry,
+				__reactorTransformersEntry: entry,
 			});
 		}
 		const installedDir = await ensureRuntimeInstalled({
@@ -486,9 +486,9 @@ export function loadTransformersRuntime<T extends ConfigurableTransformers, K>(
 		const entry = await prepareCompiledRuntime(installedDir, TRANSFORMERS_PACKAGE);
 		const require_ = createRequire(entry);
 		return attachTransformersRuntimeMetadata(configureTransformers(require_(entry) as T), {
-			__ompRuntimeNodeModules: path.join(installedDir, "node_modules"),
-			__ompTransformersEntry: entry,
-			__ompCudaRepairError: cudaRepairError,
+			__reactorRuntimeNodeModules: path.join(installedDir, "node_modules"),
+			__reactorTransformersEntry: entry,
+			__reactorCudaRepairError: cudaRepairError,
 		});
 	});
 }

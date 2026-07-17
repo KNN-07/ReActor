@@ -78,7 +78,9 @@ export function legacyDataDir(env: ProcessEnv = process.env): string {
 }
 
 export function defaultDataDir(env: ProcessEnv = process.env): string {
-	return env.MNEMOPI_DATA_DIR && env.MNEMOPI_DATA_DIR.length > 0 ? env.MNEMOPI_DATA_DIR : legacyDataDir(env);
+	return env.REACTOR_MNEMOPI_DATA_DIR && env.REACTOR_MNEMOPI_DATA_DIR.length > 0
+		? env.REACTOR_MNEMOPI_DATA_DIR
+		: legacyDataDir(env);
 }
 
 export function defaultTripleDbPath(env: ProcessEnv = process.env): string {

@@ -325,7 +325,7 @@ async function fetchOllamaNativeModels(
  * Ollama's cloud catalog reports for stock models.
  */
 const OLLAMA_FALLBACK_CONTEXT_WINDOW = 128_000;
-/** Cap max output tokens at a value that matches OMP's other openai-responses defaults. */
+/** Cap max output tokens at a value that matches ReActor's other openai-responses defaults. */
 const OLLAMA_DEFAULT_MAX_TOKENS = 8192;
 
 interface OllamaResolvedMetadata {
@@ -1188,7 +1188,7 @@ function withXaiOAuthCompatDefaults(model: ModelSpec<"openai-responses">): Model
 // "low"}`). Hermes sends `xhigh` to xAI verbatim and we match that contract
 // — let xAI decide if the level is valid for the specific Grok model.
 // `resolveModelThinking` folds this into `model.thinking.effortMap`, downstream
-// of the omitReasoningEffort gate in pi-ai's stream.ts.
+// of the omitReasoningEffort gate in ai's stream.ts.
 const XAI_REASONING_EFFORT_MAP = { minimal: "low" } as const;
 
 // xai-oauth's /v1/models exposes no per-request output limit on the OAuth
@@ -1490,7 +1490,7 @@ export function zhipuCodingPlanModelManagerOptions(
  * deployment, but Kimi K2 (instruct / thinking / turbo) on Fireworks is
  * documented to ship long reasoning traces that should be bounded — capping
  * at 32,768 prevents handing callers a budget the router cannot honor.
- * See https://github.com/can1357/oh-my-pi/issues/1849.
+ * See https://github.com/KNN-07/ReActor/issues/1849.
  */
 export const FIREWORKS_KIMI_MAX_TOKENS = 32_768;
 

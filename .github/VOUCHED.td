@@ -2,7 +2,7 @@
 #
 # Only vouched users can open PRs here; unvouched/denounced PRs are
 # auto-closed by .github/workflows/vouch-pr.yml (mitchellh/vouch check-pr).
-# Issues are intentionally NOT gated here — robomp triages those.
+# Issues are intentionally NOT gated here — reactor-worker triages those.
 #
 # Write-access collaborators and bots are auto-allowed and need no entry.
 # A denounced user ("-handle") is always blocked, even if also listed.

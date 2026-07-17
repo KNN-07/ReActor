@@ -2,9 +2,9 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "bun:test";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import type { FetchImpl } from "@oh-my-pi/pi-ai";
-import { AuthStorage } from "@oh-my-pi/pi-coding-agent/session/auth-storage";
-import { removeSyncWithRetries, Snowflake } from "@oh-my-pi/pi-utils";
+import type { FetchImpl } from "@reactor/ai";
+import { AuthStorage } from "@reactor/coding-agent/session/auth-storage";
+import { removeSyncWithRetries, Snowflake } from "@reactor/utils";
 
 describe("AuthStorage MiniMax login", () => {
 	let tempDir: string;

@@ -3,7 +3,7 @@ import * as fs from "node:fs";
 import { createRequire, isBuiltin } from "node:module";
 import * as path from "node:path";
 import * as url from "node:url";
-import { isCompiledBinary, stripWindowsExtendedLengthPathPrefix } from "@oh-my-pi/pi-utils";
+import { isCompiledBinary, stripWindowsExtendedLengthPathPrefix } from "@reactor/utils";
 import { registerPluginCacheInvalidator } from "../../discovery/helpers";
 
 const IS_COMPILED_BINARY = isCompiledBinary();
@@ -17,15 +17,15 @@ const IS_COMPILED_BINARY = isCompiledBinary();
 // imports inside runtime-loaded extensions.
 //
 // Compiled builds retain lazy loaders for host packages and serve requested
-// surfaces through `omp-legacy-pi-bundled:<key>` synthetic modules.
+// surfaces through `reactor-legacy-pi-bundled:<key>` synthetic modules.
 // `scripts/legacy-pi-virtual-module.ts` derives literal dynamic-import edges
 // from current package exports inside a Bun build plugin: no generated source
 // or duplicate key list exists on disk. Deferring each host module evaluation
 // avoids cycles with an extension-loading command that is itself in the
 // retained package graph.
-const BUNDLED_VIRTUAL_SCHEME = "omp-legacy-pi-bundled:";
-const BUNDLED_VIRTUAL_NAMESPACE = "omp-legacy-pi-bundled";
-const BUNDLED_MODULES_GLOBAL = "__ompLegacyPiBundledModules";
+const BUNDLED_VIRTUAL_SCHEME = "reactor-legacy-pi-bundled:";
+const BUNDLED_VIRTUAL_NAMESPACE = "reactor-legacy-pi-bundled";
+const BUNDLED_MODULES_GLOBAL = "__reactorLegacyPiBundledModules";
 const TYPEBOX_BUNDLED_MODULE_KEY = "typebox";
 
 type BundledModule = Readonly<Record<string, unknown>>;
@@ -44,12 +44,12 @@ let bundledModuleLoadersPromise: Promise<BundledModuleLoaders> | null = null;
  */
 function ensureBundledModuleLoadersLoaded(): Promise<BundledModuleLoaders> {
 	if (!IS_COMPILED_BINARY) {
-		return Promise.reject(new Error("omp:legacy-pi-shim: bundled modules are only available in compiled mode"));
+		return Promise.reject(new Error("reactor:legacy-pi-shim: bundled modules are only available in compiled mode"));
 	}
 	if (!bundledModuleLoadersPromise) {
-		bundledModuleLoadersPromise = import("omp-legacy-pi-modules").then(module => {
+		bundledModuleLoadersPromise = import("reactor-legacy-pi-modules").then(module => {
 			Reflect.set(globalThis, BUNDLED_MODULES_GLOBAL, loadedBundledModules);
-			return module.BUNDLED_PI_MODULE_LOADERS;
+			return module.BUNDLED_REACTOR_MODULE_LOADERS;
 		});
 	}
 	return bundledModuleLoadersPromise;
@@ -59,7 +59,7 @@ async function loadBundledModule(moduleKey: string): Promise<void> {
 	const loaders = await ensureBundledModuleLoadersLoaded();
 	const loader = loaders[moduleKey];
 	if (!loader) {
-		throw new Error(`omp:legacy-pi-shim: no bundled module registered for ${moduleKey}`);
+		throw new Error(`reactor:legacy-pi-shim: no bundled module registered for ${moduleKey}`);
 	}
 	loadedBundledModules[moduleKey] = await loader();
 }
@@ -79,10 +79,10 @@ function isBundledVirtualSpecifier(value: string): boolean {
 function synthesizeBundledModuleSourceFromModules(moduleKey: string, modules: BundledModules): string {
 	const mod = modules[moduleKey];
 	if (!mod) {
-		throw new Error(`omp:legacy-pi-shim: no bundled module registered for ${moduleKey}`);
+		throw new Error(`reactor:legacy-pi-shim: no bundled module registered for ${moduleKey}`);
 	}
 	const lines: string[] = [
-		`const __omp_bundled = globalThis[${JSON.stringify(BUNDLED_MODULES_GLOBAL)}][${JSON.stringify(moduleKey)}];`,
+		`const __reactor_bundled = globalThis[${JSON.stringify(BUNDLED_MODULES_GLOBAL)}][${JSON.stringify(moduleKey)}];`,
 	];
 	let hasDefault = false;
 	for (const exportName in mod) {
@@ -90,10 +90,10 @@ function synthesizeBundledModuleSourceFromModules(moduleKey: string, modules: Bu
 			hasDefault = true;
 			continue;
 		}
-		lines.push(`export const ${exportName} = __omp_bundled[${JSON.stringify(exportName)}];`);
+		lines.push(`export const ${exportName} = __reactor_bundled[${JSON.stringify(exportName)}];`);
 	}
 	if (hasDefault) {
-		lines.push("export default __omp_bundled.default;");
+		lines.push("export default __reactor_bundled.default;");
 	}
 	lines.push("");
 	return lines.join("\n");
@@ -101,7 +101,7 @@ function synthesizeBundledModuleSourceFromModules(moduleKey: string, modules: Bu
 
 /**
  * Build the synthetic source served for one
- * `omp-legacy-pi-bundled:<key>` import.
+ * `reactor-legacy-pi-bundled:<key>` import.
  */
 async function synthesizeBundledModuleSource(moduleKey: string): Promise<string> {
 	await loadBundledModule(moduleKey);
@@ -123,24 +123,24 @@ export function __getLegacyPiBundledModulesGlobal(): string {
 
 // Canonical scope for in-process pi packages. Plugins published against any of
 // the aliased scopes below (mariozechner's original publish, earendil-works'
-// fork, or the canonical @oh-my-pi scope itself) are remapped to this scope and
-// resolved against the bundled copy that ships inside the omp binary. This
+// fork, or the canonical @ReActor scope itself) are remapped to this scope and
+// resolved against the bundled copy that ships inside the reactor binary. This
 // keeps plugins running against the exact runtime state of the host (single
 // module registry, single tool registry, etc.) regardless of which historical
 // scope name they happened to declare in their peerDependencies.
-const CANONICAL_PI_SCOPE = "@oh-my-pi";
+const CANONICAL_REACTOR_SCOPE = "@ReActor";
 
 // Scopes that have historically been used to publish (or alias) the same set
-// of internal pi-* packages. `@oh-my-pi` is intentionally included so direct
+// of internal pi-* packages. `@ReActor` is intentionally included so direct
 // canonical imports still pass through the same host-bundled package resolution
 // path instead of pulling a duplicate copy from plugin node_modules.
-const PI_SCOPE_ALIASES = ["oh-my-pi", "mariozechner", "earendil-works"] as const;
+const REACTOR_SCOPE_ALIASES = ["ReActor", "mariozechner", "earendil-works"] as const;
 
-// Internal pi-* package basenames bundled inside the omp binary.
-const PI_PACKAGE_NAMES = ["pi-agent-core", "pi-ai", "pi-coding-agent", "pi-natives", "pi-tui", "pi-utils"] as const;
+// Internal pi-* package basenames bundled inside the reactor binary.
+const REACTOR_PACKAGE_NAMES = ["agent-core", "ai", "coding-agent", "reactor-natives", "tui", "utils"] as const;
 
-const PI_SCOPE_ALTERNATION = PI_SCOPE_ALIASES.join("|");
-const PI_PACKAGE_ALTERNATION = PI_PACKAGE_NAMES.join("|");
+const REACTOR_SCOPE_ALTERNATION = REACTOR_SCOPE_ALIASES.join("|");
+const REACTOR_PACKAGE_ALTERNATION = REACTOR_PACKAGE_NAMES.join("|");
 
 // Upstream `@mariozechner/*` packages exposed a few subpaths at the package
 // root that we relocated under a different folder. Each entry rewrites
@@ -148,18 +148,18 @@ const PI_PACKAGE_ALTERNATION = PI_PACKAGE_NAMES.join("|");
 // plugins importing the upstream layout still resolve to a real file in our
 // bundled copy. Entries ending in `/` rewrite the whole subtree; add new
 // `pkg/from -> pkg/to` pairs whenever an upstream-only subpath breaks resolution.
-const PI_SUBPATH_REMAPS: ReadonlyMap<string, string> = new Map<string, string>([
-	["pi-ai/utils/oauth", "pi-ai/oauth"],
-	["pi-ai/utils/oauth/", "pi-ai/oauth/"],
+const REACTOR_SUBPATH_REMAPS: ReadonlyMap<string, string> = new Map<string, string>([
+	["ai/utils/oauth", "ai/oauth"],
+	["ai/utils/oauth/", "ai/oauth/"],
 ]);
 
 function remapLegacyPiSubpath(rest: string): string {
-	const exact = PI_SUBPATH_REMAPS.get(rest);
+	const exact = REACTOR_SUBPATH_REMAPS.get(rest);
 	if (exact) {
 		return exact;
 	}
 
-	for (const [from, to] of PI_SUBPATH_REMAPS) {
+	for (const [from, to] of REACTOR_SUBPATH_REMAPS) {
 		if (from.endsWith("/") && rest.startsWith(from)) {
 			return `${to}${rest.slice(from.length)}`;
 		}
@@ -168,9 +168,11 @@ function remapLegacyPiSubpath(rest: string): string {
 	return rest;
 }
 
-const LEGACY_PI_SPECIFIER_FILTER = new RegExp(`^@(?:${PI_SCOPE_ALTERNATION})/(?:${PI_PACKAGE_ALTERNATION})(?:/.*)?$`);
-const LEGACY_PI_IMPORT_SPECIFIER_REGEX = new RegExp(
-	`((?:from\\s+|import\\s+|import\\s*\\(\\s*)["'])(@(?:${PI_SCOPE_ALTERNATION})/(?:${PI_PACKAGE_ALTERNATION})(?:/[^"'()\\s]+)?)(["'])`,
+const LEGACY_REACTOR_SPECIFIER_FILTER = new RegExp(
+	`^@(?:${REACTOR_SCOPE_ALTERNATION})/(?:${REACTOR_PACKAGE_ALTERNATION})(?:/.*)?$`,
+);
+const LEGACY_REACTOR_IMPORT_SPECIFIER_REGEX = new RegExp(
+	`((?:from\\s+|import\\s+|import\\s*\\(\\s*)["'])(@(?:${REACTOR_SCOPE_ALTERNATION})/(?:${REACTOR_PACKAGE_ALTERNATION})(?:/[^"'()\\s]+)?)(["'])`,
 	"g",
 );
 const resolvedSpecifierFallbacks = new Map<string, string>();
@@ -212,20 +214,20 @@ const PACKAGE_IMPORT_EXCLUDED = Symbol("packageImportExcluded");
 const TYPEBOX_SPECIFIER_FILTER = /^(?:@sinclair\/typebox|typebox)$/;
 
 // Compat-shim path resolution. In compiled-binary mode every bundled surface
-// is served through the `omp-legacy-pi-bundled:` virtual namespace (see the
+// is served through the `reactor-legacy-pi-bundled:` virtual namespace (see the
 // bundled-module block above) — bunfs paths are unreachable on Bun 1.3.14+, so the
 // pre-#3423 helpers that derived `/$bunfs/root/...` paths from
 // `import.meta.dir` are gone. Dev / source-link / installed-package modes
 // still need a real filesystem path for the source shims, which
 // `sourceShimPath` computes either from the npm prebuilt `dist/cli.js`
-// bundle (`PI_BUNDLED=true`) or directly from the monorepo source tree.
+// bundle (`REACTOR_BUNDLED=true`) or directly from the monorepo source tree.
 
 /**
  * Compute the package root for the npm prebuilt `dist/cli.js` bundle.
  *
- * `bundle-dist.ts` defines `process.env.PI_BUNDLED="true"`; after bundling,
+ * `bundle-dist.ts` defines `process.env.REACTOR_BUNDLED="true"`; after bundling,
  * `import.meta.dir` points at `<package>/dist`. Do not resolve the package via
- * bare `@oh-my-pi/pi-coding-agent` here: from a global install Bun can pick an
+ * bare `@reactor/coding-agent` here: from a global install Bun can pick an
  * older cache entry, recreating mixed-runtime plugin loading.
  */
 export function __computeBundledSelfPackageRoot(metaDir: string, pathImpl: typeof path = path): string {
@@ -243,7 +245,7 @@ export function __computeBundledSelfPackageRoot(metaDir: string, pathImpl: typeo
 }
 
 function resolveBundledSelfPackageRoot(): string | undefined {
-	if (!process.env.PI_BUNDLED) return undefined;
+	if (!process.env.REACTOR_BUNDLED) return undefined;
 	return __computeBundledSelfPackageRoot(import.meta.dir);
 }
 
@@ -260,7 +262,7 @@ function sourceShimPath(file: string): string {
  * the source file is missing.
  *
  * In compiled-binary mode the shim is served through the
- * `omp-legacy-pi-bundled:` virtual namespace (issue #3423) — bunfs paths are
+ * `reactor-legacy-pi-bundled:` virtual namespace (issue #3423) — bunfs paths are
  * unreachable on Bun 1.3.14+, so the virtual specifier is always available and
  * needs no filesystem probe. In dev / source-link / installed-package mode the
  * shim is an on-disk source file; validation mirrors
@@ -287,38 +289,38 @@ export function __resolveTypeBoxShimPath(
 const TYPEBOX_SHIM_PATH = __resolveTypeBoxShimPath(IS_COMPILED_BINARY, sourceShimPath("typebox.ts"));
 
 // Legacy extensions historically imported `Type` (and `Static`/`TSchema`) from
-// the package root of `@(scope)/pi-ai`. pi-ai 15.1.0 removed the runtime `Type`
+// the package root of `@(scope)/ai`. ai 15.1.0 removed the runtime `Type`
 // export (see `packages/ai/CHANGELOG.md`), so the bare canonical specifier no
 // longer satisfies those imports. The override below redirects only the bare
-// pi-ai package root onto a sibling shim that re-exports the canonical surface
+// ai package root onto a sibling shim that re-exports the canonical surface
 // plus the borrowed `Type` runtime from the Zod-backed TypeBox shim. Subpath
-// imports such as `@oh-my-pi/pi-ai/oauth` continue to resolve directly
-// against the bundled pi-ai package.
-const LEGACY_PI_AI_SHIM_PATH = IS_COMPILED_BINARY
-	? bundledModuleVirtualSpecifier(`${CANONICAL_PI_SCOPE}/pi-ai`)
-	: sourceShimPath("legacy-pi-ai-shim.ts");
+// imports such as `@reactor/ai/oauth` continue to resolve directly
+// against the bundled ai package.
+const LEGACY_REACTOR_AI_SHIM_PATH = IS_COMPILED_BINARY
+	? bundledModuleVirtualSpecifier(`${CANONICAL_REACTOR_SCOPE}/ai`)
+	: sourceShimPath("legacy-ai-shim.ts");
 
 // The coding-agent's own `./src/index.ts` cannot be listed as an extra
 // `bun --compile` entrypoint alongside the CLI entry without breaking binary
 // startup (issue #1474 follow-up). In compiled-binary mode the legacy
-// `@(scope)/pi-coding-agent` root therefore resolves through the bundled
+// `@(scope)/coding-agent` root therefore resolves through the bundled
 // module shim; in dev / source-link / installed-package mode it points at the
 // sibling source shim whose distinct file path avoids the #1474 collision
 // while still re-exporting the canonical package surface.
-const LEGACY_PI_CODING_AGENT_SHIM_PATH = IS_COMPILED_BINARY
-	? bundledModuleVirtualSpecifier(`${CANONICAL_PI_SCOPE}/pi-coding-agent`)
+const LEGACY_REACTOR_CODING_AGENT_SHIM_PATH = IS_COMPILED_BINARY
+	? bundledModuleVirtualSpecifier(`${CANONICAL_REACTOR_SCOPE}/coding-agent`)
 	: sourceShimPath("legacy-pi-coding-agent-shim.ts");
 
-// Package-root overrides. Shim entries (`pi-ai`, `pi-coding-agent`) always
+// Package-root overrides. Shim entries (`ai`, `coding-agent`) always
 // replace the canonical surface so the legacy `Type` runtime and the legacy
-// helpers stay reachable. The bundled host packages (`pi-agent-core`,
-// `pi-natives`, `pi-tui`, `pi-utils`) are added only in compiled-binary mode
+// helpers stay reachable. The bundled host packages (`agent-core`,
+// `reactor-natives`, `tui`, `utils`) are added only in compiled-binary mode
 // to route extensions onto the in-process module instance — in dev /
 // source-link / installed-package mode the canonical specifier resolves
 // cleanly through `Bun.resolveSync` and hardcoding a source-tree path would
-// miss installs where the bundled packages live at `node_modules/@oh-my-pi/pi-*`.
+// miss installs where the bundled packages live at `node_modules/@reactor/pi-*`.
 //
-// Compiled-binary entries are `omp-legacy-pi-bundled:<key>` specifiers handed
+// Compiled-binary entries are `reactor-legacy-pi-bundled:<key>` specifiers handed
 // to the synthetic onLoad in `installLegacyPiSpecifierShim()` — bunfs paths
 // are unusable on Bun 1.3.14+ (issue #3423). Filesystem-shaped overrides are
 // still validated against on-disk presence so a missing dev-mode shim falls
@@ -326,7 +328,7 @@ const LEGACY_PI_CODING_AGENT_SHIM_PATH = IS_COMPILED_BINARY
 
 /**
  * Drop overrides whose filesystem targets are missing so they can fall
- * through to the canonical-resolution path. Virtual `omp-legacy-pi-bundled:`
+ * through to the canonical-resolution path. Virtual `reactor-legacy-pi-bundled:`
  * entries always pass — live bundled module references are the source of truth
  * in compiled mode where bunfs paths are unreachable (issue #3423).
  *
@@ -349,9 +351,9 @@ export function __validateLegacyPiPackageRootOverrides(
 
 /**
  * Compute the override map keyed by every canonical specifier the host serves
- * directly: the pi-ai / pi-coding-agent roots (compat shims that re-attach
+ * directly: the ai / coding-agent roots (compat shims that re-attach
  * legacy helpers) plus, in compiled mode, every build-supplied module key.
- * Subpath coverage stops `@(scope)/pi-ai/oauth` and friends from falling
+ * Subpath coverage stops `@(scope)/ai/oauth` and friends from falling
  * through to the extension's absent peer install when bunfs walks fail.
  */
 export function __buildLegacyPiPackageRootOverrides(
@@ -359,8 +361,8 @@ export function __buildLegacyPiPackageRootOverrides(
 	bundledModuleKeys: Iterable<string> = [],
 ): Record<string, string> {
 	const candidates: Record<string, string> = {
-		[`${CANONICAL_PI_SCOPE}/pi-ai`]: LEGACY_PI_AI_SHIM_PATH,
-		[`${CANONICAL_PI_SCOPE}/pi-coding-agent`]: LEGACY_PI_CODING_AGENT_SHIM_PATH,
+		[`${CANONICAL_REACTOR_SCOPE}/ai`]: LEGACY_REACTOR_AI_SHIM_PATH,
+		[`${CANONICAL_REACTOR_SCOPE}/coding-agent`]: LEGACY_REACTOR_CODING_AGENT_SHIM_PATH,
 	};
 	if (isCompiled) {
 		for (const key of bundledModuleKeys) {
@@ -394,7 +396,7 @@ function ensureLegacyPiOverridesReady(): Promise<void> {
 let isLegacyPiSpecifierShimInstalled = false;
 
 function remapLegacyPiSpecifier(specifier: string): string | null {
-	if (!LEGACY_PI_SPECIFIER_FILTER.test(specifier)) {
+	if (!LEGACY_REACTOR_SPECIFIER_FILTER.test(specifier)) {
 		return null;
 	}
 	const slashIdx = specifier.indexOf("/", 1);
@@ -404,7 +406,7 @@ function remapLegacyPiSpecifier(specifier: string): string | null {
 	}
 	const rest = specifier.slice(slashIdx + 1);
 	const remappedSubpath = remapLegacyPiSubpath(rest);
-	return `${CANONICAL_PI_SCOPE}/${remappedSubpath}`;
+	return `${CANONICAL_REACTOR_SCOPE}/${remappedSubpath}`;
 }
 
 function getResolvedSpecifier(specifier: string): string {
@@ -419,7 +421,7 @@ function getResolvedSpecifier(specifier: string): string {
 }
 
 /**
- * Resolve a canonical `@oh-my-pi/*` specifier to a filesystem path, preferring
+ * Resolve a canonical `@ReActor/*` specifier to a filesystem path, preferring
  * a bundled compat shim when one is registered for the package root.
  *
  * Falls back to `getResolvedSpecifier` (which may throw under compiled binary
@@ -435,7 +437,7 @@ function resolveCanonicalPiSpecifier(remappedSpecifier: string): string {
 }
 
 function toImportSpecifier(resolvedPath: string): string {
-	// Virtual `omp-legacy-pi-bundled:` specifiers are served by the synthetic
+	// Virtual `reactor-legacy-pi-bundled:` specifiers are served by the synthetic
 	// onLoad in `installLegacyPiSpecifierShim()`; wrapping them as `file://`
 	// would corrupt the scheme.
 	if (isBundledVirtualSpecifier(resolvedPath)) {
@@ -446,7 +448,7 @@ function toImportSpecifier(resolvedPath: string): string {
 
 function rewriteLegacyPiImports(source: string): string {
 	return source.replace(
-		LEGACY_PI_IMPORT_SPECIFIER_REGEX,
+		LEGACY_REACTOR_IMPORT_SPECIFIER_REGEX,
 		(match, prefix: string, specifier: string, suffix: string) => {
 			const remappedSpecifier = remapLegacyPiSpecifier(specifier);
 			if (!remappedSpecifier) {
@@ -472,7 +474,7 @@ function rewriteLegacyPiImports(source: string): string {
 const TYPEBOX_IMPORT_SPECIFIER_REGEX = /((?:from\s+|import\s+|import\s*\(\s*)["'])(@sinclair\/typebox|typebox)(["'])/g;
 
 /**
- * Rewrite the extension-owned specifiers OMP must host-resolve — legacy
+ * Rewrite the extension-owned specifiers ReActor must host-resolve — legacy
  * `@(scope)/pi-*`, bare TypeBox packages, package `imports` aliases like
  * `#src/*`, and extension-local bare dependencies — to absolute `file://` URLs
  * or compiled-mode virtual specifiers. Relative siblings and built-in modules
@@ -1113,7 +1115,7 @@ const EXTENSION_GRAPH_SPECIFIER_REGEX = /((?:from\s+|import\s+|import\s*\(\s*)["
 const extensionGraphHookModules = new Map<string, Set<string>>();
 const commonJsModuleSources = new Map<string, string>();
 const commonJsFallbackModulePaths = new Map<string, string>();
-const COMMONJS_REQUIRE_GLOBAL = "__ompLegacyPiRequireGraphModule";
+const COMMONJS_REQUIRE_GLOBAL = "__reactorLegacyPiRequireGraphModule";
 const commonJsModuleDefinitions = new Map<string, { source: string; filename: string; dirname: string }>();
 const commonJsModuleCache = new Map<
 	string,
@@ -1207,7 +1209,7 @@ async function realpathOrSelfUncached(p: string): Promise<string> {
 
 /**
  * Walk the extension's import graph starting at `entryRealPath`, returning the
- * realpath of every reachable source module OMP must rewrite at load time.
+ * realpath of every reachable source module ReActor must rewrite at load time.
  * Relative imports and package `imports` aliases are always graph-owned.
  * Extension-local bare dependency entries are also included so their relative
  * children receive the reload mtime tag; bare imports inside those dependencies
@@ -1367,18 +1369,18 @@ function synthesizeCommonJsDefaultModule(modulePath: string, source: string, tar
 		dirname: path.dirname(targetPath),
 	});
 	commonJsModuleCache.delete(modulePath);
-	const exportsBinding = "__ompLegacyPiCommonJsExports";
+	const exportsBinding = "__reactorLegacyPiCommonJsExports";
 	const namedExports = collectCommonJsNamedExports(executableSource)
 		.map(
 			(name, index) =>
-				`const __ompLegacyPiCommonJsExport${index} = ${exportsBinding}[${JSON.stringify(name)}]; export { __ompLegacyPiCommonJsExport${index} as ${name} };`,
+				`const __reactorLegacyPiCommonJsExport${index} = ${exportsBinding}[${JSON.stringify(name)}]; export { __reactorLegacyPiCommonJsExport${index} as ${name} };`,
 		)
 		.join("\n");
 	return `const ${exportsBinding} = globalThis[${JSON.stringify(COMMONJS_REQUIRE_GLOBAL)}](${JSON.stringify(modulePath)});\nexport default ${exportsBinding};\n${namedExports}\n`;
 }
 
 /**
- * Linkedom's canvas bridge uses its bundled fallback because OMP does not ship
+ * Linkedom's canvas bridge uses its bundled fallback because ReActor does not ship
  * native canvas.
  */
 async function prepareCommonJsDefaultModule(modulePath: string, source: string): Promise<string> {
@@ -1428,7 +1430,7 @@ async function installExtensionGraphHook(
 		const filter = new RegExp(`^(?:${alternation})(?:\\?mtime=\\d+)?$`);
 		const hookId = Bun.hash(`${entryRealPath}\0async\0${[...asyncModules.keys()].join("\0")}`).toString(36);
 		Bun.plugin({
-			name: `omp:legacy-pi-ext:${hookId}`,
+			name: `reactor:legacy-pi-ext:${hookId}`,
 			setup(build) {
 				build.onLoad({ filter, namespace: "file" }, async args => {
 					const queryIndex = args.path.indexOf("?mtime=");
@@ -1457,7 +1459,7 @@ async function installExtensionGraphHook(
 		const filter = new RegExp(`^(?:${alternation})(?:\\?mtime=\\d+)?$`);
 		const hookId = Bun.hash(`${entryRealPath}\0commonjs\0${[...commonJsPaths].join("\0")}`).toString(36);
 		Bun.plugin({
-			name: `omp:legacy-pi-ext:${hookId}`,
+			name: `reactor:legacy-pi-ext:${hookId}`,
 			setup(build) {
 				build.onLoad({ filter, namespace: "file" }, args => {
 					const queryIndex = args.path.indexOf("?mtime=");
@@ -1482,7 +1484,7 @@ async function installExtensionGraphHook(
 			36,
 		);
 		Bun.plugin({
-			name: `omp:legacy-pi-ext:${hookId}`,
+			name: `reactor:legacy-pi-ext:${hookId}`,
 			setup(build) {
 				build.onLoad({ filter, namespace: "file" }, args => {
 					const queryIndex = args.path.indexOf("?mtime=");
@@ -1617,7 +1619,7 @@ function resolveLegacyPiSpecifier(args: { path: string; importer: string }): { p
 		return undefined;
 	}
 
-	// Primary: resolve the canonical @oh-my-pi/* specifier from the host binary
+	// Primary: resolve the canonical @ReActor/* specifier from the host binary
 	// location. Works in dev mode and in source-link installs.
 	try {
 		return { path: resolveCanonicalPiSpecifier(remappedSpecifier) };
@@ -1625,7 +1627,7 @@ function resolveLegacyPiSpecifier(args: { path: string; importer: string }): { p
 		// Fallback for compiled binary mode: the bundled packages live inside
 		// /$bunfs/root and aren't reachable by filesystem resolution. Prefer the
 		// canonical specifier against the importing file's directory when the
-		// plugin installed @oh-my-pi peer deps, then try the original legacy
+		// plugin installed @ReActor peer deps, then try the original legacy
 		// specifier for plugins that still vendor only @mariozechner or
 		// @earendil-works peer deps.
 		const importerDir = path.dirname(args.importer);
@@ -1652,11 +1654,11 @@ export function installLegacyPiSpecifierShim(): void {
 	isLegacyPiSpecifierShimInstalled = true;
 
 	Bun.plugin({
-		name: "omp:legacy-pi-shim",
+		name: "reactor:legacy-pi-shim",
 		setup(build) {
-			build.onResolve({ filter: LEGACY_PI_SPECIFIER_FILTER, namespace: "file" }, resolveLegacyPiSpecifier);
+			build.onResolve({ filter: LEGACY_REACTOR_SPECIFIER_FILTER, namespace: "file" }, resolveLegacyPiSpecifier);
 			build.onResolve({ filter: TYPEBOX_SPECIFIER_FILTER, namespace: "file" }, resolveTypeBoxSpecifier);
-			// Compiled mode serves `omp-legacy-pi-bundled:<key>` imports from
+			// Compiled mode serves `reactor-legacy-pi-bundled:<key>` imports from
 			// live host module references. No bunfs path leaves this loader.
 			build.onLoad({ filter: /.*/, namespace: BUNDLED_VIRTUAL_NAMESPACE }, async args => {
 				return { contents: await synthesizeBundledModuleSource(args.path), loader: "js" };

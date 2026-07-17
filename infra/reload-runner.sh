@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build + roll the preloaded omp-kata runner image onto the self-hosted CI host,
+# Build + roll the preloaded reactor-kata runner image onto the self-hosted CI host,
 # driven over SSH from this repo. The Dockerfile next to this script is the
 # source of truth: it is copied to the host, built there, and the ARC runner
 # scale set is pointed at the new tag and rolled.
@@ -16,15 +16,15 @@
 # your ssh target; the remaining knobs default to the reference deployment.
 #
 # Usage:
-#   CI_HOST=my-ci-host ./infra/reload-runner.sh                # tag: omp-kata-runner:YYYY-MM-DD-HHMMSS
-#   CI_HOST=my-ci-host ./infra/reload-runner.sh 2026-06-20     # tag: omp-kata-runner:2026-06-20
+#   CI_HOST=my-ci-host ./infra/reload-runner.sh                # tag: reactor-kata-runner:YYYY-MM-DD-HHMMSS
+#   CI_HOST=my-ci-host ./infra/reload-runner.sh 2026-06-20     # tag: reactor-kata-runner:2026-06-20
 #   CI_HOST=my-ci-host ./infra/reload-runner.sh my/repo:tag    # explicit repo:tag
 #
 # Env knobs (defaults match the reference deployment):
 #   CI_HOST                  ssh target of the CI host                     (required)
-#   REMOTE_CTX               remote build dir for the Dockerfile           [/root/omp-kata-runner-image]
-#   ARC_VALUES               remote ARC scale-set helm values file         [/root/arc-omp-values.yaml]
-#   ARC_RELEASE              helm release name of the runner scale set     [omp-kata]
+#   REMOTE_CTX               remote build dir for the Dockerfile           [/root/reactor-kata-runner-image]
+#   ARC_VALUES               remote ARC scale-set helm values file         [/root/arc-reactor-values.yaml]
+#   ARC_RELEASE              helm release name of the runner scale set     [reactor-kata]
 #   ARC_NAMESPACE            namespace the runner scale set lives in       [arc-runners]
 #   ARC_CHART_VERSION        gha-runner-scale-set chart version            [0.14.2]
 #   KUBECONFIG_REMOTE        kubeconfig path on the host                   [/etc/rancher/k3s/k3s.yaml]
@@ -35,9 +35,9 @@
 set -euo pipefail
 
 : "${CI_HOST:?set CI_HOST to the ssh target of your CI host, e.g. CI_HOST=my-ci-host}"
-REMOTE_CTX="${REMOTE_CTX:-/root/omp-kata-runner-image}"
-ARC_VALUES="${ARC_VALUES:-/root/arc-omp-values.yaml}"
-ARC_RELEASE="${ARC_RELEASE:-omp-kata}"
+REMOTE_CTX="${REMOTE_CTX:-/root/reactor-kata-runner-image}"
+ARC_VALUES="${ARC_VALUES:-/root/arc-reactor-values.yaml}"
+ARC_RELEASE="${ARC_RELEASE:-reactor-kata}"
 ARC_NAMESPACE="${ARC_NAMESPACE:-arc-runners}"
 ARC_CHART_VERSION="${ARC_CHART_VERSION:-0.14.2}"
 KUBECONFIG_REMOTE="${KUBECONFIG_REMOTE:-/etc/rancher/k3s/k3s.yaml}"
@@ -47,7 +47,7 @@ NERDCTL_VERSION="${NERDCTL_VERSION:-2.1.6}"
 BUILDKIT_VERSION="${BUILDKIT_VERSION:-0.25.1}"
 
 arg="${1:-$(date +%Y-%m-%d-%H%M%S)}"
-case "$arg" in *:*) IMAGE="$arg";; *) IMAGE="omp-kata-runner:$arg";; esac
+case "$arg" in *:*) IMAGE="$arg";; *) IMAGE="reactor-kata-runner:$arg";; esac
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 [ -f "$here/runner.Dockerfile" ] || { echo "no runner.Dockerfile next to $0" >&2; exit 1; }
@@ -157,7 +157,7 @@ build_with_containerd() {
     --local dockerfile=. \
     --opt filename=Dockerfile \
     --output "type=image,name=$IMAGE,store=true"
-  k3s ctr -n k8s.io images tag "$IMAGE" omp-kata-runner:preloaded >/dev/null 2>&1 || true
+  k3s ctr -n k8s.io images tag "$IMAGE" reactor-kata-runner:preloaded >/dev/null 2>&1 || true
 
   echo "==> [3/5] verifying baked tools from k3s containerd"
   verify_baked_tools "$NERDCTL_BIN"
@@ -165,7 +165,7 @@ build_with_containerd() {
 
 build_with_docker() {
   echo "==> [1/5] building $IMAGE with docker"
-  DOCKER_BUILDKIT=1 docker build -t "$IMAGE" -t omp-kata-runner:preloaded .
+  DOCKER_BUILDKIT=1 docker build -t "$IMAGE" -t reactor-kata-runner:preloaded .
 
   echo "==> [2/5] verifying baked tools"
   docker run --rm --entrypoint bash "$IMAGE" -lc '
@@ -215,7 +215,7 @@ case "$selected_backend" in
 esac
 
 echo "==> [4/5] pointing ARC runner scale set at $IMAGE"
-sed -i "s#image: omp-kata-runner:.*#image: $IMAGE#" "$ARC_VALUES"
+sed -i "s#image: reactor-kata-runner:.*#image: $IMAGE#" "$ARC_VALUES"
 helm upgrade "$ARC_RELEASE" --namespace "$ARC_NAMESPACE" --version "$ARC_CHART_VERSION" \
   -f "$ARC_VALUES" \
   oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set >/dev/null

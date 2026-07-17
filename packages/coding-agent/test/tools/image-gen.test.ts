@@ -1,15 +1,15 @@
 import { afterEach, describe, expect, it } from "bun:test";
-import type { Model } from "@oh-my-pi/pi-ai";
-import type { ModelRegistry } from "@oh-my-pi/pi-coding-agent/config/model-registry";
-import type { CustomToolContext } from "@oh-my-pi/pi-coding-agent/extensibility/custom-tools";
-import type { ReadonlySessionManager } from "@oh-my-pi/pi-coding-agent/session/session-manager";
+import type { Model } from "@reactor/ai";
+import type { ModelRegistry } from "@reactor/coding-agent/config/model-registry";
+import type { CustomToolContext } from "@reactor/coding-agent/extensibility/custom-tools";
+import type { ReadonlySessionManager } from "@reactor/coding-agent/session/session-manager";
 import {
 	getImageGenTools,
 	getImageGenToolsWithRegistry,
 	imageGenTool,
 	setPreferredImageProvider,
-} from "@oh-my-pi/pi-coding-agent/tools/image-gen";
-import { removeWithRetries } from "@oh-my-pi/pi-utils";
+} from "@reactor/coding-agent/tools/image-gen";
+import { removeWithRetries } from "@reactor/utils";
 
 const originalOpenRouterKey = Bun.env.OPENROUTER_API_KEY;
 const generatedImagePaths: string[] = [];
@@ -618,7 +618,7 @@ describe("imageGenTool", () => {
 
 		expect(requestUrl).toBe("https://api.x.ai/v1/images/generations");
 		expect(captured.authorization).toBe("Bearer test-xai-token");
-		expect(captured.userAgent).toBe("oh-my-pi/xai");
+		expect(captured.userAgent).toBe("ReActor/xai");
 		expect(requestBody).toMatchObject({
 			model: "grok-imagine-image",
 			prompt: "a cat.",

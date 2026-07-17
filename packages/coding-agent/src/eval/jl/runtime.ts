@@ -60,11 +60,17 @@ const WINDOWS_ENV_ALLOWLIST = [
 	"USERPROFILE",
 ];
 
-const DEFAULT_ENV_DENYLIST = ["PI_API_KEY", "PI_TOKEN", "PI_PASSWORD", "PI_SESSION", "PI_TOOL_BRIDGE_TOKEN"];
+const DEFAULT_ENV_DENYLIST = [
+	"REACTOR_API_KEY",
+	"REACTOR_TOKEN",
+	"REACTOR_PASSWORD",
+	"REACTOR_SESSION",
+	"REACTOR_TOOL_BRIDGE_TOKEN",
+];
 
 // Julia version managers and package layout live behind these prefixes; passing them
 // through lets Julia discover packages and configure its runtime consistently.
-const DEFAULT_ENV_ALLOW_PREFIXES = ["LC_", "XDG_", "PI_", "JULIA_", "OPENBLAS_", "MKL_"];
+const DEFAULT_ENV_ALLOW_PREFIXES = ["LC_", "XDG_", "REACTOR_", "JULIA_", "OPENBLAS_", "MKL_"];
 
 export interface JuliaRuntime {
 	/** Path to the julia executable. */

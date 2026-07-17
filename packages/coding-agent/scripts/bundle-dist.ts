@@ -2,7 +2,7 @@
 
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import { isEnoent } from "@oh-my-pi/pi-utils";
+import { isEnoent } from "@reactor/utils";
 import { buildDocsIndexPayload } from "./generate-docs-index";
 
 const packageDir = path.join(import.meta.dir, "..");
@@ -11,15 +11,15 @@ const cliPath = path.join(outDir, "cli.js");
 const shebang = "#!/usr/bin/env bun\n";
 
 // Native / optional / platform-specific deps are loaded from installed files.
-// `omp-legacy-pi-modules` exists only in compiled binaries via the build plugin;
+// `reactor-legacy-pi-modules` exists only in compiled binaries via the build plugin;
 // the npm bundle never executes that `isCompiledBinary()` branch.
 const ALWAYS_EXTERNAL = [
 	"mupdf",
-	"@oh-my-pi/pi-natives",
+	"@reactor/natives",
 	"@huggingface/transformers",
 	"fastembed",
 	"onnxruntime-node",
-	"omp-legacy-pi-modules",
+	"reactor-legacy-pi-modules",
 ];
 
 // Heavy, lazily-used third-party leaf deps. Each is a declared `dependency`, so the
@@ -64,7 +64,7 @@ function formatBytes(bytes: number): string {
 }
 
 async function cleanBundleOutputs(): Promise<void> {
-	// dist/ is shared with the dev binary (dist/omp); only remove this
+	// dist/ is shared with the dev binary (dist/reactor); only remove this
 	// script's own outputs (entry bundle + copied native assets).
 	let entries: string[];
 	try {
@@ -97,8 +97,8 @@ async function main(): Promise<void> {
 			target: "bun",
 			external: [...ALWAYS_EXTERNAL, ...RUNTIME_EXTERNAL],
 			define: {
-				"process.env.PI_BUNDLED": JSON.stringify("true"),
-				"process.env.PI_DOCS_EMBED": JSON.stringify((await buildDocsIndexPayload()).payload),
+				"process.env.REACTOR_BUNDLED": JSON.stringify("true"),
+				"process.env.REACTOR_DOCS_EMBED": JSON.stringify((await buildDocsIndexPayload()).payload),
 			},
 			minify: {
 				whitespace: true,

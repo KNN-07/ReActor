@@ -10,7 +10,7 @@
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { $flag, isBunTestRuntime, logger, Snowflake } from "@oh-my-pi/pi-utils";
+import { $flag, isBunTestRuntime, logger, Snowflake } from "@reactor/utils";
 import { $ } from "bun";
 import { Settings } from "../../config/settings";
 import { BaseKernel, getRemainingTimeMs, type KernelStartOptions } from "../kernel-base";
@@ -36,11 +36,11 @@ export type {
 export type { KernelDisplayOutput, PythonStatusEvent } from "./display";
 export { renderKernelDisplay } from "./display";
 
-const TRACE_IPC = $flag("PI_PYTHON_IPC_TRACE");
+const TRACE_IPC = $flag("REACTOR_PYTHON_IPC_TRACE");
 
 // Cache the runner script on disk so the subprocess loads it normally. Cached
 // per script hash so installs don't race across versions.
-const RUNNER_CACHE_DIR = path.join(os.tmpdir(), "omp-python-runner");
+const RUNNER_CACHE_DIR = path.join(os.tmpdir(), "reactor-python-runner");
 let RUNNER_SCRIPT_PATH: string | null = null;
 
 async function ensureRunnerScript(): Promise<string> {
@@ -83,7 +83,7 @@ export async function checkPythonKernelAvailability(
 	cwd: string,
 	interpreter?: string,
 ): Promise<PythonKernelAvailability> {
-	if (isBunTestRuntime() || $flag("PI_PYTHON_SKIP_CHECK")) {
+	if (isBunTestRuntime() || $flag("REACTOR_PYTHON_SKIP_CHECK")) {
 		return { ok: true };
 	}
 	const resolvedCwd = path.resolve(cwd);
@@ -225,10 +225,10 @@ function buildInitScript(cwd: string, env?: Record<string, string | undefined>):
 	const envPayload = Object.fromEntries(envEntries);
 	return [
 		"import os, sys",
-		`__omp_cwd = ${JSON.stringify(cwd)}`,
-		"os.chdir(__omp_cwd)",
-		`__omp_env = ${JSON.stringify(envPayload)}`,
-		"for __omp_key, __omp_val in __omp_env.items():\n    os.environ[__omp_key] = __omp_val",
-		"if __omp_cwd not in sys.path:\n    sys.path.insert(0, __omp_cwd)",
+		`__reactor_cwd = ${JSON.stringify(cwd)}`,
+		"os.chdir(__reactor_cwd)",
+		`__reactor_env = ${JSON.stringify(envPayload)}`,
+		"for __reactor_key, __reactor_val in __reactor_env.items():\n    os.environ[__reactor_key] = __reactor_val",
+		"if __reactor_cwd not in sys.path:\n    sys.path.insert(0, __reactor_cwd)",
 	].join("\n");
 }

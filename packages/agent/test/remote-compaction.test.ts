@@ -6,7 +6,7 @@ import {
 	DEFAULT_COMPACTION_SETTINGS,
 	prepareCompaction,
 	type SessionEntry,
-} from "@oh-my-pi/pi-agent-core/compaction";
+} from "@reactor/agent-core/compaction";
 import {
 	buildCompactionV2Request,
 	buildOpenAiNativeHistory,
@@ -16,9 +16,9 @@ import {
 	requestRemoteCompaction,
 	shouldUseCompactionV2Streaming,
 	shouldUseOpenAiRemoteCompaction,
-} from "@oh-my-pi/pi-agent-core/compaction/openai";
-import * as ai from "@oh-my-pi/pi-ai";
-import { getOpenAICodexTransportDetails } from "@oh-my-pi/pi-ai/providers/openai-codex-responses";
+} from "@reactor/agent-core/compaction/openai";
+import * as ai from "@reactor/ai";
+import { getOpenAICodexTransportDetails } from "@reactor/ai/providers/openai-codex-responses";
 import type {
 	AssistantMessage,
 	CodexCompactionContext,
@@ -26,10 +26,10 @@ import type {
 	Model,
 	ProviderSessionState,
 	ToolResultMessage,
-} from "@oh-my-pi/pi-ai/types";
-import { buildModel } from "@oh-my-pi/pi-catalog/build";
-import type { ModelSpec } from "@oh-my-pi/pi-catalog/types";
-import * as piUtils from "@oh-my-pi/pi-utils";
+} from "@reactor/ai/types";
+import { buildModel } from "@reactor/catalog/build";
+import type { ModelSpec } from "@reactor/catalog/types";
+import * as piUtils from "@reactor/utils";
 
 const { isRecord } = piUtils;
 const TEST_INSTALLATION_ID = "00000000-0000-4000-8000-000000000001";
@@ -970,7 +970,7 @@ describe("requestOpenAiRemoteCompaction abort", () => {
 
 describe("requestOpenAiRemoteCompaction timeout", () => {
 	test("a never-responding endpoint rejects with TimeoutError instead of hanging", async () => {
-		// Contract: the compact endpoint is a raw fetch outside the pi-ai stream
+		// Contract: the compact endpoint is a raw fetch outside the ai stream
 		// watchdogs — a silently dropped connection must not hang compaction
 		// forever (frozen "Auto context-full maintenance…" spinner).
 		const fetchMock: FetchImpl = (_input, init) => {
@@ -1040,7 +1040,7 @@ describe("requestRemoteCompaction wire formats", () => {
 		});
 	});
 
-	test("keeps the generic omp summarizer format for other endpoints", async () => {
+	test("keeps the generic reactor summarizer format for other endpoints", async () => {
 		let sentBody: unknown;
 		const fetchMock: FetchImpl = async (_input, init) => {
 			if (typeof init?.body !== "string") throw new Error("missing remote compaction request body");

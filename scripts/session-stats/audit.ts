@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * Token-usage audit over the local omp session corpus (~/.omp/agent/sessions/).
+ * Token-usage audit over the local reactor session corpus (~/.reactor/agent/sessions/).
  *
  * Phase 1 (scan, no LLM): walks recent sessions, sums *real* per-request usage
  * (input/output/cacheRead/cacheWrite + nominal cost recorded in each assistant
@@ -9,7 +9,7 @@
  * failures, compactions).
  *
  * Phase 2 (classify): for the costliest sessions, builds a compact digest and
- * asks a small model (default: anthropic/claude-sonnet-4-6 via @oh-my-pi/pi-ai)
+ * asks a small model (default: anthropic/claude-sonnet-4-6 via @reactor/ai)
  * to judge:
  *   a) session hygiene — multiple topics in one chat, missed handoff points,
  *   b) task-spawn quality — wasteful spawns, context-transfer failures,
@@ -22,8 +22,8 @@
  *   bun scripts/session-stats/audit.ts --folder Projects-pi --max-llm 6
  *   bun scripts/session-stats/audit.ts --json out.json
  *
- * Auth: resolves an API key for the classifier provider through omp's auth
- * storage (~/.omp/agent/agent.db: stored key, OAuth, or env var fallback).
+ * Auth: resolves an API key for the classifier provider through reactor's auth
+ * storage (~/.reactor/agent/agent.db: stored key, OAuth, or env var fallback).
  */
 
 import type { Dirent } from "node:fs";
@@ -39,14 +39,14 @@ import {
 	SqliteAuthCredentialStore,
 	type Tool,
 	type ToolCall,
-} from "@oh-my-pi/pi-ai";
-import { type GeneratedProvider, getBundledModel } from "@oh-my-pi/pi-catalog/models";
-import { getAgentDbPath, isEnoent } from "@oh-my-pi/pi-utils";
+} from "@reactor/ai";
+import { type GeneratedProvider, getBundledModel } from "@reactor/catalog/models";
+import { getAgentDbPath, isEnoent } from "@reactor/utils";
 import SYSTEM_PROMPT from "./audit-prompt.md" with { type: "text" };
 
-const SESSIONS_ROOT = path.join(os.homedir(), ".omp", "agent", "sessions");
+const SESSIONS_ROOT = path.join(os.homedir(), ".reactor", "agent", "sessions");
 const DEFAULT_MODEL = "anthropic/claude-sonnet-4-6";
-const CACHE_PATH = path.join(os.homedir(), ".omp", "stats-audit-cache.json");
+const CACHE_PATH = path.join(os.homedir(), ".reactor", "stats-audit-cache.json");
 
 // --------------------------------------------------------------------------
 // CLI
@@ -106,7 +106,7 @@ function parseCli(argv: string[]): CliOptions {
 	});
 	if (values.help) {
 		console.log(
-			`session audit — token usage analysis over ~/.omp/agent/sessions\n\n` +
+			`session audit — token usage analysis over ~/.reactor/agent/sessions\n\n` +
 				`  --since <12h|3d|1w|1mo>  window by session mtime (default 1w)\n` +
 				`  --folder <substr>        only folders containing substring\n` +
 				`  --exclude <substr>       drop folders containing substring\n` +
@@ -117,7 +117,7 @@ function parseCli(argv: string[]): CliOptions {
 				`  --json <file>            write full machine-readable results\n` +
 				`  --digest-dir <dir>       dump per-session digests fed to the model\n` +
 				`  --session <substr>       classify sessions whose id/title matches (ignores --min-cost)\n` +
-				`  --no-cache               skip the verdict cache (~/.omp/stats-audit-cache.json)\n` +
+				`  --no-cache               skip the verdict cache (~/.reactor/stats-audit-cache.json)\n` +
 				`  --no-llm                 scan + report only\n` +
 				`  --limit <n>              scan at most n session groups (debug)`,
 		);
@@ -1009,7 +1009,7 @@ async function openClassifier(modelSpec: string): Promise<Classifier> {
 	await storage.reload();
 	const apiKey = await storage.getApiKey(provider);
 	if (!apiKey) {
-		throw new Error(`no credentials for provider "${provider}" (omp login or env var required)`);
+		throw new Error(`no credentials for provider "${provider}" (reactor login or env var required)`);
 	}
 	return { model, apiKey };
 }
@@ -1074,7 +1074,7 @@ function usageOf(response: AssistantMessageLike): UsageTotals {
 	};
 }
 
-/** Narrow view of pi-ai's AssistantMessage used here (content + usage). */
+/** Narrow view of ai's AssistantMessage used here (content + usage). */
 interface AssistantMessageLike {
 	content: (ToolCall | { type: string })[];
 	usage: { input: number; output: number; cacheRead: number; cacheWrite: number; cost: { total: number } };

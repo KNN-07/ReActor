@@ -5,17 +5,10 @@ import {
 	extractFactsSafe,
 	heuristicExtractFacts,
 	parseFacts,
-} from "@oh-my-pi/pi-mnemopi/core/extraction";
-import { getExtractionStats, resetExtractionStats } from "@oh-my-pi/pi-mnemopi/core/extraction/diagnostics";
-import {
-	CallableLlmBackend,
-	resetHostLlmBackendForTests,
-	setHostLlmBackend,
-} from "@oh-my-pi/pi-mnemopi/core/llm-backends";
-import {
-	type ResolvedMnemopiRuntimeOptions,
-	withMnemopiRuntimeOptions,
-} from "@oh-my-pi/pi-mnemopi/core/runtime-options";
+} from "@reactor/mnemopi/core/extraction";
+import { getExtractionStats, resetExtractionStats } from "@reactor/mnemopi/core/extraction/diagnostics";
+import { CallableLlmBackend, resetHostLlmBackendForTests, setHostLlmBackend } from "@reactor/mnemopi/core/llm-backends";
+import { type ResolvedMnemopiRuntimeOptions, withMnemopiRuntimeOptions } from "@reactor/mnemopi/core/runtime-options";
 
 const OLD_ENV = { ...process.env };
 function restoreEnv(): void {
@@ -80,7 +73,7 @@ describe("structured extraction", () => {
 	});
 
 	it("uses deterministic heuristic extraction when no LLM is configured", async () => {
-		process.env.MNEMOPI_LLM_ENABLED = "false";
+		process.env.REACTOR_MNEMOPI_LLM_ENABLED = "false";
 		const facts = await extractFactsSafe("My name is Ada. I work at Example Corp and I prefer dark mode.");
 		expect(facts).toContain("The user's name is Ada");
 		expect(facts).toContain("The user works at Example Corp");
@@ -97,9 +90,9 @@ describe("structured extraction", () => {
 	});
 
 	it("routes enabled host LLM extraction before remote and keeps temperature zero", async () => {
-		process.env.MNEMOPI_LLM_ENABLED = "true";
-		process.env.MNEMOPI_HOST_LLM_ENABLED = "true";
-		process.env.MNEMOPI_LLM_BASE_URL = "http://remote.invalid/v1";
+		process.env.REACTOR_MNEMOPI_LLM_ENABLED = "true";
+		process.env.REACTOR_MNEMOPI_HOST_LLM_ENABLED = "true";
+		process.env.REACTOR_MNEMOPI_LLM_BASE_URL = "http://remote.invalid/v1";
 		let capturedTemperature = -1;
 		setHostLlmBackend(
 			new CallableLlmBackend("fake", (_prompt, opts) => {
@@ -115,7 +108,7 @@ describe("structured extraction", () => {
 	});
 
 	it("prefers a configured completion with the extraction-prompt override at temperature zero", async () => {
-		process.env.MNEMOPI_LLM_ENABLED = "true";
+		process.env.REACTOR_MNEMOPI_LLM_ENABLED = "true";
 		let capturedPrompt = "";
 		let capturedTemperature = -1;
 		const resolved: ResolvedMnemopiRuntimeOptions = {

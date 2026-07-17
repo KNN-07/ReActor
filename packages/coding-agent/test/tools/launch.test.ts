@@ -43,8 +43,8 @@ async function shutdown(client: DaemonBrokerClient): Promise<void> {
 }
 
 async function startPtyDaemonWithShell(shell: string, initialMarker: string, expectedMarker: string): Promise<void> {
-	const projectDir = await tempDir("omp-daemon-shell-project-");
-	const runtimeDir = await tempDir("omp-daemon-shell-runtime-");
+	const projectDir = await tempDir("reactor-daemon-shell-project-");
+	const runtimeDir = await tempDir("reactor-daemon-shell-runtime-");
 	const runner = `
 		import { createDaemonBrokerClient } from "./src/launch/client";
 
@@ -63,7 +63,7 @@ async function startPtyDaemonWithShell(shell: string, initialMarker: string, exp
 					application: process.execPath,
 					args: [
 						"-e",
-						"process.stdout.write(process.env.OMP_TEST_SHELL_MARKER); process.stdout.write(String.fromCharCode(10)); process.stdin.resume();",
+						"process.stdout.write(process.env.REACTOR_TEST_SHELL_MARKER); process.stdout.write(String.fromCharCode(10)); process.stdin.resume();",
 					],
 					env: {},
 					cwd: projectDir,
@@ -108,7 +108,7 @@ async function startPtyDaemonWithShell(shell: string, initialMarker: string, exp
 		env: {
 			...process.env,
 			SHELL: shell,
-			OMP_TEST_SHELL_MARKER: initialMarker,
+			REACTOR_TEST_SHELL_MARKER: initialMarker,
 		},
 		stdout: "pipe",
 		stderr: "pipe",
@@ -131,8 +131,8 @@ afterEach(async () => {
 
 describe("daemon broker", () => {
 	it("shares PTY output and input across project clients", async () => {
-		const projectDir = await tempDir("omp-daemon-project-");
-		const runtimeDir = await tempDir("omp-daemon-runtime-");
+		const projectDir = await tempDir("reactor-daemon-project-");
+		const runtimeDir = await tempDir("reactor-daemon-runtime-");
 		const scriptPath = path.join(projectDir, "service.ts");
 		await Bun.write(
 			scriptPath,
@@ -215,7 +215,7 @@ setInterval(() => {}, 1000);
 
 	it("uses a basic shell when the login shell cannot run POSIX commands", async () => {
 		if (process.platform === "win32") return;
-		const shellPath = path.join(await tempDir("omp-daemon-nonposix-shell-"), "csh");
+		const shellPath = path.join(await tempDir("reactor-daemon-nonposix-shell-"), "csh");
 		await Bun.write(shellPath, "#!/bin/sh\nexit 1\n");
 		await fs.chmod(shellPath, 0o755);
 
@@ -224,16 +224,16 @@ setInterval(() => {}, 1000);
 
 	it("preserves compatible login shells for PTY daemons", async () => {
 		if (process.platform === "win32") return;
-		const shellPath = path.join(await tempDir("omp-daemon-posix-shell-"), "zsh");
-		await Bun.write(shellPath, '#!/bin/sh\nexport OMP_TEST_SHELL_MARKER="compatible-shell"\nexec /bin/sh "$@"\n');
+		const shellPath = path.join(await tempDir("reactor-daemon-posix-shell-"), "zsh");
+		await Bun.write(shellPath, '#!/bin/sh\nexport REACTOR_TEST_SHELL_MARKER="compatible-shell"\nexec /bin/sh "$@"\n');
 		await fs.chmod(shellPath, 0o755);
 
 		await startPtyDaemonWithShell(shellPath, "basic-shell", "compatible-shell");
 	}, 20_000);
 
-	it("stops non-persistent daemons after the last project omp exits", async () => {
-		const projectDir = await tempDir("omp-daemon-exit-project-");
-		const runtimeDir = await tempDir("omp-daemon-exit-runtime-");
+	it("stops non-persistent daemons after the last project reactor exits", async () => {
+		const projectDir = await tempDir("reactor-daemon-exit-project-");
+		const runtimeDir = await tempDir("reactor-daemon-exit-runtime-");
 		const scriptPath = path.join(projectDir, "service.ts");
 		await Bun.write(scriptPath, `process.stdout.write("READY\\n"); setInterval(() => {}, 1000);\n`);
 		const presence = await registerDaemonProjectPresence(projectDir, runtimeDir);
@@ -290,8 +290,8 @@ setInterval(() => {}, 1000);
 	}, 20_000);
 
 	it("keeps detached daemons alive through broker replacement", async () => {
-		const projectDir = await tempDir("omp-daemon-detached-project-");
-		const runtimeDir = await tempDir("omp-daemon-detached-runtime-");
+		const projectDir = await tempDir("reactor-daemon-detached-project-");
+		const runtimeDir = await tempDir("reactor-daemon-detached-runtime-");
 		const scriptPath = path.join(projectDir, "service.ts");
 		await Bun.write(scriptPath, `process.stdout.write("READY\\n"); setInterval(() => {}, 1000);\n`);
 		const first = await createDaemonBrokerClient(projectDir, { runtimeDir, idleGraceMs: 5_000 });
@@ -362,8 +362,8 @@ setInterval(() => {}, 1000);
 	// used to report "Ready: <match>" AND "Readiness timed out" with no hint of
 	// which condition failed. The snapshot now names the unmet condition(s).
 	it("names the unmet readiness condition when start times out", async () => {
-		const projectDir = await tempDir("omp-daemon-ready-project-");
-		const runtimeDir = await tempDir("omp-daemon-ready-runtime-");
+		const projectDir = await tempDir("reactor-daemon-ready-project-");
+		const runtimeDir = await tempDir("reactor-daemon-ready-runtime-");
 		const scriptPath = path.join(projectDir, "service.ts");
 		await Bun.write(scriptPath, `process.stdout.write("LISTENING\\n"); setInterval(() => {}, 1000);\n`);
 		// Reserve an ephemeral port and release it so nothing accepts connections there.

@@ -1,8 +1,8 @@
 import type { Effort } from "./effort";
 
-// Re-exported from @oh-my-pi/pi-utils so the whole workspace shares one
+// Re-exported from @reactor/utils so the whole workspace shares one
 // `fetch`-compatible signature (tls-fetch's wrappers produce/accept it).
-export type { FetchImpl } from "@oh-my-pi/pi-utils";
+export type { FetchImpl } from "@reactor/utils";
 export type { KnownProvider } from "./provider-models/descriptors";
 
 export type KnownApi =
@@ -184,12 +184,12 @@ export interface OpenAICompat {
 	supportsMultipleSystemMessages?: boolean;
 	/** Whether the provider supports `reasoning_effort`. Default: auto-detected from URL. */
 	supportsReasoningEffort?: boolean;
-	/** Optional mapping from pi-ai reasoning levels to provider/model-specific `reasoning_effort` values. */
+	/** Optional mapping from ai reasoning levels to provider/model-specific `reasoning_effort` values. */
 	reasoningEffortMap?: Partial<Record<Effort, string>>;
 	/** Whether the provider supports `stream_options: { include_usage: true }` for token usage in streaming responses. Default: true. */
 	supportsUsageInStreaming?: boolean;
 	/**
-	 * Enable the Gemini thinking-loop guard (pi-ai stream layer) for this model.
+	 * Enable the Gemini thinking-loop guard (ai stream layer) for this model.
 	 * Defaults to true when the model id classifies as the gemini family. Set
 	 * explicitly to cover an opaque OpenAI-compat proxy alias (e.g. `my-model`)
 	 * that routes to Gemini, or to false to opt a gemini-family id out.
@@ -598,7 +598,7 @@ export interface ResolvedOpenAIResponsesCompat extends ResolvedOpenAISharedCompa
 
 /**
  * OpenRouter is a pseudo API: runtime dispatch can use either Responses
- * (default) or Chat Completions (`PI_OPENROUTER_RESPONSES=0`) with the same
+ * (default) or Chat Completions (`REACTOR_OPENROUTER_RESPONSES=0`) with the same
  * model object, so its resolved compat must satisfy both handlers.
  */
 export type ResolvedOpenRouterCompat = ResolvedOpenAICompat & ResolvedOpenAIResponsesCompat;
@@ -717,7 +717,7 @@ export interface Model<TApi extends Api = Api> {
 	input: ("text" | "image")[];
 	/**
 	 * Decoder family used for image inputs when it has narrower format support
-	 * than OMP's general image pipeline. `stb` local backends reject WebP.
+	 * than ReActor's general image pipeline. `stb` local backends reject WebP.
 	 */
 	imageInputDecoder?: "stb";
 	/**
@@ -749,26 +749,26 @@ export interface Model<TApi extends Api = Api> {
 	 * the wire field is suppressed.
 	 *
 	 * Use this for proxies (notably Ollama) that forward to a backend whose true
-	 * output limit OMP cannot discover — sending the wrong value triggers 400s
+	 * output limit ReActor cannot discover — sending the wrong value triggers 400s
 	 * from the upstream provider.
 	 */
 	omitMaxOutputTokens?: boolean;
 	headers?: Record<string, string>;
 	/**
-	 * Streaming transport override. When `"pi-native"`, `streamSimple` routes
+	 * Streaming transport override. When `"reactor-native"`, `streamSimple` routes
 	 * the request to the model's `baseUrl` via the auth-gateway's
 	 * `POST /v1/pi/stream` endpoint instead of dispatching the per-API
-	 * provider client. The `baseUrl` must point at an `omp auth-gateway`
+	 * provider client. The `baseUrl` must point at an `reactor auth-gateway`
 	 * (or compatible) host; `headers.Authorization` (or `apiKey` resolved by
 	 * the registry) carries the gateway bearer.
 	 *
-	 * Used by containerized omp installs (e.g. robomp slots) to route every
+	 * Used by containerized reactor installs (e.g. reactor-worker slots) to route every
 	 * LLM call through a sidecar gateway that holds the real provider
 	 * credentials. The model's other metadata (pricing, context window,
 	 * thinking config, …) still resolves locally; only the streaming
 	 * dispatch is redirected.
 	 */
-	transport?: "pi-native";
+	transport?: "reactor-native";
 	/** Hint that websocket transport should be preferred when supported by the provider implementation. */
 	preferWebsockets?: boolean;
 	/** Codex Responses Lite transport: send the lite marker and carry instructions/tools as input items (mirrors codex-rs `use_responses_lite`). */

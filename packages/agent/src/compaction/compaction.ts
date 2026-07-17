@@ -21,15 +21,15 @@ import {
 	type Tool,
 	type Usage,
 	withAuth,
-} from "@oh-my-pi/pi-ai";
-import { ProviderHttpError } from "@oh-my-pi/pi-ai/error";
-import { createOpenAICodexCompactionRequestContext } from "@oh-my-pi/pi-ai/providers/openai-codex-responses";
-import { convertTools } from "@oh-my-pi/pi-ai/providers/openai-responses";
-import { buildResponsesInput, resolveOpenAICompatPolicy } from "@oh-my-pi/pi-ai/providers/openai-shared";
-import { preferredDialect } from "@oh-my-pi/pi-catalog/identity";
-import { clampThinkingLevelForModel } from "@oh-my-pi/pi-catalog/model-thinking";
-import { logger, prompt, stringifyJson } from "@oh-my-pi/pi-utils";
-import * as snapcompact from "@oh-my-pi/snapcompact";
+} from "@reactor/ai";
+import { ProviderHttpError } from "@reactor/ai/error";
+import { createOpenAICodexCompactionRequestContext } from "@reactor/ai/providers/openai-codex-responses";
+import { convertTools } from "@reactor/ai/providers/openai-responses";
+import { buildResponsesInput, resolveOpenAICompatPolicy } from "@reactor/ai/providers/openai-shared";
+import { preferredDialect } from "@reactor/catalog/identity";
+import { clampThinkingLevelForModel } from "@reactor/catalog/model-thinking";
+import * as snapcompact from "@reactor/snapcompact";
+import { logger, prompt, stringifyJson } from "@reactor/utils";
 import { type AgentTelemetry, instrumentedCompleteSimple } from "../telemetry";
 import { ThinkingLevel } from "../thinking";
 import { countTokens } from "../tokenizer";
@@ -695,7 +695,7 @@ function resolveCompactionEffort(model: Model, level: ThinkingLevel | undefined)
  * onto a top-level `.status` field so callers (notably
  * `AgentSession.#isCompactionAuthFailure`) can branch on 401/403 without
  * regex-scraping `error.message`. The `auth_unavailable` synthetic
- * (pi-native gateway) does not populate `errorStatus`, hence the legacy
+ * (reactor-native gateway) does not populate `errorStatus`, hence the legacy
  * message-based check is still required upstream — see issue #986.
  */
 function createSummarizationError(prefix: string, response: AssistantMessage): Error {

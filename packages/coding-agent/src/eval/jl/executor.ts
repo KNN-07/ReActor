@@ -1,5 +1,5 @@
 import * as path from "node:path";
-import { getProjectDir, logger } from "@oh-my-pi/pi-utils";
+import { getProjectDir, logger } from "@reactor/utils";
 import type { ToolSession } from "../../tools";
 import { attachSessionOwner, createCancelledKernelResult, executeWithKernelBase } from "../executor-base";
 import { ensurePyToolBridge, type PyToolBridgeInfo } from "../py/tool-bridge";
@@ -201,15 +201,15 @@ function buildKernelEnvPatch(options: {
 	localRoots?: Record<string, string>;
 }): Record<string, string | undefined> {
 	const patch: Record<string, string | undefined> = {};
-	if (options.sessionFile) patch.PI_SESSION_FILE = options.sessionFile;
-	if (options.artifactsDir) patch.PI_ARTIFACTS_DIR = options.artifactsDir;
+	if (options.sessionFile) patch.REACTOR_SESSION_FILE = options.sessionFile;
+	if (options.artifactsDir) patch.REACTOR_ARTIFACTS_DIR = options.artifactsDir;
 	if (options.bridge) {
-		patch.PI_TOOL_BRIDGE_URL = options.bridge.url;
-		patch.PI_TOOL_BRIDGE_TOKEN = options.bridge.token;
-		patch.PI_TOOL_BRIDGE_SESSION = options.bridgeSessionId ?? "";
+		patch.REACTOR_TOOL_BRIDGE_URL = options.bridge.url;
+		patch.REACTOR_TOOL_BRIDGE_TOKEN = options.bridge.token;
+		patch.REACTOR_TOOL_BRIDGE_SESSION = options.bridgeSessionId ?? "";
 	}
 	if (options.localRoots) {
-		patch.PI_EVAL_LOCAL_ROOTS = JSON.stringify(options.localRoots);
+		patch.REACTOR_EVAL_LOCAL_ROOTS = JSON.stringify(options.localRoots);
 	}
 	return patch;
 }

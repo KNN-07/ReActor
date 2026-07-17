@@ -2,8 +2,8 @@
  * Root command for the coding agent CLI.
  */
 
-import { APP_NAME } from "@oh-my-pi/pi-utils";
-import { Args, Command, Flags } from "@oh-my-pi/pi-utils/cli";
+import { APP_NAME } from "@reactor/utils";
+import { Args, Command, Flags } from "@reactor/utils/cli";
 import { type Args as ParsedArgs, parseArgs, reportCliUsageError } from "../cli/args";
 import { runRootCommand } from "../main";
 import { prepareAcpTerminalAuthArgs } from "../modes/acp/terminal-auth";
@@ -26,13 +26,13 @@ export default class Index extends Command {
 			description: 'Model to use (fuzzy match: "opus", "gpt-5.2", or "openai/gpt-5.2")',
 		}),
 		smol: Flags.string({
-			description: "Smol/fast model for lightweight tasks (or PI_SMOL_MODEL env)",
+			description: "Smol/fast model for lightweight tasks (or REACTOR_SMOL_MODEL env)",
 		}),
 		slow: Flags.string({
-			description: "Slow/reasoning model for thorough analysis (or PI_SLOW_MODEL env)",
+			description: "Slow/reasoning model for thorough analysis (or REACTOR_SLOW_MODEL env)",
 		}),
 		plan: Flags.string({
-			description: "Plan model for architectural planning (or PI_PLAN_MODEL env)",
+			description: "Plan model for architectural planning (or REACTOR_PLAN_MODEL env)",
 		}),
 		prewalk: Flags.boolean({
 			description:
@@ -183,10 +183,10 @@ export default class Index extends Command {
 		`# Include files in initial message\n  ${APP_NAME} @prompt.md @image.png "What color is the sky?"`,
 		`# Non-interactive mode (process and exit)\n  ${APP_NAME} -p "List all .ts files in src/"`,
 		`# Continue previous session\n  ${APP_NAME} --continue "What did we discuss?"`,
-		`# Create a shell shortcut for a work profile\n  ${APP_NAME} --profile work --alias omp-work`,
+		`# Create a shell shortcut for a work profile\n  ${APP_NAME} --profile work --alias reactor-work`,
 		`# Use different model (fuzzy matching)\n  ${APP_NAME} --model opus "Help me refactor this code"`,
 		`# Limit model cycling to specific models\n  ${APP_NAME} --models claude-sonnet,claude-haiku,gpt-4o`,
-		`# Export a session file to HTML\n  ${APP_NAME} --export ~/.omp/agent/sessions/--path--/session.jsonl`,
+		`# Export a session file to HTML\n  ${APP_NAME} --export ~/.reactor/agent/sessions/--path--/session.jsonl`,
 	];
 
 	static strict = false;

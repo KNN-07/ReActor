@@ -2,7 +2,7 @@
  * Contract: a large session snapshot is delivered as a small `welcome` frame
  * plus a train of `snapshot-chunk` frames, so the guest can clear its 30s
  * first-welcome timeout long before the full transcript arrives — the fix for
- * [#3144](https://github.com/can1357/oh-my-pi/issues/3144) where a multi-MB
+ * [#3144](https://github.com/KNN-07/ReActor/issues/3144) where a multi-MB
  * single-frame welcome timed out on the default relay.
  *
  * The test drives the production `CollabHost` (real sealing, real envelopes)
@@ -11,13 +11,13 @@
  * are stubbed.
  */
 import { afterAll, afterEach, beforeAll, describe, expect, it, spyOn } from "bun:test";
-import { importRoomKey } from "@oh-my-pi/pi-coding-agent/collab/crypto";
-import { CollabGuestLink } from "@oh-my-pi/pi-coding-agent/collab/guest";
-import { CollabHost } from "@oh-my-pi/pi-coding-agent/collab/host";
-import { COLLAB_PROTO, type CollabFrame, parseCollabLink } from "@oh-my-pi/pi-coding-agent/collab/protocol";
-import { CollabSocket } from "@oh-my-pi/pi-coding-agent/collab/relay-client";
-import type { InteractiveModeContext } from "@oh-my-pi/pi-coding-agent/modes/types";
-import type { SessionEntry } from "@oh-my-pi/pi-coding-agent/session/session-entries";
+import { importRoomKey } from "@reactor/coding-agent/collab/crypto";
+import { CollabGuestLink } from "@reactor/coding-agent/collab/guest";
+import { CollabHost } from "@reactor/coding-agent/collab/host";
+import { COLLAB_PROTO, type CollabFrame, parseCollabLink } from "@reactor/coding-agent/collab/protocol";
+import { CollabSocket } from "@reactor/coding-agent/collab/relay-client";
+import type { InteractiveModeContext } from "@reactor/coding-agent/modes/types";
+import type { SessionEntry } from "@reactor/coding-agent/session/session-entries";
 import { installInMemoryRelay, uninstallInMemoryRelay } from "./helpers/in-memory-relay";
 
 // In-memory transport: shared FakeWebSocket + InMemoryRelay harness (see

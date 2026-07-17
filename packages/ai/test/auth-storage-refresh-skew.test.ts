@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
-import { type AuthCredentialStore, AuthStorage, SqliteAuthCredentialStore } from "@oh-my-pi/pi-ai/auth-storage";
-import { registerOAuthProvider, unregisterOAuthProviders } from "@oh-my-pi/pi-ai/registry/oauth";
+import { type AuthCredentialStore, AuthStorage, SqliteAuthCredentialStore } from "@reactor/ai/auth-storage";
+import { registerOAuthProvider, unregisterOAuthProviders } from "@reactor/ai/registry/oauth";
 import { removeWithRetries } from "../../utils/src/temp";
 
 describe("AuthStorage OAuth refresh skew", () => {
@@ -12,7 +12,7 @@ describe("AuthStorage OAuth refresh skew", () => {
 	let authStorage: AuthStorage | undefined;
 
 	beforeEach(async () => {
-		tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "pi-ai-auth-refresh-skew-"));
+		tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "ai-auth-refresh-skew-"));
 		store = await SqliteAuthCredentialStore.open(path.join(tempDir, "agent.db"));
 		authStorage = new AuthStorage(store);
 	});

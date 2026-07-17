@@ -1,7 +1,7 @@
 name: Vouch (PR gate)
 
 # Auto-close PRs from unvouched or denounced users. Issues are left alone
-# (robomp triages those). Runs under `pull_request_target` so the token can
+# (reactor-worker triages those). Runs under `pull_request_target` so the token can
 # act on fork PRs; this job does NO checkout and runs NO PR code — it only
 # reads .github/VOUCHED.td from the base repo and calls the GitHub API.
 
@@ -33,10 +33,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Survivors of the gate (vouched, or auto-allowed collaborators/bots) get
-      # a FRESH `vouched` label on every (re)open / ready-for-review. robomp
-      # reviews ONLY on that label event (ROBOMP_PR_REVIEW_TRIGGER=vouched_label),
+      # a FRESH `vouched` label on every (re)open / ready-for-review. reactor-worker
+      # reviews ONLY on that label event (REACTOR_WORKER_PR_REVIEW_TRIGGER=vouched_label),
       # so review is always triggered by a just-validated PR, never a stale label.
-      - name: Label vouched PRs for robomp review
+      - name: Label vouched PRs for reactor-worker review
         if: ${{ steps.vouch.outputs.status == 'vouched' || steps.vouch.outputs.status == 'allowed' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -7,17 +7,17 @@
  * settings. The original `--list-models` short-circuit in `runRootCommand`
  * exited before extensions were loaded.
  *
- * Contract under test: the `omp models` listing entry point loads extensions
+ * Contract under test: the `reactor models` listing entry point loads extensions
  * (CLI `-e` paths and configured `settings.extensions`) before listing, so
  * extension-registered providers/models appear in the output.
  */
 
 import { afterAll, beforeAll, expect, test } from "bun:test";
 import * as fs from "node:fs/promises";
-import { AuthStorage } from "@oh-my-pi/pi-ai";
-import { runModelsListing } from "@oh-my-pi/pi-coding-agent/cli/models-cli";
-import { ModelRegistry } from "@oh-my-pi/pi-coding-agent/config/model-registry";
-import { TempDir } from "@oh-my-pi/pi-utils";
+import { AuthStorage } from "@reactor/ai";
+import { runModelsListing } from "@reactor/coding-agent/cli/models-cli";
+import { ModelRegistry } from "@reactor/coding-agent/config/model-registry";
+import { TempDir } from "@reactor/utils";
 
 let tmp: TempDir;
 let extPath: string;
@@ -54,7 +54,7 @@ afterAll(async () => {
 	await tmp.remove();
 });
 
-test("omp models surfaces extension-registered providers (issue #905)", async () => {
+test("reactor models surfaces extension-registered providers (issue #905)", async () => {
 	const authStorage = await AuthStorage.create(dbPath);
 	try {
 		const modelRegistry = new ModelRegistry(authStorage);
@@ -86,7 +86,7 @@ test("omp models surfaces extension-registered providers (issue #905)", async ()
 	}
 });
 
-test("omp models prints invalid models.yml schema errors before listing output", async () => {
+test("reactor models prints invalid models.yml schema errors before listing output", async () => {
 	const modelsPath = tmp.join("invalid-models.yml");
 	await fs.writeFile(
 		modelsPath,

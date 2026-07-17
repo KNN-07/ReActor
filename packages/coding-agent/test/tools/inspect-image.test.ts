@@ -2,18 +2,18 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { AuthStorage, type completeSimple, type ImageContent, type Model } from "@oh-my-pi/pi-ai";
-import { buildModel } from "@oh-my-pi/pi-catalog/build";
-import { ModelRegistry } from "@oh-my-pi/pi-coding-agent/config/model-registry";
-import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { getThemeByName } from "@oh-my-pi/pi-coding-agent/modes/theme/theme";
-import { createAgentSession } from "@oh-my-pi/pi-coding-agent/sdk";
-import { SessionManager } from "@oh-my-pi/pi-coding-agent/session/session-manager";
-import type { ToolSession } from "@oh-my-pi/pi-coding-agent/tools";
-import { InspectImageTool } from "@oh-my-pi/pi-coding-agent/tools/inspect-image";
-import { inspectImageToolRenderer } from "@oh-my-pi/pi-coding-agent/tools/inspect-image-renderer";
-import { toolRenderers } from "@oh-my-pi/pi-coding-agent/tools/renderers";
-import { removeSyncWithRetries, sanitizeText } from "@oh-my-pi/pi-utils";
+import { AuthStorage, type completeSimple, type ImageContent, type Model } from "@reactor/ai";
+import { buildModel } from "@reactor/catalog/build";
+import { ModelRegistry } from "@reactor/coding-agent/config/model-registry";
+import { Settings } from "@reactor/coding-agent/config/settings";
+import { getThemeByName } from "@reactor/coding-agent/modes/theme/theme";
+import { createAgentSession } from "@reactor/coding-agent/sdk";
+import { SessionManager } from "@reactor/coding-agent/session/session-manager";
+import type { ToolSession } from "@reactor/coding-agent/tools";
+import { InspectImageTool } from "@reactor/coding-agent/tools/inspect-image";
+import { inspectImageToolRenderer } from "@reactor/coding-agent/tools/inspect-image-renderer";
+import { toolRenderers } from "@reactor/coding-agent/tools/renderers";
+import { removeSyncWithRetries, sanitizeText } from "@reactor/utils";
 import { type } from "arktype";
 
 const TINY_PNG_BASE64 =
@@ -125,7 +125,7 @@ describe("InspectImageTool", () => {
 	let testDir: string;
 
 	beforeEach(() => {
-		testDir = fs.mkdtempSync(path.join(os.tmpdir(), "omp-inspect-image-"));
+		testDir = fs.mkdtempSync(path.join(os.tmpdir(), "reactor-inspect-image-"));
 	});
 
 	afterEach(() => {

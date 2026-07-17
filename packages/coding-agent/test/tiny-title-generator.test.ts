@@ -1,28 +1,28 @@
 import { afterEach, beforeAll, describe, expect, it, vi } from "bun:test";
-import type { Api, Model } from "@oh-my-pi/pi-ai";
-import * as ai from "@oh-my-pi/pi-ai";
-import { getBundledModel } from "@oh-my-pi/pi-catalog/models";
-import { isSubcommand } from "@oh-my-pi/pi-coding-agent/cli-commands";
-import { getDefault, getEnumValues, getUi } from "@oh-my-pi/pi-coding-agent/config/settings-schema";
-import { TinyTitleDownloadProgressComponent } from "@oh-my-pi/pi-coding-agent/modes/components/tiny-title-download-progress";
-import { initTheme } from "@oh-my-pi/pi-coding-agent/modes/theme/theme";
+import type { Api, Model } from "@reactor/ai";
+import * as ai from "@reactor/ai";
+import { getBundledModel } from "@reactor/catalog/models";
+import { isSubcommand } from "@reactor/coding-agent/cli-commands";
+import { getDefault, getEnumValues, getUi } from "@reactor/coding-agent/config/settings-schema";
+import { TinyTitleDownloadProgressComponent } from "@reactor/coding-agent/modes/components/tiny-title-download-progress";
+import { initTheme } from "@reactor/coding-agent/modes/theme/theme";
 import {
 	TINY_MODEL_DEVICE_DEFAULT,
 	TINY_MODEL_DEVICE_SETTING_OPTIONS,
 	TINY_MODEL_DEVICE_SETTING_VALUES,
-} from "@oh-my-pi/pi-coding-agent/tiny/device";
+} from "@reactor/coding-agent/tiny/device";
 import {
 	TINY_MODEL_DTYPE_DEFAULT,
 	TINY_MODEL_DTYPE_SETTING_OPTIONS,
 	TINY_MODEL_DTYPE_SETTING_VALUES,
-} from "@oh-my-pi/pi-coding-agent/tiny/dtype";
+} from "@reactor/coding-agent/tiny/dtype";
 import {
 	ONLINE_TINY_TITLE_MODEL_KEY,
 	TINY_TITLE_MODEL_OPTIONS,
 	TINY_TITLE_MODEL_VALUES,
-} from "@oh-my-pi/pi-coding-agent/tiny/models";
-import { createTinyTitleSubprocess, tinyTitleClient } from "@oh-my-pi/pi-coding-agent/tiny/title-client";
-import { generateSessionTitle } from "@oh-my-pi/pi-coding-agent/utils/title-generator";
+} from "@reactor/coding-agent/tiny/models";
+import { createTinyTitleSubprocess, tinyTitleClient } from "@reactor/coding-agent/tiny/title-client";
+import { generateSessionTitle } from "@reactor/coding-agent/utils/title-generator";
 import type { Subprocess } from "bun";
 
 function getModelOrThrow(id: string): Model<Api> {

@@ -1,6 +1,6 @@
 # Filesystem Scan Cache Architecture Contract
 
-This document defines the current contract for the shared filesystem scan cache implemented in Rust (`crates/pi-natives/src/fs_cache.rs`) and consumed by native discovery/search APIs exposed to `packages/coding-agent`.
+This document defines the current contract for the shared filesystem scan cache implemented in Rust (`crates/reactor-natives/src/fs_cache.rs`) and consumed by native discovery/search APIs exposed to `packages/coding-agent`.
 
 ## What this cache is
 
@@ -14,12 +14,12 @@ Primary goals:
 
 ## Ownership and public surface
 
-- Cache implementation and policy: `crates/pi-natives/src/fs_cache.rs`
+- Cache implementation and policy: `crates/reactor-natives/src/fs_cache.rs`
 - Native consumers:
-  - `crates/pi-natives/src/glob.rs`
-  - `crates/pi-natives/src/fd.rs` (`fuzzyFind`)
-  - `crates/pi-natives/src/grep.rs` (cached directory mode only)
-  - `crates/pi-natives/src/ast.rs` (`astGrep`/`astEdit` file discovery; always cached)
+  - `crates/reactor-natives/src/glob.rs`
+  - `crates/reactor-natives/src/fd.rs` (`fuzzyFind`)
+  - `crates/reactor-natives/src/grep.rs` (cached directory mode only)
+  - `crates/reactor-natives/src/ast.rs` (`astGrep`/`astEdit` file discovery; always cached)
 - JS binding/export:
   - `packages/natives/native/index.d.ts` (`invalidateFsScanCache`)
   - `packages/natives/native/index.js`

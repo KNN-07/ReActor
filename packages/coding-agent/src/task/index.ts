@@ -2,9 +2,9 @@
  * Task tool - Delegate tasks to specialized agents.
  *
  * Discovers agent definitions from:
- *   - Bundled agents (shipped with omp-coding-agent)
- *   - ~/.omp/agent/agents/*.md (user-level)
- *   - .omp/agents/*.md (project-level)
+ *   - Bundled agents (shipped with reactor-coding-agent)
+ *   - ~/.reactor/agent/agents/*.md (user-level)
+ *   - .reactor/agents/*.md (project-level)
  *
  * Supports:
  *   - Single agent spawn per call (parallelism = parallel task calls)
@@ -16,9 +16,9 @@
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import path from "node:path";
-import type { AgentTool, AgentToolResult, AgentToolUpdateCallback } from "@oh-my-pi/pi-agent-core";
-import type { Usage } from "@oh-my-pi/pi-ai";
-import { $env, logger, prompt, Snowflake } from "@oh-my-pi/pi-utils";
+import type { AgentTool, AgentToolResult, AgentToolUpdateCallback } from "@reactor/agent-core";
+import type { Usage } from "@reactor/ai";
+import { $env, logger, prompt, Snowflake } from "@reactor/utils";
 import type { ToolSession } from "..";
 import { resolveAgentModelPatterns } from "../config/model-resolver";
 import { MCPManager } from "../mcp/manager";
@@ -577,7 +577,7 @@ export class TaskTool implements AgentTool<TaskToolSchemaInstance, TaskToolDetai
 		private readonly session: ToolSession,
 		discoveredAgents: AgentDefinition[],
 	) {
-		this.#blockedAgent = $env.PI_BLOCKED_AGENT;
+		this.#blockedAgent = $env.REACTOR_BLOCKED_AGENT;
 		this.#discoveredAgents = discoveredAgents;
 	}
 
@@ -1304,7 +1304,7 @@ export class TaskTool implements AgentTool<TaskToolSchemaInstance, TaskToolDetai
 		// Derive artifacts directory
 		const sessionFile = this.session.getSessionFile();
 		const artifactsDir = sessionFile ? sessionFile.slice(0, -6) : null;
-		const tempArtifactsDir = artifactsDir ? null : path.join(os.tmpdir(), `omp-task-${Snowflake.next()}`);
+		const tempArtifactsDir = artifactsDir ? null : path.join(os.tmpdir(), `reactor-task-${Snowflake.next()}`);
 		const effectiveArtifactsDir = artifactsDir || tempArtifactsDir!;
 
 		const localProtocolOptions: LocalProtocolOptions = this.session.localProtocolOptions ?? {

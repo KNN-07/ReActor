@@ -1,9 +1,10 @@
 {
   "type": "module",
-  "name": "@oh-my-pi/pi-ai",
-  "version": "17.0.2",
+  "name": "@reactor/ai",
+	"private": true,
+  "version": "0.1.0",
   "description": "Unified LLM API with automatic model discovery and provider configuration",
-  "homepage": "https://omp.sh",
+  "homepage": "https://reactor.sh",
   "author": "Can Boluk",
   "contributors": [
     "Mario Zechner"
@@ -11,11 +12,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/can1357/oh-my-pi.git",
+    "url": "git+https://github.com/KNN-07/ReActor.git",
     "directory": "packages/ai"
   },
   "bugs": {
-    "url": "https://github.com/can1357/oh-my-pi/issues"
+    "url": "https://github.com/KNN-07/ReActor/issues"
   },
   "keywords": [
     "ai",
@@ -38,9 +39,9 @@
   },
   "dependencies": {
     "@bufbuild/protobuf": "catalog:",
-    "@oh-my-pi/pi-catalog": "catalog:",
-    "@oh-my-pi/pi-utils": "catalog:",
-    "@oh-my-pi/pi-wire": "catalog:",
+    "@reactor/catalog": "workspace:*",
+    "@reactor/utils": "workspace:*",
+    "@reactor/wire": "workspace:*",
     "arktype": "catalog:",
     "zod": "catalog:"
   },

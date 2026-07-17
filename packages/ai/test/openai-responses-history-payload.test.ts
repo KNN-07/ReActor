@@ -2,14 +2,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "bun:test";
 import {
 	convertCodexResponsesMessages,
 	streamOpenAICodexResponses,
-} from "@oh-my-pi/pi-ai/providers/openai-codex-responses";
-import { type OpenAIResponsesOptions, streamOpenAIResponses } from "@oh-my-pi/pi-ai/providers/openai-responses";
-import { buildResponsesInput } from "@oh-my-pi/pi-ai/providers/openai-shared";
-import type { Context, Model, ModelSpec, ProviderSessionState, Tool } from "@oh-my-pi/pi-ai/types";
-import { createOpenAIResponsesHistoryPayload, truncateResponseItemId } from "@oh-my-pi/pi-ai/utils";
-import { buildModel } from "@oh-my-pi/pi-catalog/build";
-import { type GeneratedProvider, getBundledModel } from "@oh-my-pi/pi-catalog/models";
-import * as piUtils from "@oh-my-pi/pi-utils";
+} from "@reactor/ai/providers/openai-codex-responses";
+import { type OpenAIResponsesOptions, streamOpenAIResponses } from "@reactor/ai/providers/openai-responses";
+import { buildResponsesInput } from "@reactor/ai/providers/openai-shared";
+import type { Context, Model, ModelSpec, ProviderSessionState, Tool } from "@reactor/ai/types";
+import { createOpenAIResponsesHistoryPayload, truncateResponseItemId } from "@reactor/ai/utils";
+import { buildModel } from "@reactor/catalog/build";
+import { type GeneratedProvider, getBundledModel } from "@reactor/catalog/models";
+import * as piUtils from "@reactor/utils";
 import { type } from "arktype";
 
 const TEST_INSTALLATION_ID = "00000000-0000-4000-8000-000000000001";

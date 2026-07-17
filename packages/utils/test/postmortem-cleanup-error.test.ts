@@ -3,14 +3,14 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { postmortem } from "@oh-my-pi/pi-utils";
+import { postmortem } from "@reactor/utils";
 
 const postmortemModuleUrl = pathToFileURL(join(import.meta.dir, "../src/index.ts")).href;
 
 async function runPostmortemProbe(
 	source: string,
 ): Promise<{ exitCode: number | null; stdout: string; stderr: string }> {
-	const root = await mkdtemp(join(tmpdir(), "omp-postmortem-probe-"));
+	const root = await mkdtemp(join(tmpdir(), "reactor-postmortem-probe-"));
 	const probePath = join(root, "probe.ts");
 	try {
 		await Bun.write(probePath, source);
@@ -18,7 +18,7 @@ async function runPostmortemProbe(
 			cwd: process.cwd(),
 			stdout: "pipe",
 			stderr: "pipe",
-			env: { ...process.env, OMP_AGENT_DIR: join(root, "agent") },
+			env: { ...process.env, REACTOR_AGENT_DIR: join(root, "agent") },
 		});
 		// Process-level regressions can hang the child; the watchdog bounds the fixture without slowing green runs.
 		const watchdog = Bun.sleep(2000).then(() => {
@@ -51,7 +51,7 @@ describe("postmortem expected cleanup errors", () => {
 		const marked = postmortem.markExpectedCleanupError(reason);
 
 		expect(marked).toBe(reason);
-		expect(Reflect.get(reason, Symbol.for("omp.expectedCleanupError"))).toBe(true);
+		expect(Reflect.get(reason, Symbol.for("reactor.expectedCleanupError"))).toBe(true);
 		expect(postmortem.isExpectedCleanupError(reason)).toBe(true);
 	});
 

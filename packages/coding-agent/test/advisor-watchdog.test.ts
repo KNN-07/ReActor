@@ -1,14 +1,14 @@
 import { afterEach, describe, expect, it } from "bun:test";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { getBundledModel } from "@oh-my-pi/pi-catalog/models";
-import { ModelRegistry } from "@oh-my-pi/pi-coding-agent/config/model-registry";
-import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { createAgentSession } from "@oh-my-pi/pi-coding-agent/sdk";
-import type { AgentSession } from "@oh-my-pi/pi-coding-agent/session/agent-session";
-import { AuthStorage } from "@oh-my-pi/pi-coding-agent/session/auth-storage";
-import { SessionManager } from "@oh-my-pi/pi-coding-agent/session/session-manager";
-import { TempDir } from "@oh-my-pi/pi-utils";
+import { getBundledModel } from "@reactor/catalog/models";
+import { ModelRegistry } from "@reactor/coding-agent/config/model-registry";
+import { Settings } from "@reactor/coding-agent/config/settings";
+import { createAgentSession } from "@reactor/coding-agent/sdk";
+import type { AgentSession } from "@reactor/coding-agent/session/agent-session";
+import { AuthStorage } from "@reactor/coding-agent/session/auth-storage";
+import { SessionManager } from "@reactor/coding-agent/session/session-manager";
+import { TempDir } from "@reactor/utils";
 
 describe("advisor watchdog prompt discovery", () => {
 	const tempDirs: TempDir[] = [];
@@ -238,10 +238,10 @@ describe("advisor watchdog prompt discovery", () => {
 		const tempDir = TempDir.createSync("@pi-advisor-watchdog-");
 		tempDirs.push(tempDir);
 		const cwd = tempDir.join("project-root");
-		const ompDir = path.join(cwd, ".omp");
+		const reactorDir = path.join(cwd, ".reactor");
 		const userAgentDir = tempDir.join("user-agent");
 		fs.mkdirSync(cwd, { recursive: true });
-		fs.mkdirSync(ompDir, { recursive: true });
+		fs.mkdirSync(reactorDir, { recursive: true });
 		fs.mkdirSync(userAgentDir, { recursive: true });
 
 		const userWatchdogContent = "User-level watchdog rule.";
@@ -249,7 +249,7 @@ describe("advisor watchdog prompt discovery", () => {
 		const standaloneWatchdogContent = "Standalone project watchdog rule.";
 
 		fs.writeFileSync(path.join(userAgentDir, "WATCHDOG.md"), userWatchdogContent, "utf8");
-		fs.writeFileSync(path.join(ompDir, "WATCHDOG.md"), nativeWatchdogContent, "utf8");
+		fs.writeFileSync(path.join(reactorDir, "WATCHDOG.md"), nativeWatchdogContent, "utf8");
 		fs.writeFileSync(path.join(cwd, "WATCHDOG.md"), standaloneWatchdogContent, "utf8");
 
 		const authStorage = await AuthStorage.create(tempDir.join("testauth.db"));
@@ -290,7 +290,7 @@ describe("advisor watchdog prompt discovery", () => {
 			expect(dump).toContain(nativeWatchdogContent);
 			expect(dump).toContain(standaloneWatchdogContent);
 
-			// Check ordering: user-level should appear first, then native project level (.omp/WATCHDOG.md has depth 0),
+			// Check ordering: user-level should appear first, then native project level (.reactor/WATCHDOG.md has depth 0),
 			// then standalone project level (cwd/WATCHDOG.md has depth 0).
 			// Between native and standalone, they both have depth 0, so their relative order doesn't strictly matter
 			// as long as user-level comes before both of them.

@@ -8,7 +8,7 @@
  * the final shipped behavior belongs in release notes.
  *
  * For every non-empty `[Unreleased]` section this script hands the whole section
- * to a small model (default `google-vertex/gemini-3.5-flash` via `@oh-my-pi/pi-ai`)
+ * to a small model (default `google-vertex/gemini-3.5-flash` via `@reactor/ai`)
  * and asks for a complete replacement grouped by changelog category. The model
  * returns structured sections/items; markdown is rendered locally so only the
  * Unreleased section changes and formatting stays deterministic.
@@ -25,8 +25,8 @@
  *   bun scripts/rewrite-changelog.ts --package coding-agent
  *   bun scripts/rewrite-changelog.ts --model google/gemini-3.5-flash
  *
- * Auth: resolves the provider API key through omp's auth storage
- * (~/.omp/agent/agent.db: stored key, OAuth, or env var fallback).
+ * Auth: resolves the provider API key through reactor's auth storage
+ * (~/.reactor/agent/agent.db: stored key, OAuth, or env var fallback).
  */
 
 import * as path from "node:path";
@@ -40,9 +40,9 @@ import {
 	SqliteAuthCredentialStore,
 	type Tool,
 	type ToolCall,
-} from "@oh-my-pi/pi-ai";
-import { type GeneratedProvider, getBundledModel } from "@oh-my-pi/pi-catalog/models";
-import { getAgentDbPath } from "@oh-my-pi/pi-utils";
+} from "@reactor/ai";
+import { type GeneratedProvider, getBundledModel } from "@reactor/catalog/models";
+import { getAgentDbPath } from "@reactor/utils";
 import { z } from "zod/v4";
 import {
 	type ChangelogDocument,
@@ -114,7 +114,7 @@ async function openModel(modelSpec: string): Promise<RewriteModel> {
 	await storage.reload();
 	const apiKey = await storage.getApiKey(provider);
 	if (!apiKey) {
-		throw new Error(`no credentials for provider "${provider}" (run \`omp login\` or set the provider env var)`);
+		throw new Error(`no credentials for provider "${provider}" (run \`reactor login\` or set the provider env var)`);
 	}
 	return { model, apiKey, spec: modelSpec };
 }

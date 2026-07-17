@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "bun:test";
-import { getFastembedCacheDir } from "@oh-my-pi/pi-utils";
+import { getFastembedCacheDir } from "@reactor/utils";
 import "./setup";
 import {
 	available,
@@ -9,18 +9,18 @@ import {
 	resetEmbeddingProviderForTests,
 	setEmbeddingProviderForTests,
 	setLocalModelInitializerForTests,
-} from "@oh-my-pi/pi-mnemopi/core/embeddings";
-import { Mnemopi } from "@oh-my-pi/pi-mnemopi/core/memory";
-import { withMnemopiRuntimeOptions } from "@oh-my-pi/pi-mnemopi/core/runtime-options";
+} from "@reactor/mnemopi/core/embeddings";
+import { Mnemopi } from "@reactor/mnemopi/core/memory";
+import { withMnemopiRuntimeOptions } from "@reactor/mnemopi/core/runtime-options";
 import packageJson from "../package.json" with { type: "json" };
 
 const ENV_KEYS = [
 	"NODE_ENV",
 	"BUN_ENV",
-	"MNEMOPI_NO_EMBEDDINGS",
-	"MNEMOPI_EMBEDDING_MODEL",
-	"MNEMOPI_EMBEDDING_API_URL",
-	"MNEMOPI_EMBEDDING_API_KEY",
+	"REACTOR_MNEMOPI_NO_EMBEDDINGS",
+	"REACTOR_MNEMOPI_EMBEDDING_MODEL",
+	"REACTOR_MNEMOPI_EMBEDDING_API_URL",
+	"REACTOR_MNEMOPI_EMBEDDING_API_KEY",
 	"OPENROUTER_BASE_URL",
 	"OPENROUTER_API_KEY",
 	"OPENAI_API_KEY",
@@ -86,7 +86,7 @@ function streamRows(
 
 describe("optional embeddings", () => {
 	it("falls back cleanly when embeddings are disabled", async () => {
-		await withEnv({ MNEMOPI_NO_EMBEDDINGS: "1" }, async () => {
+		await withEnv({ REACTOR_MNEMOPI_NO_EMBEDDINGS: "1" }, async () => {
 			setEmbeddingProviderForTests({ embed: streamRows(() => [[1, 2, 3]]), available: () => true });
 
 			expect(await available()).toBe(false);
@@ -96,7 +96,7 @@ describe("optional embeddings", () => {
 	});
 
 	it("uses a fake provider and caches single-query embeddings", async () => {
-		await withEnv({ MNEMOPI_NO_EMBEDDINGS: undefined }, async () => {
+		await withEnv({ REACTOR_MNEMOPI_NO_EMBEDDINGS: undefined }, async () => {
 			let calls = 0;
 			setEmbeddingProviderForTests({
 				embed: streamRows(texts => {
@@ -114,7 +114,7 @@ describe("optional embeddings", () => {
 	});
 
 	it("returns null instead of throwing when the provider fails", async () => {
-		await withEnv({ MNEMOPI_NO_EMBEDDINGS: undefined }, async () => {
+		await withEnv({ REACTOR_MNEMOPI_NO_EMBEDDINGS: undefined }, async () => {
 			setEmbeddingProviderForTests({
 				embed() {
 					throw new Error("provider unavailable");
@@ -134,7 +134,7 @@ describe("optional embeddings", () => {
 				requests += 1;
 				expect(request.headers.get("content-type")).toBe("application/json");
 				expect(request.headers.get("user-agent")).toBe(`Oh-My-Pi/${packageJson.version}`);
-				expect(request.headers.get("http-referer")).toBe("https://omp.sh/");
+				expect(request.headers.get("http-referer")).toBe("https://reactor.sh/");
 				expect(request.headers.get("x-openrouter-title")).toBe("Oh-My-Pi");
 				expect(request.headers.get("x-openrouter-categories")).toBe("cli-agent");
 				expect(request.headers.get("x-title")).toBeNull();
@@ -151,10 +151,10 @@ describe("optional embeddings", () => {
 		try {
 			await withEnv(
 				{
-					MNEMOPI_NO_EMBEDDINGS: undefined,
-					MNEMOPI_EMBEDDING_MODEL: "openai/text-embedding-3-small",
-					MNEMOPI_EMBEDDING_API_URL: server.url.toString().replace(/\/+$/, ""),
-					MNEMOPI_EMBEDDING_API_KEY: undefined,
+					REACTOR_MNEMOPI_NO_EMBEDDINGS: undefined,
+					REACTOR_MNEMOPI_EMBEDDING_MODEL: "openai/text-embedding-3-small",
+					REACTOR_MNEMOPI_EMBEDDING_API_URL: server.url.toString().replace(/\/+$/, ""),
+					REACTOR_MNEMOPI_EMBEDDING_API_KEY: undefined,
 					OPENROUTER_API_KEY: undefined,
 					OPENAI_API_KEY: undefined,
 				},
@@ -170,7 +170,7 @@ describe("optional embeddings", () => {
 		}
 	});
 	it("flattens async batches into one matrix", async () => {
-		await withEnv({ MNEMOPI_NO_EMBEDDINGS: undefined }, async () => {
+		await withEnv({ REACTOR_MNEMOPI_NO_EMBEDDINGS: undefined }, async () => {
 			setEmbeddingProviderForTests({
 				// fastembed-shaped: an async generator yielding batches of rows.
 				embed: async function* (texts) {
@@ -221,9 +221,9 @@ describe("optional embeddings", () => {
 			{
 				NODE_ENV: undefined,
 				BUN_ENV: undefined,
-				MNEMOPI_NO_EMBEDDINGS: undefined,
-				MNEMOPI_EMBEDDING_MODEL: "BAAI/bge-small-en-v1.5",
-				MNEMOPI_EMBEDDING_API_URL: undefined,
+				REACTOR_MNEMOPI_NO_EMBEDDINGS: undefined,
+				REACTOR_MNEMOPI_EMBEDDING_MODEL: "BAAI/bge-small-en-v1.5",
+				REACTOR_MNEMOPI_EMBEDDING_API_URL: undefined,
 				OPENROUTER_BASE_URL: undefined,
 				OPENROUTER_API_KEY: undefined,
 				OPENAI_API_KEY: undefined,

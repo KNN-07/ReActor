@@ -20,8 +20,8 @@ import {
 	sleep,
 	sleepAllSessions,
 	update,
-} from "@oh-my-pi/pi-mnemopi/core/memory";
-import { openDatabase } from "@oh-my-pi/pi-mnemopi/db";
+} from "@reactor/mnemopi/core/memory";
+import { openDatabase } from "@reactor/mnemopi/db";
 
 const roots: string[] = [];
 let previousDataDir: string | undefined;
@@ -34,17 +34,17 @@ function tempRoot(): string {
 
 function useTempDataDir(): string {
 	const root = tempRoot();
-	previousDataDir = process.env.MNEMOPI_DATA_DIR;
-	process.env.MNEMOPI_DATA_DIR = root;
+	previousDataDir = process.env.REACTOR_MNEMOPI_DATA_DIR;
+	process.env.REACTOR_MNEMOPI_DATA_DIR = root;
 	return root;
 }
 
 afterEach(() => {
 	resetDefaultInstanceForTests();
 	if (previousDataDir === undefined) {
-		delete process.env.MNEMOPI_DATA_DIR;
+		delete process.env.REACTOR_MNEMOPI_DATA_DIR;
 	} else {
-		process.env.MNEMOPI_DATA_DIR = previousDataDir;
+		process.env.REACTOR_MNEMOPI_DATA_DIR = previousDataDir;
 	}
 	previousDataDir = undefined;
 	for (;;) {
@@ -96,8 +96,8 @@ describe("Mnemopi facade", () => {
 	});
 
 	it("accepts an already-open Database handle for memory, annotations, and episodic graph writes", () => {
-		const previousProactiveLinking = process.env.MNEMOPI_PROACTIVE_LINKING;
-		process.env.MNEMOPI_PROACTIVE_LINKING = "1";
+		const previousProactiveLinking = process.env.REACTOR_MNEMOPI_PROACTIVE_LINKING;
+		process.env.REACTOR_MNEMOPI_PROACTIVE_LINKING = "1";
 		const db = openDatabase(":memory:");
 		const memory = new Mnemopi({ db, sessionId: "external-db" });
 		try {
@@ -116,8 +116,8 @@ describe("Mnemopi facade", () => {
 		} finally {
 			memory.close();
 			db.close();
-			if (previousProactiveLinking === undefined) delete process.env.MNEMOPI_PROACTIVE_LINKING;
-			else process.env.MNEMOPI_PROACTIVE_LINKING = previousProactiveLinking;
+			if (previousProactiveLinking === undefined) delete process.env.REACTOR_MNEMOPI_PROACTIVE_LINKING;
+			else process.env.REACTOR_MNEMOPI_PROACTIVE_LINKING = previousProactiveLinking;
 		}
 	});
 

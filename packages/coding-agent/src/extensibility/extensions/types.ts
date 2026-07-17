@@ -14,8 +14,8 @@ import type {
 	ThinkingLevel,
 	ToolApproval,
 	ToolLoadMode,
-} from "@oh-my-pi/pi-agent-core";
-import type { CompactionResult } from "@oh-my-pi/pi-agent-core/compaction";
+} from "@reactor/agent-core";
+import type { CompactionResult } from "@reactor/agent-core/compaction";
 import type {
 	Api,
 	AssistantMessageEvent,
@@ -29,10 +29,10 @@ import type {
 	Static,
 	TextContent,
 	TSchema,
-} from "@oh-my-pi/pi-ai";
-import type { OAuthCredentials, OAuthLoginCallbacks } from "@oh-my-pi/pi-ai/oauth/types";
-import type { AutocompleteItem, AutocompleteProvider, Component, EditorTheme, KeyId, TUI } from "@oh-my-pi/pi-tui";
-import type { logger as PiLogger } from "@oh-my-pi/pi-utils";
+} from "@reactor/ai";
+import type { OAuthCredentials, OAuthLoginCallbacks } from "@reactor/ai/oauth/types";
+import type { AutocompleteItem, AutocompleteProvider, Component, EditorTheme, KeyId, TUI } from "@reactor/tui";
+import type { logger as PiLogger } from "@reactor/utils";
 import type { Type as arktype } from "arktype";
 import type * as zod from "zod/v4";
 import type { KeybindingsManager } from "../../config/keybindings";
@@ -1060,7 +1060,7 @@ export interface ExtensionAPI {
 	/** Injected zod/v4 module for canonical extension tool parameter schemas. */
 	zod: typeof zod;
 
-	/** Injected pi-coding-agent exports for accessing SDK utilities */
+	/** Injected coding-agent exports for accessing SDK utilities */
 	pi: typeof PiCodingAgent;
 
 	// =========================================================================

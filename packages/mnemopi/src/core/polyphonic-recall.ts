@@ -220,7 +220,7 @@ export class PolyphonicRecallEngine {
 	}
 
 	vectorVoice(queryEmbedding: readonly number[] | Float32Array | null): VoiceRecallResult[] {
-		if (envDisabled("MNEMOPI_VOICE_VECTOR") || queryEmbedding === null) return [];
+		if (envDisabled("REACTOR_MNEMOPI_VOICE_VECTOR") || queryEmbedding === null) return [];
 		const queryUnit = normalizeVector(queryEmbedding);
 		if (queryUnit === null) return [];
 		const now = new Date().toISOString();
@@ -277,7 +277,7 @@ export class PolyphonicRecallEngine {
 		return [...byId.values()].sort((a, b) => b.score - a.score || a.memoryId.localeCompare(b.memoryId)).slice(0, 20);
 	}
 	graphVoice(query: string): VoiceRecallResult[] {
-		if (envDisabled("MNEMOPI_VOICE_GRAPH")) return [];
+		if (envDisabled("REACTOR_MNEMOPI_VOICE_GRAPH")) return [];
 		const results: VoiceRecallResult[] = [];
 		const seedIds = new Set<string>();
 		for (const entity of extractEntities(query)) {
@@ -323,7 +323,7 @@ export class PolyphonicRecallEngine {
 		return results;
 	}
 	factVoice(query: string): VoiceRecallResult[] {
-		if (envDisabled("MNEMOPI_VOICE_FACT")) return [];
+		if (envDisabled("REACTOR_MNEMOPI_VOICE_FACT")) return [];
 		const byId = new Map<string, VoiceRecallResult>();
 		for (const word of queryWords(query)) {
 			const subject = word[0] === undefined ? word : word[0].toUpperCase() + word.slice(1);
@@ -351,7 +351,7 @@ export class PolyphonicRecallEngine {
 		return [...byId.values()].sort((a, b) => b.score - a.score || a.memoryId.localeCompare(b.memoryId));
 	}
 	temporalVoice(query: string): VoiceRecallResult[] {
-		if (envDisabled("MNEMOPI_VOICE_TEMPORAL") || !looksTemporal(query)) return [];
+		if (envDisabled("REACTOR_MNEMOPI_VOICE_TEMPORAL") || !looksTemporal(query)) return [];
 		const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 		let rows: TemporalRow[] = [];
 		try {

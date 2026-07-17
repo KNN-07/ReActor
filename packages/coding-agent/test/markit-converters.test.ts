@@ -11,9 +11,9 @@ import { describe, expect, it } from "bun:test";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
-import { convertBufferWithMarkit, convertFileWithMarkit } from "@oh-my-pi/pi-coding-agent/utils/markit";
-import { zip } from "@oh-my-pi/pi-coding-agent/utils/zip";
-import { removeWithRetries } from "@oh-my-pi/pi-utils";
+import { convertBufferWithMarkit, convertFileWithMarkit } from "@reactor/coding-agent/utils/markit";
+import { zip } from "@reactor/coding-agent/utils/zip";
+import { removeWithRetries } from "@reactor/utils";
 
 const enc = (s: string): Uint8Array => new TextEncoder().encode(s);
 const WML = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
@@ -154,7 +154,7 @@ describe("markit converters", () => {
 	});
 
 	it("reads PDF text after inline image binary data containing delimiter bytes", async () => {
-		const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "omp-pdf-inline-home-"));
+		const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "reactor-pdf-inline-home-"));
 		const homeRoot = path.parse(homeDir).root;
 		const homeDrive = homeRoot.endsWith(path.sep) ? homeRoot.slice(0, -1) : homeRoot;
 		const homePath = homeDir.slice(homeDrive.length) || path.sep;
@@ -178,11 +178,10 @@ describe("markit converters", () => {
 					LOCALAPPDATA: path.join(homeDir, "AppData", "Local"),
 					USERPROFILE: homeDir,
 					NO_COLOR: "1",
-					OMP_PROFILE: "",
-					PI_CODING_AGENT_DIR: path.join(homeDir, ".omp", "agent"),
-					PI_CONFIG_DIR: ".omp",
-					PI_NO_TITLE: "1",
-					PI_PROFILE: "",
+					REACTOR_CODING_AGENT_DIR: path.join(homeDir, ".reactor", "agent"),
+					REACTOR_CONFIG_DIR: ".reactor",
+					REACTOR_NO_TITLE: "1",
+					REACTOR_PROFILE: "",
 					XDG_CACHE_HOME: path.join(homeDir, ".cache"),
 					XDG_DATA_HOME: path.join(homeDir, ".local", "share"),
 					XDG_STATE_HOME: path.join(homeDir, ".local", "state"),

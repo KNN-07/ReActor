@@ -1,18 +1,18 @@
 import { afterEach, describe, expect, it, vi } from "bun:test";
 import * as path from "node:path";
-import { ThinkingLevel } from "@oh-my-pi/pi-agent-core";
-import * as ai from "@oh-my-pi/pi-ai";
-import { Effort, type Model } from "@oh-my-pi/pi-ai";
-import { buildModel } from "@oh-my-pi/pi-catalog/build";
-import { getBundledModel } from "@oh-my-pi/pi-catalog/models";
+import { ThinkingLevel } from "@reactor/agent-core";
+import * as ai from "@reactor/ai";
+import { Effort, type Model } from "@reactor/ai";
+import { buildModel } from "@reactor/catalog/build";
+import { getBundledModel } from "@reactor/catalog/models";
 import {
 	classifyDifficulty,
 	parseDifficultyBucket,
 	parseDifficultyLevel,
-} from "@oh-my-pi/pi-coding-agent/auto-thinking/classifier";
-import { ModelRegistry } from "@oh-my-pi/pi-coding-agent/config/model-registry";
-import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { AuthStorage } from "@oh-my-pi/pi-coding-agent/session/auth-storage";
+} from "@reactor/coding-agent/auto-thinking/classifier";
+import { ModelRegistry } from "@reactor/coding-agent/config/model-registry";
+import { Settings } from "@reactor/coding-agent/config/settings";
+import { AuthStorage } from "@reactor/coding-agent/session/auth-storage";
 import {
 	AUTO_THINKING,
 	clampAutoThinkingEffort,
@@ -21,10 +21,10 @@ import {
 	parseEffort,
 	parseThinkingLevel,
 	resolveProvisionalAutoLevel,
-} from "@oh-my-pi/pi-coding-agent/thinking";
-import type { TinyMemoryLocalModelKey } from "@oh-my-pi/pi-coding-agent/tiny/models";
-import { tinyModelClient } from "@oh-my-pi/pi-coding-agent/tiny/title-client";
-import { TempDir } from "@oh-my-pi/pi-utils";
+} from "@reactor/coding-agent/thinking";
+import type { TinyMemoryLocalModelKey } from "@reactor/coding-agent/tiny/models";
+import { tinyModelClient } from "@reactor/coding-agent/tiny/title-client";
+import { TempDir } from "@reactor/utils";
 
 describe("auto thinking classifier helpers", () => {
 	afterEach(() => {
@@ -228,7 +228,7 @@ describe("auto thinking classifier helpers", () => {
 	});
 
 	it("returns undefined for reasoning models without controllable efforts (devin-agent shape)", () => {
-		// Repro for https://github.com/can1357/oh-my-pi/issues/3356 — Devin
+		// Repro for https://github.com/KNN-07/ReActor/issues/3356 — Devin
 		// models report `reasoning: true` but expose no `thinking.efforts` (Cascade
 		// selects effort by routing to sibling model ids). `auto` must not invent
 		// a concrete effort here, or `requireSupportedEffort` throws in stream.ts.

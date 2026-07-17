@@ -1,6 +1,6 @@
 # Magic keywords
 
-Magic keywords are standalone words in a user prompt that add a hidden instruction for that turn. They are enabled by default and glow in the editor when `omp` recognizes them.
+Magic keywords are standalone words in a user prompt that add a hidden instruction for that turn. They are enabled by default and glow in the editor when `reactor` recognizes them.
 
 ## Keywords
 
@@ -35,12 +35,12 @@ Open `/settings` and use **Interaction → Magic Keywords**, or change the setti
 
 ```bash
 # Disable every magic keyword
-omp config set magicKeywords.enabled false
+reactor config set magicKeywords.enabled false
 
 # Disable one keyword while leaving the others enabled
-omp config set magicKeywords.ultrathink false
-omp config set magicKeywords.orchestrate false
-omp config set magicKeywords.workflow false
+reactor config set magicKeywords.ultrathink false
+reactor config set magicKeywords.orchestrate false
+reactor config set magicKeywords.workflow false
 ```
 
-All four settings default to `true`. Run `omp config list` to inspect every available setting and its current value. See [Settings](./settings.md) for configuration scopes, precedence, and project-local overrides.
+All four settings default to `true`. Run `reactor config list` to inspect every available setting and its current value. See [Settings](./settings.md) for configuration scopes, precedence, and project-local overrides.

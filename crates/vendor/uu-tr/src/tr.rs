@@ -17,7 +17,7 @@ use operation::{
 	DeleteOperation, Sequence, SqueezeOperation, SymbolTranslator, TranslateOperation, flush_output,
 	translate_input,
 };
-use pi_uutils_ctx::format_usage;
+use reactor_uutils_ctx::format_usage;
 use simd::process_input;
 use uucore::{
 	display::Quotable,
@@ -42,19 +42,19 @@ pub fn run(argv: Vec<OsString>) -> i32 {
 		Err(err) => {
 			let rendered = err.to_string();
 			if err.use_stderr() {
-				let _ = write!(pi_uutils_ctx::stderr(), "{rendered}");
+				let _ = write!(reactor_uutils_ctx::stderr(), "{rendered}");
 				return 1;
 			}
-			let _ = write!(pi_uutils_ctx::stdout(), "{rendered}");
+			let _ = write!(reactor_uutils_ctx::stdout(), "{rendered}");
 			return 0;
 		},
 	};
 
 	match tr_main(&matches) {
-		Ok(()) => pi_uutils_ctx::exit_code(),
+		Ok(()) => reactor_uutils_ctx::exit_code(),
 		Err(err) => {
 			let code = err.code();
-			let _ = writeln!(pi_uutils_ctx::stderr(), "tr: {err}");
+			let _ = writeln!(reactor_uutils_ctx::stderr(), "tr: {err}");
 			if code == 0 { 1 } else { code }
 		},
 	}
@@ -125,7 +125,7 @@ fn tr_main(matches: &clap::ArgMatches) -> UResult<()> {
 			.count();
 		if trailing_backslashes % 2 == 1 {
 			let _ = writeln!(
-				pi_uutils_ctx::stderr(),
+				reactor_uutils_ctx::stderr(),
 				"tr: warning: an unescaped backslash at end of string is not portable"
 			);
 		}
@@ -142,8 +142,8 @@ fn tr_main(matches: &clap::ArgMatches) -> UResult<()> {
 	)?;
 
 	// pi-uutils: replace process-global stdin/stdout with the invocation context.
-	let mut input = BufReader::new(pi_uutils_ctx::stdin());
-	let mut output = pi_uutils_ctx::stdout();
+	let mut input = BufReader::new(reactor_uutils_ctx::stdin());
+	let mut output = reactor_uutils_ctx::stdout();
 
 	if delete_flag {
 		if squeeze_flag {

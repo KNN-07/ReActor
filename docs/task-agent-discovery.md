@@ -57,19 +57,19 @@ Because bundled parsing uses `level: "fatal"`, malformed bundled frontmatter thr
 
 ## Filesystem and plugin discovery
 
-`discoverAgents(cwd, home)` (`src/task/discovery.ts`) merges agents from OMP-native roots and Claude plugin roots before appending bundled definitions. Cross-harness roots such as `.claude/agents`, `.codex/agents`, and `.gemini/agents` are intentionally skipped — their frontmatter schema is not the OMP task-agent contract (`TASK_AGENT_CONFIG_SOURCE = ".omp"` filters both dir lists).
+`discoverAgents(cwd, home)` (`src/task/discovery.ts`) merges agents from ReActor-native roots and Claude plugin roots before appending bundled definitions. Cross-harness roots such as `.claude/agents`, `.codex/agents`, and `.gemini/agents` are intentionally skipped — their frontmatter schema is not the ReActor task-agent contract (`TASK_AGENT_CONFIG_SOURCE = ".reactor"` filters both dir lists).
 
 ### Discovery inputs
 
-1. Nearest project `.omp` agents dir from `findAllNearestProjectConfigDirs("agents", cwd)` (filtered to `.omp`; first hit only)
-2. User `.omp` agents dir from `getConfigDirs("agents", { project: false })` (filtered to `.omp`; first hit only)
+1. Nearest project `.reactor` agents dir from `findAllNearestProjectConfigDirs("agents", cwd)` (filtered to `.reactor`; first hit only)
+2. User `.reactor` agents dir from `getConfigDirs("agents", { project: false })` (filtered to `.reactor`; first hit only)
 3. Claude plugin roots (`listClaudePluginRoots(home, cwd)`) with `agents/` subdirs — only when `isProviderEnabled("claude-plugins")`; project-scope plugins sort before user-scope
 4. Bundled agents (`loadBundledAgents()`)
 
 ### Actual source order
 
-1. project `.omp/agents`
-2. user `~/.omp/agent/agents`
+1. project `.reactor/agents`
+2. user `~/.reactor/agent/agents`
 3. plugin `agents/` dirs (project-scope first, then user-scope)
 4. bundled agents last
 
@@ -83,7 +83,7 @@ Discovery uses first-wins dedup by exact `agent.name`:
 
 Implications:
 
-- Project `.omp` overrides user `.omp`.
+- Project `.reactor` overrides user `.reactor`.
 - Non-bundled agents override bundled agents with the same name.
 - Name matching is case-sensitive (`Task` and `task` are distinct).
 - Within one directory, markdown files are read in lexicographic filename order before dedup.
@@ -164,7 +164,7 @@ If denied: immediate `Cannot spawn '...'. Allowed: ...` response.
 
 ### Blocked self-recursion env guard
 
-`PI_BLOCKED_AGENT` is read at tool construction. If request matches, execution is rejected with recursion-prevention message.
+`REACTOR_BLOCKED_AGENT` is read at tool construction. If request matches, execution is rejected with recursion-prevention message.
 
 ### Recursion-depth gating (task tool availability inside child sessions)
 

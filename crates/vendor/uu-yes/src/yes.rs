@@ -7,7 +7,7 @@
 
 // pi-uutils: vendored from uutils/coreutils 0.8.0 and patched to run in-process
 // as a shell builtin. All process-global stdio is routed through
-// `pi_uutils_ctx`, `translate!` strings are literalized, and the entry point no
+// `reactor_uutils_ctx`, `translate!` strings are literalized, and the entry point no
 // longer calls `std::process::exit`. Because the utility runs inside the shell
 // process there is no SIGPIPE to terminate it when the consumer closes, so a
 // broken-pipe write error exits cleanly with code 0 (GNU behaviour) on every
@@ -21,7 +21,7 @@ use std::{
 };
 
 use clap::{Arg, ArgAction, Command, builder::ValueParser};
-use pi_uutils_ctx::format_usage;
+use reactor_uutils_ctx::format_usage;
 use uucore::error::strip_errno;
 
 // it's possible that using a smaller or larger buffer might provide better
@@ -39,10 +39,10 @@ pub fn run(argv: Vec<OsString>) -> i32 {
 		Err(err) => {
 			let rendered = err.to_string();
 			if err.use_stderr() {
-				let _ = write!(pi_uutils_ctx::stderr(), "{rendered}");
+				let _ = write!(reactor_uutils_ctx::stderr(), "{rendered}");
 				return 1;
 			}
-			let _ = write!(pi_uutils_ctx::stdout(), "{rendered}");
+			let _ = write!(reactor_uutils_ctx::stdout(), "{rendered}");
 			return 0;
 		},
 	};
@@ -58,7 +58,7 @@ pub fn run(argv: Vec<OsString>) -> i32 {
 		// so the in-process builtin exits cleanly with 0 on every platform.
 		ExecStop::Io(err) if err.kind() == io::ErrorKind::BrokenPipe => 0,
 		ExecStop::Io(err) => {
-			let _ = writeln!(pi_uutils_ctx::stderr(), "yes: standard output: {}", strip_errno(&err));
+			let _ = writeln!(reactor_uutils_ctx::stderr(), "yes: standard output: {}", strip_errno(&err));
 			1
 		},
 		// pi-uutils: the shell asked the scope to cancel (abort/timeout);
@@ -146,10 +146,10 @@ enum ExecStop {
 /// iteration (each iteration writes a full [`BUF_SIZE`]-ish batch, so polling
 /// per iteration is cheap) so shell abort/timeout stops the loop promptly.
 fn exec(bytes: &[u8]) -> ExecStop {
-	let mut stdout = pi_uutils_ctx::stdout();
+	let mut stdout = reactor_uutils_ctx::stdout();
 
 	loop {
-		if pi_uutils_ctx::is_cancelled() {
+		if reactor_uutils_ctx::is_cancelled() {
 			return ExecStop::Cancelled;
 		}
 		if let Err(err) = stdout.write_all(bytes) {
@@ -163,7 +163,7 @@ mod tests {
 	use std::{collections::HashMap, io::Write, path::PathBuf, sync::Arc};
 
 	use parking_lot::Mutex;
-	use pi_uutils_ctx::ScopeIo;
+	use reactor_uutils_ctx::ScopeIo;
 
 	use super::*;
 
@@ -234,7 +234,7 @@ mod tests {
 			.map(OsString::from)
 			.collect();
 
-		let code = pi_uutils_ctx::scope(io, || run(argv));
+		let code = reactor_uutils_ctx::scope(io, || run(argv));
 
 		let out_str = String::from_utf8(stdout_buf.lock().clone()).unwrap();
 		let err_str = String::from_utf8(stderr_buf.lock().clone()).unwrap();

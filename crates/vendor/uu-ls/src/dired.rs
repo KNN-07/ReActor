@@ -10,7 +10,7 @@ use std::{
 	io::{BufWriter, Write},
 };
 
-use pi_uutils_ctx::CtxStdout;
+use reactor_uutils_ctx::CtxStdout;
 use uucore::error::UResult;
 
 /// `dired` Module Documentation

@@ -1,15 +1,15 @@
 import { beforeAll, describe, expect, it } from "bun:test";
-import type { AgentTool } from "@oh-my-pi/pi-agent-core";
-import type { TSchema } from "@oh-my-pi/pi-ai";
-import { resetSettingsForTest, Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { renderMCPResult } from "@oh-my-pi/pi-coding-agent/mcp/render";
-import { DeferredMCPTool, MCPTool, type MCPToolDetails } from "@oh-my-pi/pi-coding-agent/mcp/tool-bridge";
-import type { MCPServerConnection, MCPToolDefinition, MCPTransport } from "@oh-my-pi/pi-coding-agent/mcp/types";
-import { ToolExecutionComponent } from "@oh-my-pi/pi-coding-agent/modes/components/tool-execution";
-import { theme as activeTheme, getThemeByName, initTheme } from "@oh-my-pi/pi-coding-agent/modes/theme/theme";
-import { formatOutputNotice, type OutputMeta } from "@oh-my-pi/pi-coding-agent/tools/output-meta";
-import { formatStatusIcon } from "@oh-my-pi/pi-coding-agent/tools/render-utils";
-import { TUI } from "@oh-my-pi/pi-tui";
+import type { AgentTool } from "@reactor/agent-core";
+import type { TSchema } from "@reactor/ai";
+import { resetSettingsForTest, Settings } from "@reactor/coding-agent/config/settings";
+import { renderMCPResult } from "@reactor/coding-agent/mcp/render";
+import { DeferredMCPTool, MCPTool, type MCPToolDetails } from "@reactor/coding-agent/mcp/tool-bridge";
+import type { MCPServerConnection, MCPToolDefinition, MCPTransport } from "@reactor/coding-agent/mcp/types";
+import { ToolExecutionComponent } from "@reactor/coding-agent/modes/components/tool-execution";
+import { theme as activeTheme, getThemeByName, initTheme } from "@reactor/coding-agent/modes/theme/theme";
+import { formatOutputNotice, type OutputMeta } from "@reactor/coding-agent/tools/output-meta";
+import { formatStatusIcon } from "@reactor/coding-agent/tools/render-utils";
+import { TUI } from "@reactor/tui";
 import { VirtualTerminal } from "../../tui/test/virtual-terminal";
 
 beforeAll(async () => {

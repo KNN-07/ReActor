@@ -1,11 +1,11 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import { isEisdir, isEnoent, postmortem } from "@oh-my-pi/pi-utils";
+import { isEisdir, isEnoent, postmortem } from "@reactor/utils";
 import { daemonRuntimeDir } from "./paths";
 
 const CLIENTS_DIR = "clients";
 
-/** Handle keeping one omp process registered in a project daemon scope. */
+/** Handle keeping one reactor process registered in a project daemon scope. */
 export interface DaemonProjectPresence {
 	close(): Promise<void>;
 }
@@ -20,7 +20,7 @@ async function canonicalProjectDir(projectDir: string): Promise<string> {
 	}
 }
 
-/** Register this omp process so project daemons survive while it remains alive. */
+/** Register this reactor process so project daemons survive while it remains alive. */
 export async function registerDaemonProjectPresence(
 	projectDir: string,
 	runtimeOverride?: string,
@@ -44,7 +44,7 @@ export async function registerDaemonProjectPresence(
 	return { close };
 }
 
-/** Return whether a registered omp process in this runtime directory is still alive. */
+/** Return whether a registered reactor process in this runtime directory is still alive. */
 export async function hasLiveDaemonProjectPresence(runtimeDir: string): Promise<boolean> {
 	const clientsDir = path.join(runtimeDir, CLIENTS_DIR);
 	let entries: string[];

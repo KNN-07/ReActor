@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it } from "bun:test";
-import type { FetchImpl } from "@oh-my-pi/pi-ai";
-import { extractFacts } from "@oh-my-pi/pi-mnemopi/core/extraction";
-import { type ChatMessage, ExtractionClient } from "@oh-my-pi/pi-mnemopi/core/extraction/client";
-import { getExtractionStats, resetExtractionStats } from "@oh-my-pi/pi-mnemopi/core/extraction/diagnostics";
-import { resetHostLlmBackendForTests } from "@oh-my-pi/pi-mnemopi/core/llm-backends";
+import type { FetchImpl } from "@reactor/ai";
+import { extractFacts } from "@reactor/mnemopi/core/extraction";
+import { type ChatMessage, ExtractionClient } from "@reactor/mnemopi/core/extraction/client";
+import { getExtractionStats, resetExtractionStats } from "@reactor/mnemopi/core/extraction/diagnostics";
+import { resetHostLlmBackendForTests } from "@reactor/mnemopi/core/llm-backends";
 
 const OLD_ENV = { ...process.env };
 
@@ -26,8 +26,8 @@ afterEach(() => {
 
 describe("extraction integration", () => {
 	it("uses a fake OpenAI-compatible remote endpoint for extractFacts", async () => {
-		process.env.MNEMOPI_LLM_ENABLED = "true";
-		process.env.MNEMOPI_LLM_BASE_URL = "http://fake-remote/v1";
+		process.env.REACTOR_MNEMOPI_LLM_ENABLED = "true";
+		process.env.REACTOR_MNEMOPI_LLM_BASE_URL = "http://fake-remote/v1";
 		let payloadJson = "";
 		const fetchMock: FetchImpl = async (_input, init) => {
 			payloadJson = String(init?.body);

@@ -1,20 +1,20 @@
 import { afterEach, describe, expect, it, spyOn } from "bun:test";
-import { logger } from "@oh-my-pi/pi-utils";
+import { logger } from "@reactor/utils";
 import "./setup";
 import {
 	embed,
 	resetEmbeddingProviderForTests,
 	setLocalModelInitializerForTests,
-} from "@oh-my-pi/pi-mnemopi/core/embeddings";
-import { withMnemopiRuntimeOptions } from "@oh-my-pi/pi-mnemopi/core/runtime-options";
+} from "@reactor/mnemopi/core/embeddings";
+import { withMnemopiRuntimeOptions } from "@reactor/mnemopi/core/runtime-options";
 
 const ENV_KEYS = [
 	"NODE_ENV",
 	"BUN_ENV",
-	"MNEMOPI_NO_EMBEDDINGS",
-	"MNEMOPI_EMBEDDING_MODEL",
-	"MNEMOPI_EMBEDDING_API_URL",
-	"MNEMOPI_EMBEDDING_API_KEY",
+	"REACTOR_MNEMOPI_NO_EMBEDDINGS",
+	"REACTOR_MNEMOPI_EMBEDDING_MODEL",
+	"REACTOR_MNEMOPI_EMBEDDING_API_URL",
+	"REACTOR_MNEMOPI_EMBEDDING_API_KEY",
 	"OPENROUTER_BASE_URL",
 	"OPENROUTER_API_KEY",
 	"OPENAI_API_KEY",
@@ -30,7 +30,7 @@ async function withLocalModelEnv<T>(fn: () => Promise<T>): Promise<T> {
 		if (value !== undefined) snapshot[key] = value;
 		delete process.env[key];
 	}
-	process.env.MNEMOPI_EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5";
+	process.env.REACTOR_MNEMOPI_EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5";
 	resetEmbeddingProviderForTests();
 	try {
 		return await fn();

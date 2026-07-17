@@ -1,11 +1,11 @@
 /**
  * Grep CLI command handlers.
  *
- * Handles `omp grep` subcommand for testing grep tool on Windows.
+ * Handles `reactor grep` subcommand for testing grep tool on Windows.
  */
 import * as path from "node:path";
-import { GrepOutputMode, grep } from "@oh-my-pi/pi-natives";
-import { APP_NAME } from "@oh-my-pi/pi-utils";
+import { GrepOutputMode, grep } from "@reactor/natives";
+import { APP_NAME } from "@reactor/utils";
 import chalk from "chalk";
 import { expandPath } from "../tools/path-utils";
 
@@ -151,7 +151,7 @@ ${chalk.bold("Options:")}
   --no-gitignore        Include files excluded by .gitignore
 
 ${chalk.bold("Environment:")}
-  PI_WALK_WORKERS=N    Set filesystem walker workers (default 4, 0 = auto)
+  REACTOR_WALK_WORKERS=N    Set filesystem walker workers (default 4, 0 = auto)
 
 ${chalk.bold("Examples:")}
   ${APP_NAME} grep "import" src/

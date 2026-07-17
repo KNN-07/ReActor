@@ -8,8 +8,8 @@ import {
 	setKeybindings,
 	TUI_KEYBINDINGS,
 	KeybindingsManager as TuiKeybindingsManager,
-} from "@oh-my-pi/pi-tui";
-import { getActiveProfile, getAgentDir, getProfileRootDir, isEnoent, logger } from "@oh-my-pi/pi-utils";
+} from "@reactor/tui";
+import { getActiveProfile, getAgentDir, getProfileRootDir, isEnoent, logger } from "@reactor/utils";
 import { JSONC, YAML } from "bun";
 
 /**
@@ -57,7 +57,7 @@ interface AppKeybindings {
 
 export type AppKeybinding = keyof AppKeybindings;
 
-declare module "@oh-my-pi/pi-tui" {
+declare module "@reactor/tui" {
 	interface Keybindings extends AppKeybindings {}
 }
 

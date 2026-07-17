@@ -2,8 +2,8 @@ import { afterEach, expect, it } from "bun:test";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
-import { getThemeByName } from "@oh-my-pi/pi-coding-agent/modes/theme/theme";
-import { getAgentDir, getCustomThemesDir, removeWithRetries, setAgentDir } from "@oh-my-pi/pi-utils";
+import { getThemeByName } from "@reactor/coding-agent/modes/theme/theme";
+import { getAgentDir, getCustomThemesDir, removeWithRetries, setAgentDir } from "@reactor/utils";
 
 const DARK_THEME_PATH = path.join(import.meta.dir, "..", "src", "modes", "theme", "dark.json");
 
@@ -15,9 +15,9 @@ afterEach(async () => {
 	if (tempAgentDir === undefined) return;
 	setAgentDir(originalAgentDir);
 	if (originalAgentDirEnv === undefined) {
-		delete process.env.PI_CODING_AGENT_DIR;
+		delete process.env.REACTOR_CODING_AGENT_DIR;
 	} else {
-		process.env.PI_CODING_AGENT_DIR = originalAgentDirEnv;
+		process.env.REACTOR_CODING_AGENT_DIR = originalAgentDirEnv;
 	}
 	await removeWithRetries(tempAgentDir);
 	tempAgentDir = undefined;
@@ -25,8 +25,8 @@ afterEach(async () => {
 
 it("uses the Nerd Fonts v3 Material Design session icon", async () => {
 	originalAgentDir = getAgentDir();
-	originalAgentDirEnv = process.env.PI_CODING_AGENT_DIR;
-	tempAgentDir = await fs.mkdtemp(path.join(os.tmpdir(), "omp-nerd-symbols-"));
+	originalAgentDirEnv = process.env.REACTOR_CODING_AGENT_DIR;
+	tempAgentDir = await fs.mkdtemp(path.join(os.tmpdir(), "reactor-nerd-symbols-"));
 	setAgentDir(tempAgentDir);
 
 	const dark = await Bun.file(DARK_THEME_PATH).json();

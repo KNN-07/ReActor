@@ -1,14 +1,14 @@
 import { afterEach, describe, expect, it } from "bun:test";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { Agent } from "@oh-my-pi/pi-agent-core";
-import type { AssistantMessage } from "@oh-my-pi/pi-ai";
-import { getBundledModel } from "@oh-my-pi/pi-catalog/models";
-import { ModelRegistry } from "@oh-my-pi/pi-coding-agent/config/model-registry";
-import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { createSessionTeardown } from "@oh-my-pi/pi-coding-agent/modes/session-teardown";
-import { AgentSession } from "@oh-my-pi/pi-coding-agent/session/agent-session";
-import { AuthStorage } from "@oh-my-pi/pi-coding-agent/session/auth-storage";
+import { Agent } from "@reactor/agent-core";
+import type { AssistantMessage } from "@reactor/ai";
+import { getBundledModel } from "@reactor/catalog/models";
+import { ModelRegistry } from "@reactor/coding-agent/config/model-registry";
+import { Settings } from "@reactor/coding-agent/config/settings";
+import { createSessionTeardown } from "@reactor/coding-agent/modes/session-teardown";
+import { AgentSession } from "@reactor/coding-agent/session/agent-session";
+import { AuthStorage } from "@reactor/coding-agent/session/auth-storage";
 import {
 	collectPendingToolCalls,
 	createInterruptedTurnAbortMessage,
@@ -16,10 +16,10 @@ import {
 	SESSION_EXIT_CUSTOM_TYPE,
 	TOOL_EXECUTION_START_CUSTOM_TYPE,
 	type ToolExecutionStartData,
-} from "@oh-my-pi/pi-coding-agent/session/exit-diagnostics";
-import { convertToLlm } from "@oh-my-pi/pi-coding-agent/session/messages";
-import { SessionManager } from "@oh-my-pi/pi-coding-agent/session/session-manager";
-import { postmortem, TempDir } from "@oh-my-pi/pi-utils";
+} from "@reactor/coding-agent/session/exit-diagnostics";
+import { convertToLlm } from "@reactor/coding-agent/session/messages";
+import { SessionManager } from "@reactor/coding-agent/session/session-manager";
+import { postmortem, TempDir } from "@reactor/utils";
 
 const pendingAssistant: AssistantMessage = {
 	role: "assistant",

@@ -128,7 +128,7 @@ function restoreTempPath(targetPath: string): string {
 }
 
 function defaultBackupDir(env: Env = process.env): string {
-	const explicit = env.MNEMOPI_BACKUP_DIR;
+	const explicit = env.REACTOR_MNEMOPI_BACKUP_DIR;
 	if (explicit !== undefined && explicit.length > 0) return explicit;
 	const dir = configuredDataDir(env);
 	return join(dirname(dir), "backups");

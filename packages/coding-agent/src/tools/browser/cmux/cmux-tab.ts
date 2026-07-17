@@ -1,7 +1,7 @@
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { logger, postmortem, Snowflake, untilAborted } from "@oh-my-pi/pi-utils";
+import { logger, postmortem, Snowflake, untilAborted } from "@reactor/utils";
 import { JsRuntime, type RuntimeHooks } from "../../../eval/js/shared/runtime";
 import { callSessionTool } from "../../../eval/js/tool-bridge";
 import { resizeImage } from "../../../utils/image-resize";
@@ -191,7 +191,7 @@ const setValue = (target, value, append = false) => {
 
 const RESPONSE_OBSERVER_SCRIPT = String.raw`
 (() => {
-	const key = "__ompCmuxResponses";
+	const key = "__reactorCmuxResponses";
 	if (globalThis[key]) return true;
 	const state = { nextId: 1, records: [] };
 	Object.defineProperty(globalThis, key, { value: state, configurable: true });
@@ -531,7 +531,7 @@ export class CmuxTab {
 						context.session.browserScreenshotDir,
 						`screenshot-${new Date().toISOString().replace(/[:.]/g, "-").slice(0, -1)}.${ext}`,
 					)
-				: (returnedPath ?? path.join(os.tmpdir(), `omp-sshots-${Snowflake.next()}.${ext}`)));
+				: (returnedPath ?? path.join(os.tmpdir(), `reactor-sshots-${Snowflake.next()}.${ext}`)));
 		await fs.promises.mkdir(path.dirname(dest), { recursive: true });
 		await Bun.write(dest, savedBuffer);
 		const info: ScreenshotResult = {
@@ -985,14 +985,14 @@ export class CmuxTab {
 
 	async #responseCursor(): Promise<number> {
 		const value = await this.#evalScript<unknown>(
-			"(() => Math.max(0, ((globalThis.__ompCmuxResponses && globalThis.__ompCmuxResponses.nextId) || 1) - 1))()",
+			"(() => Math.max(0, ((globalThis.__reactorCmuxResponses && globalThis.__reactorCmuxResponses.nextId) || 1) - 1))()",
 		);
 		return numberFrom(value, 0);
 	}
 
 	async #responseRecordsAfter(id: number): Promise<CmuxResponseRecord[]> {
 		const value = await this.#evalScript<unknown>(
-			`(() => ((globalThis.__ompCmuxResponses && globalThis.__ompCmuxResponses.records) || []).filter(record => record.id > ${JSON.stringify(id)}))()`,
+			`(() => ((globalThis.__reactorCmuxResponses && globalThis.__reactorCmuxResponses.records) || []).filter(record => record.id > ${JSON.stringify(id)}))()`,
 		);
 		if (!Array.isArray(value)) return [];
 		const records: CmuxResponseRecord[] = [];

@@ -1,6 +1,6 @@
 import { execSync } from "node:child_process";
 import * as path from "node:path";
-import { registerCustomApi, unregisterCustomApis } from "@oh-my-pi/pi-ai/api-registry";
+import { registerCustomApi, unregisterCustomApis } from "@reactor/ai/api-registry";
 import type {
 	Api,
 	Context,
@@ -9,28 +9,28 @@ import type {
 	RemoteCompactionConfig,
 	SimpleStreamOptions,
 	ThinkingConfig,
-} from "@oh-my-pi/pi-ai/types";
-import type { AssistantMessageEventStream } from "@oh-my-pi/pi-ai/utils/event-stream";
-import { buildModel } from "@oh-my-pi/pi-catalog/build";
-import { isVertexExpressOpenAIUrl } from "@oh-my-pi/pi-catalog/hosts";
-import { readModelCache } from "@oh-my-pi/pi-catalog/model-cache";
+} from "@reactor/ai/types";
+import type { AssistantMessageEventStream } from "@reactor/ai/utils/event-stream";
+import { buildModel } from "@reactor/catalog/build";
+import { isVertexExpressOpenAIUrl } from "@reactor/catalog/hosts";
+import { readModelCache } from "@reactor/catalog/model-cache";
 import {
 	createModelManager,
 	type ModelManagerOptions,
 	type ModelRefreshStrategy,
-} from "@oh-my-pi/pi-catalog/model-manager";
-import { getBundledModels, getBundledProviders } from "@oh-my-pi/pi-catalog/models";
+} from "@reactor/catalog/model-manager";
+import { getBundledModels, getBundledProviders } from "@reactor/catalog/models";
 import {
 	googleAntigravityModelManagerOptions,
 	googleGeminiCliModelManagerOptions,
 	openaiCodexModelManagerOptions,
 	PROVIDER_DESCRIPTORS,
-} from "@oh-my-pi/pi-catalog/provider-models";
+} from "@reactor/catalog/provider-models";
 import {
 	collapseBuiltModelVariants,
 	getVariantAliasSources,
 	resolveVariantAlias,
-} from "@oh-my-pi/pi-catalog/variant-collapse";
+} from "@reactor/catalog/variant-collapse";
 
 const SPECIAL_MODEL_MANAGER_PROVIDER_IDS: readonly string[] = [
 	"google-antigravity",
@@ -61,11 +61,11 @@ const RUNTIME_DYNAMIC_MODEL_FETCH_TIMEOUT_MS = 15_000;
 const BUILT_IN_DISCOVERY_CACHE_TTL_MS = 2 * 60 * 60 * 1000;
 const BUILT_IN_DISCOVERY_NON_AUTHORITATIVE_RETRY_MS = 5 * 60 * 1000;
 
-import type { ApiKeyResolver, FetchImpl } from "@oh-my-pi/pi-ai";
-import { registerOAuthProvider, unregisterOAuthProviders } from "@oh-my-pi/pi-ai/oauth";
-import type { OAuthCredentials, OAuthLoginCallbacks } from "@oh-my-pi/pi-ai/oauth/types";
-import { getBundledModelReferenceIndex, resolveModelReference } from "@oh-my-pi/pi-catalog/identity";
-import { isBunTestRuntime, isRecord, logger, wrapFetchForExtraCa } from "@oh-my-pi/pi-utils";
+import type { ApiKeyResolver, FetchImpl } from "@reactor/ai";
+import { registerOAuthProvider, unregisterOAuthProviders } from "@reactor/ai/oauth";
+import type { OAuthCredentials, OAuthLoginCallbacks } from "@reactor/ai/oauth/types";
+import { getBundledModelReferenceIndex, resolveModelReference } from "@reactor/catalog/identity";
+import { isBunTestRuntime, isRecord, logger, wrapFetchForExtraCa } from "@reactor/utils";
 import { parseModelString, resolveProviderModelReference } from "../config/model-resolver";
 import type { AuthStorage, OAuthCredential } from "../session/auth-storage";
 import { type ApiKeyResolverModel, type ApiKeyResolverOptions, createApiKeyResolver } from "./api-key-resolver";
@@ -135,7 +135,7 @@ interface ProviderOverride {
  *   3. Existing bundled baseUrl (the host baked into `models.json`)
  *
  * `transport` resolution priority:
- *   1. `providerOverride.transport` (e.g. `pi-native` for auth-gateway users)
+ *   1. `providerOverride.transport` (e.g. `reactor-native` for auth-gateway users)
  *   2. `existing.transport` (carried over from boot-time override application)
  *   3. `model.transport` (rarely set — discovery defaults omit it)
  *
@@ -143,7 +143,7 @@ interface ProviderOverride {
  * preferred over (3), the bundled `api.xiaomimimo.com` would shadow the
  * tp- token-plan host and produce 401s on the first stream call.
  * Without explicit transport propagation, an openrouter (or any) entry
- * marked `transport: pi-native` in models.yml silently reverts to the
+ * marked `transport: reactor-native` in models.yml silently reverts to the
  * default openai-completions transport after the background catalog
  * refresh — so the first `/model` switch after boot hits the raw OpenAI
  * chat-completions URL instead of the gateway's `/v1/pi/stream` (#2555).
@@ -1964,7 +1964,7 @@ export class ModelRegistry {
 	/**
 	 * Check whether auth is configured for a model's provider.
 	 *
-	 * Mirrors the upstream `@mariozechner/pi-coding-agent` API surface so that
+	 * Mirrors the upstream `@mariozechner/coding-agent` API surface so that
 	 * external plugins/extensions and downstream wrappers (e.g. subagent launch
 	 * paths that pre-flight auth before model resolution) can probe a model
 	 * without resolving an API key. Returns true for keyless providers as well

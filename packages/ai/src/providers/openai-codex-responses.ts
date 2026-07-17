@@ -1,13 +1,13 @@
 import * as os from "node:os";
 import { scheduler } from "node:timers/promises";
-import { calculateCost } from "@oh-my-pi/pi-catalog/models";
+import { calculateCost } from "@reactor/catalog/models";
 import {
 	CODEX_BASE_URL,
 	CODEX_CLIENT_VERSION,
 	getCodexAccountId,
 	OPENAI_HEADER_VALUES,
 	OPENAI_HEADERS,
-} from "@oh-my-pi/pi-catalog/wire/codex";
+} from "@reactor/catalog/wire/codex";
 import {
 	$env,
 	$flag,
@@ -18,7 +18,7 @@ import {
 	parseStreamingJson,
 	readSseJson,
 	structuredCloneJSON,
-} from "@oh-my-pi/pi-utils";
+} from "@reactor/utils";
 import { type } from "arktype";
 import packageJson from "../../package.json" with { type: "json" };
 import * as AIError from "../error";
@@ -193,13 +193,13 @@ export function createOpenAICodexCompactionRequestContext(options: {
 	};
 }
 
-const CODEX_DEBUG = $flag("PI_CODEX_DEBUG");
+const CODEX_DEBUG = $flag("REACTOR_CODEX_DEBUG");
 const CODEX_MAX_RETRIES = 5;
 const CODEX_RETRY_DELAY_MS = 500;
 const CODEX_WEBSOCKET_CONNECT_TIMEOUT_MS = 10000;
-const CODEX_WEBSOCKET_PING_INTERVAL_MS = Number($env.PI_CODEX_WEBSOCKET_PING_INTERVAL_MS || 10_000);
-const CODEX_WEBSOCKET_PONG_TIMEOUT_MS = Number($env.PI_CODEX_WEBSOCKET_PONG_TIMEOUT_MS || 60_000);
-const CODEX_WEBSOCKET_MESSAGE_QUEUE_CAPACITY = Number($env.PI_CODEX_WEBSOCKET_MESSAGE_QUEUE_CAPACITY || 4096);
+const CODEX_WEBSOCKET_PING_INTERVAL_MS = Number($env.REACTOR_CODEX_WEBSOCKET_PING_INTERVAL_MS || 10_000);
+const CODEX_WEBSOCKET_PONG_TIMEOUT_MS = Number($env.REACTOR_CODEX_WEBSOCKET_PONG_TIMEOUT_MS || 60_000);
+const CODEX_WEBSOCKET_MESSAGE_QUEUE_CAPACITY = Number($env.REACTOR_CODEX_WEBSOCKET_MESSAGE_QUEUE_CAPACITY || 4096);
 /**
  * Maximum quiet period (no inbound frames AND no observed pong) we'll trust a
  * reused WebSocket for before forcing a fresh handshake. Codex backends and
@@ -210,19 +210,19 @@ const CODEX_WEBSOCKET_MESSAGE_QUEUE_CAPACITY = Number($env.PI_CODEX_WEBSOCKET_ME
  * heartbeat below also catches dead sockets, but only after `pongTimeoutMs`
  * (default 60s) and only while a request is active — this gate closes the door
  * earlier and even when the gap between requests is purely client-side (tool
- * execution, user typing, etc.). Set `PI_CODEX_WEBSOCKET_MAX_IDLE_REUSE_MS=0`
+ * execution, user typing, etc.). Set `REACTOR_CODEX_WEBSOCKET_MAX_IDLE_REUSE_MS=0`
  * to disable.
  */
-const CODEX_WEBSOCKET_MAX_IDLE_REUSE_MS = Number($env.PI_CODEX_WEBSOCKET_MAX_IDLE_REUSE_MS || 30_000);
+const CODEX_WEBSOCKET_MAX_IDLE_REUSE_MS = Number($env.REACTOR_CODEX_WEBSOCKET_MAX_IDLE_REUSE_MS || 30_000);
 /**
  * Steady-state liveness ceiling for the Codex WebSocket transport. Distinct from
- * the OMP-wide stream watchdog removed in #1392: a WebSocket can stay TCP-open
+ * the ReActor-wide stream watchdog removed in #1392: a WebSocket can stay TCP-open
  * indefinitely without exchanging frames (server crash after upgrade, half-open
  * network path), so we still need a transport-internal cap to detect those
  * states and trigger the WS→SSE fallback. Only applies AFTER the first event
  * has arrived — slow first-token paths wait as long as the caller permits.
  */
-const CODEX_WEBSOCKET_IDLE_TIMEOUT_MS = Number($env.PI_CODEX_WEBSOCKET_IDLE_TIMEOUT_MS || 300_000);
+const CODEX_WEBSOCKET_IDLE_TIMEOUT_MS = Number($env.REACTOR_CODEX_WEBSOCKET_IDLE_TIMEOUT_MS || 300_000);
 /**
  * Maximum wait for the first WebSocket event before falling back to SSE.
  * Unlike a stream watchdog, this triggers a transport switch (not a request
@@ -230,9 +230,9 @@ const CODEX_WEBSOCKET_IDLE_TIMEOUT_MS = Number($env.PI_CODEX_WEBSOCKET_IDLE_TIME
  * SSE. Generous default so legitimately slow first-token providers still get
  * a chance on the WS transport before falling through.
  */
-const CODEX_WEBSOCKET_FIRST_EVENT_TIMEOUT_MS = Number($env.PI_CODEX_WEBSOCKET_FIRST_EVENT_TIMEOUT_MS || 60_000);
-const CODEX_WEBSOCKET_RETRY_BUDGET = Number($env.PI_CODEX_WEBSOCKET_RETRY_BUDGET || CODEX_MAX_RETRIES);
-const CODEX_WEBSOCKET_RETRY_DELAY_MS = Number($env.PI_CODEX_WEBSOCKET_RETRY_DELAY_MS || CODEX_RETRY_DELAY_MS);
+const CODEX_WEBSOCKET_FIRST_EVENT_TIMEOUT_MS = Number($env.REACTOR_CODEX_WEBSOCKET_FIRST_EVENT_TIMEOUT_MS || 60_000);
+const CODEX_WEBSOCKET_RETRY_BUDGET = Number($env.REACTOR_CODEX_WEBSOCKET_RETRY_BUDGET || CODEX_MAX_RETRIES);
+const CODEX_WEBSOCKET_RETRY_DELAY_MS = Number($env.REACTOR_CODEX_WEBSOCKET_RETRY_DELAY_MS || CODEX_RETRY_DELAY_MS);
 const CODEX_WEBSOCKET_TRANSPORT_ERROR_PREFIX = "Codex websocket transport error";
 const CODEX_RETRYABLE_EVENT_CODES = new Set(["model_error", "server_error", "internal_error"]);
 const CODEX_RETRYABLE_EVENT_MESSAGE =
@@ -332,7 +332,7 @@ export interface OpenAICodexTurnRequestDiagnostics {
 	canAppendBeforeRequest: boolean;
 }
 
-/** Raw provider usage plus the normalized buckets OMP displays for the latest Codex turn. */
+/** Raw provider usage plus the normalized buckets ReActor displays for the latest Codex turn. */
 export interface OpenAICodexTurnUsageDiagnostics {
 	rawInputTokens: number;
 	rawCachedTokens: number;
@@ -2684,9 +2684,9 @@ function recordCodexWebSocketFailure(state: CodexWebSocketSessionState, activate
 }
 
 function getCodexWebSocketEnvValue(): boolean | undefined {
-	const envVal = $env.PI_CODEX_WEBSOCKET;
+	const envVal = $env.REACTOR_CODEX_WEBSOCKET;
 	if (envVal !== undefined) {
-		return $flag("PI_CODEX_WEBSOCKET");
+		return $flag("REACTOR_CODEX_WEBSOCKET");
 	}
 	return undefined;
 }
@@ -4104,7 +4104,7 @@ export function convertOpenAICodexResponsesTools(
 			// See openai-responses.ts::convertTools — explicit `strict: false` is
 			// preserved on the wire because some backends distinguish it from
 			// omitted (#4336). `strict: true` still requires enforcement success,
-			// and the `PI_NO_STRICT` global bypass MUST suppress the flag entirely
+			// and the `REACTOR_NO_STRICT` global bypass MUST suppress the flag entirely
 			// so Codex proxies that reject the `strict` key stay silent.
 			...(effectiveStrict ? { strict: true } : !NO_STRICT && tool.strict === false ? { strict: false } : {}),
 		};

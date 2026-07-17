@@ -1,9 +1,9 @@
 import { describe, expect, it } from "bun:test";
-import { buildOpenAICompat, buildOpenAIResponsesCompat } from "@oh-my-pi/pi-catalog/compat/openai";
-import type { ModelSpec, OpenAICompat } from "@oh-my-pi/pi-catalog/types";
+import { buildOpenAICompat, buildOpenAIResponsesCompat } from "@reactor/catalog/compat/openai";
+import type { ModelSpec, OpenAICompat } from "@reactor/catalog/types";
 
 /**
- * The pi-ai thinking-loop guard is gemini-only and, for `openai-completions`
+ * The ai thinking-loop guard is gemini-only and, for `openai-completions`
  * models, gates on `compat.enableGeminiThinkingLoopGuard`. `buildOpenAICompat`
  * must default that flag from the family classifier and honor explicit
  * overrides so an opaque OpenAI-compat proxy alias can opt in/out.

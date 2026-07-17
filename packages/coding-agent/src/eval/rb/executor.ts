@@ -1,7 +1,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-import { getProjectDir, logger } from "@oh-my-pi/pi-utils";
+import { getProjectDir, logger } from "@reactor/utils";
 import type { ToolSession } from "../../tools";
 import {
 	attachSessionOwner,
@@ -60,7 +60,7 @@ export interface RubyExecutorOptions {
 	/**
 	 * On-disk roots the prelude helpers substitute for internal-URL schemes
 	 * (e.g. `{ local: "/…/artifacts/local" }`). Exported to the kernel as
-	 * `PI_EVAL_LOCAL_ROOTS` (JSON).
+	 * `REACTOR_EVAL_LOCAL_ROOTS` (JSON).
 	 */
 	localRoots?: Record<string, string>;
 	/**

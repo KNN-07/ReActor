@@ -11,10 +11,10 @@ import {
 	type AgentToolResult,
 	EventLoopKeepalive,
 	ThinkingLevel,
-} from "@oh-my-pi/pi-agent-core";
-import type { CompactionOutcome } from "@oh-my-pi/pi-agent-core/compaction";
-import type { AssistantMessage, ImageContent, Message, Model, Usage, UsageReport } from "@oh-my-pi/pi-ai";
-import { modelsAreEqual } from "@oh-my-pi/pi-catalog/models";
+} from "@reactor/agent-core";
+import type { CompactionOutcome } from "@reactor/agent-core/compaction";
+import type { AssistantMessage, ImageContent, Message, Model, Usage, UsageReport } from "@reactor/ai";
+import { modelsAreEqual } from "@reactor/catalog/models";
 import type {
 	AutocompleteProvider,
 	Component,
@@ -23,7 +23,7 @@ import type {
 	NativeScrollbackLiveRegion,
 	OverlayHandle,
 	SlashCommand,
-} from "@oh-my-pi/pi-tui";
+} from "@reactor/tui";
 import {
 	Container,
 	clearRenderCache,
@@ -37,8 +37,8 @@ import {
 	Text,
 	TUI,
 	visibleWidth,
-} from "@oh-my-pi/pi-tui";
-import { isInsideTerminalMultiplexer } from "@oh-my-pi/pi-tui/terminal-capabilities";
+} from "@reactor/tui";
+import { isInsideTerminalMultiplexer } from "@reactor/tui/terminal-capabilities";
 import {
 	APP_NAME,
 	adjustHsv,
@@ -50,7 +50,7 @@ import {
 	postmortem,
 	prompt,
 	setProjectDir,
-} from "@oh-my-pi/pi-utils";
+} from "@reactor/utils";
 import chalk from "chalk";
 import { reset as resetCapabilities } from "../capability";
 import type { CollabGuestLink } from "../collab/guest";
@@ -955,7 +955,7 @@ export class InteractiveMode implements InteractiveModeContext {
 		// Load initial todos
 		await this.#loadTodoList();
 
-		// Start the UI. Cold `omp` launch opts into clearing on the first paint so
+		// Start the UI. Cold `reactor` launch opts into clearing on the first paint so
 		// the initial welcome frame does not append over the previous run's scrollback.
 		this.ui.start({ clearScrollback: options.clearInitialTerminalHistory === true });
 		pushTerminalTitle();
@@ -989,7 +989,7 @@ export class InteractiveMode implements InteractiveModeContext {
 		// custom messages, branch summaries, and compaction summaries) and the user
 		// set no explicit `mode_change` (which #reconcileModeFromSession just
 		// restored). SDK startup metadata and extension `custom` state entries are
-		// ignored. This way `omp --continue` (or auto-resume) that finds no recent
+		// ignored. This way `reactor --continue` (or auto-resume) that finds no recent
 		// session and creates a fresh one still honors the default, while a session
 		// with restored context or an explicit mode keeps its reconciled mode. Scoped
 		// to launch (not the switch reconciler above) so /new and the plan-approval →
@@ -3733,7 +3733,7 @@ export class InteractiveMode implements InteractiveModeContext {
 		// Do not force a final render during teardown: disposed session/UI state can
 		// collapse to an empty frame, clearing the viewport and leaving the parent
 		// shell prompt at row 0. Stop from the last committed frame so the terminal
-		// hands Bash the cursor immediately after visible OMP content.
+		// hands Bash the cursor immediately after visible ReActor content.
 		// Drain any in-flight Kitty key release events before stopping.
 		// This prevents escape sequences from leaking to the parent shell over slow SSH.
 		await this.ui.terminal.drainInput(1000);

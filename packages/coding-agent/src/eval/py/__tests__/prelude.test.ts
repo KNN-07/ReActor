@@ -9,7 +9,7 @@ async function runPrelude(
 ): Promise<{ stdout: string; stderr: string; exitCode: number }> {
 	const prelude = PYTHON_PRELUDE.replace(
 		"from __future__ import annotations",
-		"from __future__ import annotations\n__omp_display = lambda *args, **kwargs: None",
+		"from __future__ import annotations\n__reactor_display = lambda *args, **kwargs: None",
 	);
 	const script = `${prelude}\n${code}`;
 	const proc = Bun.spawn([pythonPath, "-c", script], {
@@ -59,9 +59,9 @@ describe("python prelude", () => {
 			const result = await runPrelude(
 				[`print(read("artifact://21", 3, 2))`, `print(read("mcp://server/resource", 10, 5))`].join("\n"),
 				{
-					PI_TOOL_BRIDGE_URL: server.url.toString(),
-					PI_TOOL_BRIDGE_TOKEN: "test-token",
-					PI_TOOL_BRIDGE_SESSION: "test-session",
+					REACTOR_TOOL_BRIDGE_URL: server.url.toString(),
+					REACTOR_TOOL_BRIDGE_TOKEN: "test-token",
+					REACTOR_TOOL_BRIDGE_SESSION: "test-session",
 				},
 			);
 

@@ -1,5 +1,5 @@
-import { hostMatchesUrl } from "@oh-my-pi/pi-catalog/hosts";
-import { $flag, logger, structuredCloneJSON } from "@oh-my-pi/pi-utils";
+import { hostMatchesUrl } from "@reactor/catalog/hosts";
+import { $flag, logger, structuredCloneJSON } from "@reactor/utils";
 import * as AIError from "../error";
 import { getEnvApiKey } from "../stream";
 import type {
@@ -107,7 +107,7 @@ export interface OpenAIResponsesOptions extends StreamOptions {
 	 * Stateful turns: chain via `previous_response_id` + delta input instead of
 	 * replaying the full transcript. Forces `store: true` (the platform only
 	 * resolves stored responses). Defaults ON against the official OpenAI API
-	 * and OFF for other Responses endpoints; `PI_OPENAI_STATEFUL` overrides the
+	 * and OFF for other Responses endpoints; `REACTOR_OPENAI_STATEFUL` overrides the
 	 * default, and `false` here vetoes everything. Requires `sessionId` +
 	 * `providerSessionState`. Falls back to a full replay whenever history
 	 * mutates or the server reports a stale id.
@@ -221,7 +221,7 @@ function isOpenAIResponsesStatefulEnabled(
 	// `store: true`, and third-party /v1/responses proxies routinely ignore or
 	// reject `previous_response_id`. An unset baseUrl means the default
 	// endpoint (api.openai.com).
-	return $flag("PI_OPENAI_STATEFUL", !baseUrl || hostMatchesUrl(baseUrl, "openai"));
+	return $flag("REACTOR_OPENAI_STATEFUL", !baseUrl || hostMatchesUrl(baseUrl, "openai"));
 }
 
 function getOpenAIResponsesChainState(

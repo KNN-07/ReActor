@@ -1,8 +1,8 @@
 import { describe, expect, it } from "bun:test";
-import { encodeResponse, encodeStream, parseRequest } from "@oh-my-pi/pi-ai/providers/openai-responses-server";
-import type { AssistantMessage } from "@oh-my-pi/pi-ai/types";
-import { AssistantMessageEventStream } from "@oh-my-pi/pi-ai/utils/event-stream";
-import { Effort } from "@oh-my-pi/pi-catalog/effort";
+import { encodeResponse, encodeStream, parseRequest } from "@reactor/ai/providers/openai-responses-server";
+import type { AssistantMessage } from "@reactor/ai/types";
+import { AssistantMessageEventStream } from "@reactor/ai/utils/event-stream";
+import { Effort } from "@reactor/catalog/effort";
 
 function zeroUsage(): AssistantMessage["usage"] {
 	return {
@@ -164,7 +164,7 @@ describe("openai-responses parseRequest", () => {
 		// case (only "none" toggles hideThinkingSummary).
 		expect(parsed.options.hideThinkingSummary).toBeUndefined();
 		// `store` and `previous_response_id` are accepted by the schema but not
-		// plumbed through pi-ai — they no longer leak into options.extra.
+		// plumbed through ai — they no longer leak into options.extra.
 		expect(parsed.options.extra).toBeUndefined();
 	});
 

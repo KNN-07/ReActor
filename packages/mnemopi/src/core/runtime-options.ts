@@ -1,5 +1,5 @@
 import { AsyncLocalStorage } from "node:async_hooks";
-import type { Api, ApiKey, Model } from "@oh-my-pi/pi-ai";
+import type { Api, ApiKey, Model } from "@reactor/ai";
 
 export interface MnemopiLlmCompleteOptions {
 	maxTokens?: number;
@@ -33,7 +33,7 @@ export interface MnemopiEmbeddingRuntimeOptions {
 	apiUrl?: string;
 	apiKey?: ApiKey;
 	provider?: MnemopiEmbeddingProvider | ((texts: readonly string[]) => EmbeddingOutput | Promise<EmbeddingOutput>);
-	/** Override `MNEMOPI_EMBEDDING_MAX_INPUT_CHARS`. `0` disables the cap. See `config.embeddingMaxInputChars`. */
+	/** Override `REACTOR_MNEMOPI_EMBEDDING_MAX_INPUT_CHARS`. `0` disables the cap. See `config.embeddingMaxInputChars`. */
 	maxInputChars?: number;
 }
 

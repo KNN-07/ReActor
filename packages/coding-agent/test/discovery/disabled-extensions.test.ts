@@ -2,10 +2,10 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "bun:test";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
-import { type ContextFile, contextFileCapability } from "@oh-my-pi/pi-coding-agent/capability/context-file";
-import { resetSettingsForTest, Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { initializeWithSettings, loadCapability } from "@oh-my-pi/pi-coding-agent/discovery";
-import { __resetDirsFromEnvForTests, removeWithRetries, setAgentDir } from "@oh-my-pi/pi-utils";
+import { type ContextFile, contextFileCapability } from "@reactor/coding-agent/capability/context-file";
+import { resetSettingsForTest, Settings } from "@reactor/coding-agent/config/settings";
+import { initializeWithSettings, loadCapability } from "@reactor/coding-agent/discovery";
+import { __resetDirsFromEnvForTests, removeWithRetries, setAgentDir } from "@reactor/utils";
 
 function restoreEnvValue(key: string, value: string | undefined): void {
 	if (value === undefined) {
@@ -27,17 +27,17 @@ describe("disabledExtensions runtime filtering", () => {
 
 	beforeEach(async () => {
 		resetSettingsForTest();
-		originalAgentDirEnv = process.env.PI_CODING_AGENT_DIR;
-		originalOmpProfileEnv = process.env.OMP_PROFILE;
-		originalPiProfileEnv = process.env.PI_PROFILE;
+		originalAgentDirEnv = process.env.REACTOR_CODING_AGENT_DIR;
+		originalOmpProfileEnv = process.env.REACTOR_PROFILE;
+		originalPiProfileEnv = process.env.REACTOR_PROFILE;
 		originalHome = process.env.HOME;
-		tempHomeDir = await fs.mkdtemp(path.join(os.tmpdir(), "omp-disabled-ext-home-"));
+		tempHomeDir = await fs.mkdtemp(path.join(os.tmpdir(), "reactor-disabled-ext-home-"));
 		process.env.HOME = tempHomeDir;
 		vi.spyOn(os, "homedir").mockReturnValue(tempHomeDir);
-		setAgentDir(path.join(tempHomeDir, ".omp", "agent"));
-		tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "omp-disabled-ext-"));
-		await fs.mkdir(path.join(tempDir, ".omp"), { recursive: true });
-		await fs.writeFile(path.join(tempDir, ".omp", "AGENTS.md"), "# project instructions\n");
+		setAgentDir(path.join(tempHomeDir, ".reactor", "agent"));
+		tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "reactor-disabled-ext-"));
+		await fs.mkdir(path.join(tempDir, ".reactor"), { recursive: true });
+		await fs.writeFile(path.join(tempDir, ".reactor", "AGENTS.md"), "# project instructions\n");
 
 		const settings = await Settings.init({
 			inMemory: true,
@@ -53,9 +53,9 @@ describe("disabledExtensions runtime filtering", () => {
 		resetSettingsForTest();
 		vi.restoreAllMocks();
 		restoreEnvValue("HOME", originalHome);
-		restoreEnvValue("OMP_PROFILE", originalOmpProfileEnv);
-		restoreEnvValue("PI_PROFILE", originalPiProfileEnv);
-		restoreEnvValue("PI_CODING_AGENT_DIR", originalAgentDirEnv);
+		restoreEnvValue("REACTOR_PROFILE", originalOmpProfileEnv);
+		restoreEnvValue("REACTOR_PROFILE", originalPiProfileEnv);
+		restoreEnvValue("REACTOR_CODING_AGENT_DIR", originalAgentDirEnv);
 		__resetDirsFromEnvForTests();
 		await removeWithRetries(tempHomeDir);
 		await removeWithRetries(tempDir);

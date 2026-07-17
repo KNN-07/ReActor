@@ -3,13 +3,13 @@ import { type ChildProcess, execSync, spawn } from "node:child_process";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
-import { Effort } from "@oh-my-pi/pi-ai";
-import { __resetVertexTokenCache } from "@oh-my-pi/pi-ai/providers/google-auth";
-import { complete, getEnvApiKey, stream } from "@oh-my-pi/pi-ai/stream";
-import type { Api, Context, ImageContent, Model, OptionsForApi, Tool, ToolResultMessage } from "@oh-my-pi/pi-ai/types";
-import { buildModel } from "@oh-my-pi/pi-catalog/build";
-import { getBundledModel } from "@oh-my-pi/pi-catalog/models";
-import { $which } from "@oh-my-pi/pi-utils";
+import { Effort } from "@reactor/ai";
+import { __resetVertexTokenCache } from "@reactor/ai/providers/google-auth";
+import { complete, getEnvApiKey, stream } from "@reactor/ai/stream";
+import type { Api, Context, ImageContent, Model, OptionsForApi, Tool, ToolResultMessage } from "@reactor/ai/types";
+import { buildModel } from "@reactor/catalog/build";
+import { getBundledModel } from "@reactor/catalog/models";
+import { $which } from "@reactor/utils";
 import { type } from "arktype";
 import { removeWithRetries } from "../../utils/src/temp";
 import { e2eApiKey, resolveApiKey } from "./oauth";
@@ -674,7 +674,7 @@ describe("Generate E2E Tests", () => {
 			const originalLocation = Bun.env.VERTEX_LOCATION;
 			const originalApiKey = Bun.env.GOOGLE_CLOUD_API_KEY;
 			const originalGac = Bun.env.GOOGLE_APPLICATION_CREDENTIALS;
-			const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "omp-vertex-impersonation-"));
+			const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "reactor-vertex-impersonation-"));
 			const adcPath = path.join(tmpDir, "impersonated-adc.json");
 			await Bun.write(
 				adcPath,
@@ -1792,8 +1792,8 @@ describe("Generate E2E Tests", () => {
 		);
 	});
 
-	// Ollama tests require PI_LOCAL_LLM=1 and ollama installed
-	const ollamaInstalled = !!Bun.env.PI_LOCAL_LLM && !!$which("ollama");
+	// Ollama tests require REACTOR_LOCAL_LLM=1 and ollama installed
+	const ollamaInstalled = !!Bun.env.REACTOR_LOCAL_LLM && !!$which("ollama");
 
 	describe.skipIf(!ollamaInstalled)("Ollama Provider (gpt-oss-20b via OpenAI Completions)", () => {
 		let llm: Model<"openai-completions"> | undefined;

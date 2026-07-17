@@ -3,13 +3,13 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } fr
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { Effort, type FetchImpl, type Model, type OpenAICompat, type ThinkingConfig } from "@oh-my-pi/pi-ai";
-import { buildModel } from "@oh-my-pi/pi-catalog/build";
-import { writeModelCache } from "@oh-my-pi/pi-catalog/model-cache";
-import { ModelRegistry } from "@oh-my-pi/pi-coding-agent/config/model-registry";
-import { resetSettingsForTest, Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { AuthStorage } from "@oh-my-pi/pi-coding-agent/session/auth-storage";
-import { removeSyncWithRetries, Snowflake } from "@oh-my-pi/pi-utils";
+import { Effort, type FetchImpl, type Model, type OpenAICompat, type ThinkingConfig } from "@reactor/ai";
+import { buildModel } from "@reactor/catalog/build";
+import { writeModelCache } from "@reactor/catalog/model-cache";
+import { ModelRegistry } from "@reactor/coding-agent/config/model-registry";
+import { resetSettingsForTest, Settings } from "@reactor/coding-agent/config/settings";
+import { AuthStorage } from "@reactor/coding-agent/session/auth-storage";
+import { removeSyncWithRetries, Snowflake } from "@reactor/utils";
 
 describe("ModelRegistry", () => {
 	let tempDir: string;
@@ -476,11 +476,11 @@ describe("ModelRegistry", () => {
 		});
 
 		test("refresh keeps transport override on built-in provider (#2555 openrouter gateway)", async () => {
-			// Reporter ran `omp` with the auth-gateway broker proxying OpenRouter.
+			// Reporter ran `reactor` with the auth-gateway broker proxying OpenRouter.
 			// Default model worked; switching via `/model` produced
 			// `404 No route: POST /chat/completions` until restart. Root cause:
 			// background discovery refresh re-fetched the openrouter catalog and
-			// `mergeDiscoveredModel` dropped `transport: pi-native` (raw catalog
+			// `mergeDiscoveredModel` dropped `transport: reactor-native` (raw catalog
 			// rows carry no transport), so the next stream went out as plain
 			// openai-completions to `${baseUrl}/chat/completions` instead of the
 			// gateway's `/v1/pi/stream`.
@@ -488,7 +488,7 @@ describe("ModelRegistry", () => {
 				openrouter: {
 					baseUrl: "http://localhost:4000",
 					apiKey: "gateway-token",
-					transport: "pi-native",
+					transport: "reactor-native",
 				},
 			});
 
@@ -515,18 +515,18 @@ describe("ModelRegistry", () => {
 			// Pre-refresh: every bundled openrouter model already carries the override.
 			const preRefresh = getModelsForProvider(registry, "openrouter");
 			expect(preRefresh.length).toBeGreaterThan(0);
-			expect(preRefresh.every(m => m.transport === "pi-native")).toBe(true);
+			expect(preRefresh.every(m => m.transport === "reactor-native")).toBe(true);
 			expect(preRefresh.every(m => m.baseUrl === "http://localhost:4000")).toBe(true);
 
 			await registry.refreshProvider("openrouter", "online");
 			expect(requestedUrls).toContain("http://localhost:4000/models");
 
 			// Post-refresh: every openrouter model — bundled or freshly
-			// discovered — must still route through the pi-native transport.
+			// discovered — must still route through the reactor-native transport.
 			const postRefresh = getModelsForProvider(registry, "openrouter");
 			expect(postRefresh.length).toBeGreaterThan(0);
 			for (const model of postRefresh) {
-				expect(model.transport).toBe("pi-native");
+				expect(model.transport).toBe("reactor-native");
 				expect(model.baseUrl).toBe("http://localhost:4000");
 			}
 		});

@@ -10,7 +10,7 @@
  *   write xd://<tool>    → execute: `content` is the JSON args object
  *
  * Args go through the same machinery as native tool calls: validated with
- * pi-ai's `validateToolArguments` (the schema is returned on mismatch, so a
+ * ai's `validateToolArguments` (the schema is returned on mismatch, so a
  * malformed call self-corrects without a round trip) and streamed through
  * the write tool's existing incremental `content` decoding for live render
  * previews. Compared to a dispatcher def this still costs zero *schema
@@ -23,10 +23,10 @@
  * known and provably does not target `xd://`; device writes then delegate to
  * the wrapped tool's own renderer with the decoded inner args.
  */
-import type { AgentToolContext, AgentToolResult, AgentToolUpdateCallback, ToolLoadMode } from "@oh-my-pi/pi-agent-core";
-import { type Tool as AiTool, toolWireSchema, validateToolArguments } from "@oh-my-pi/pi-ai";
-import { type Component, Container, Text } from "@oh-my-pi/pi-tui";
-import { parseStreamingJson } from "@oh-my-pi/pi-utils";
+import type { AgentToolContext, AgentToolResult, AgentToolUpdateCallback, ToolLoadMode } from "@reactor/agent-core";
+import { type Tool as AiTool, toolWireSchema, validateToolArguments } from "@reactor/ai";
+import { type Component, Container, Text } from "@reactor/tui";
+import { parseStreamingJson } from "@reactor/utils";
 import type { RenderResultOptions } from "../extensibility/custom-tools/types";
 import { XD_URL_PREFIX } from "../internal-urls/xd-protocol";
 import type { Theme } from "../modes/theme/theme";

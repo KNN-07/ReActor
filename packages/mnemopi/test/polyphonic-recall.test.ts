@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, it } from "bun:test";
-import { type BeamMemoryState, initBeam } from "@oh-my-pi/pi-mnemopi/core/beam";
+import { type BeamMemoryState, initBeam } from "@reactor/mnemopi/core/beam";
 import {
 	PolyphonicRecallEngine,
 	polyphonicRecall,
 	polyphonicRecallIsEnabled,
-} from "@oh-my-pi/pi-mnemopi/core/polyphonic-recall";
-import { closeQuietly, openDatabase } from "@oh-my-pi/pi-mnemopi/db";
+} from "@reactor/mnemopi/core/polyphonic-recall";
+import { closeQuietly, openDatabase } from "@reactor/mnemopi/db";
 
 function makeBeam(): BeamMemoryState {
 	const db = openDatabase(":memory:", { create: true, readwrite: true });
@@ -80,24 +80,24 @@ function seedPolyphonicFixture(beam: BeamMemoryState): PolyphonicRecallEngine {
 	return engine;
 }
 
-const previousPolyphonic = process.env.MNEMOPI_POLYPHONIC_RECALL;
+const previousPolyphonic = process.env.REACTOR_MNEMOPI_POLYPHONIC_RECALL;
 
 afterEach(() => {
-	if (previousPolyphonic === undefined) delete process.env.MNEMOPI_POLYPHONIC_RECALL;
-	else process.env.MNEMOPI_POLYPHONIC_RECALL = previousPolyphonic;
-	delete process.env.MNEMOPI_VOICE_VECTOR;
-	delete process.env.MNEMOPI_VOICE_GRAPH;
-	delete process.env.MNEMOPI_VOICE_FACT;
-	delete process.env.MNEMOPI_VOICE_TEMPORAL;
+	if (previousPolyphonic === undefined) delete process.env.REACTOR_MNEMOPI_POLYPHONIC_RECALL;
+	else process.env.REACTOR_MNEMOPI_POLYPHONIC_RECALL = previousPolyphonic;
+	delete process.env.REACTOR_MNEMOPI_VOICE_VECTOR;
+	delete process.env.REACTOR_MNEMOPI_VOICE_GRAPH;
+	delete process.env.REACTOR_MNEMOPI_VOICE_FACT;
+	delete process.env.REACTOR_MNEMOPI_VOICE_TEMPORAL;
 });
 
 describe("PolyphonicRecallEngine", () => {
 	it("reads the polyphonic recall gate per call", () => {
-		delete process.env.MNEMOPI_POLYPHONIC_RECALL;
+		delete process.env.REACTOR_MNEMOPI_POLYPHONIC_RECALL;
 		expect(polyphonicRecallIsEnabled()).toBe(false);
-		process.env.MNEMOPI_POLYPHONIC_RECALL = "0";
+		process.env.REACTOR_MNEMOPI_POLYPHONIC_RECALL = "0";
 		expect(polyphonicRecallIsEnabled()).toBe(false);
-		process.env.MNEMOPI_POLYPHONIC_RECALL = "1";
+		process.env.REACTOR_MNEMOPI_POLYPHONIC_RECALL = "1";
 		expect(polyphonicRecallIsEnabled()).toBe(true);
 	});
 
@@ -121,9 +121,9 @@ describe("PolyphonicRecallEngine", () => {
 		const beam = makeBeam();
 		try {
 			const engine = seedPolyphonicFixture(beam);
-			process.env.MNEMOPI_VOICE_VECTOR = "0";
-			process.env.MNEMOPI_VOICE_GRAPH = "0";
-			process.env.MNEMOPI_VOICE_TEMPORAL = "0";
+			process.env.REACTOR_MNEMOPI_VOICE_VECTOR = "0";
+			process.env.REACTOR_MNEMOPI_VOICE_GRAPH = "0";
+			process.env.REACTOR_MNEMOPI_VOICE_TEMPORAL = "0";
 			const results = engine.recall("Alice recent", [1, 0], 10);
 			expect(results.map(result => result.id)).toEqual(["m1"]);
 			expect(results[0]?.voice_scores).toEqual({ fact: 1 / 61 });
@@ -162,16 +162,16 @@ describe("PolyphonicRecallEngine", () => {
 				"wm-global-b",
 				JSON.stringify([1, 0]),
 			]);
-			process.env.MNEMOPI_VOICE_GRAPH = "0";
-			process.env.MNEMOPI_VOICE_FACT = "0";
-			process.env.MNEMOPI_VOICE_TEMPORAL = "0";
+			process.env.REACTOR_MNEMOPI_VOICE_GRAPH = "0";
+			process.env.REACTOR_MNEMOPI_VOICE_FACT = "0";
+			process.env.REACTOR_MNEMOPI_VOICE_TEMPORAL = "0";
 
 			const vectorResults = polyphonicRecall(beam, "vector marker", 5, { queryEmbedding: [1, 0] });
 
 			expect(vectorResults.map(result => result.id)).toEqual(["wm-global-b"]);
 
-			process.env.MNEMOPI_VOICE_VECTOR = "0";
-			delete process.env.MNEMOPI_VOICE_TEMPORAL;
+			process.env.REACTOR_MNEMOPI_VOICE_VECTOR = "0";
+			delete process.env.REACTOR_MNEMOPI_VOICE_TEMPORAL;
 
 			const temporalResults = polyphonicRecall(beam, "recent vector marker", 5);
 
@@ -214,9 +214,9 @@ describe("PolyphonicRecallEngine", () => {
 					VALUES ('cf_alice_visibility', 'Alice', 'owns', 'visibility fixture', 0.9, 2, ?, ?, ?, 'likely_true')`,
 				[timestamp, timestamp, JSON.stringify(["wm-private-fact", "wm-global-fact"])],
 			);
-			process.env.MNEMOPI_VOICE_VECTOR = "0";
-			process.env.MNEMOPI_VOICE_GRAPH = "0";
-			process.env.MNEMOPI_VOICE_TEMPORAL = "0";
+			process.env.REACTOR_MNEMOPI_VOICE_VECTOR = "0";
+			process.env.REACTOR_MNEMOPI_VOICE_GRAPH = "0";
+			process.env.REACTOR_MNEMOPI_VOICE_TEMPORAL = "0";
 
 			const results = engine.recall("Alice", null, 5);
 

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { basetenModelManagerOptions } from "@oh-my-pi/pi-catalog/provider-models/openai-compat";
-import type { FetchImpl } from "@oh-my-pi/pi-catalog/types";
+import { basetenModelManagerOptions } from "@reactor/catalog/provider-models/openai-compat";
+import type { FetchImpl } from "@reactor/catalog/types";
 
 describe("Baseten provider discovery", () => {
 	test("discovers Baseten models with custom metadata", async () => {

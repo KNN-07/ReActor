@@ -1,9 +1,10 @@
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
-import { getOAuthProviders } from "@oh-my-pi/pi-ai/oauth";
-import { type AutocompleteItem, Spacer } from "@oh-my-pi/pi-tui";
-import { APP_NAME, getProjectDir, setProjectDir } from "@oh-my-pi/pi-utils";
+import { getOAuthProviders } from "@reactor/ai/oauth";
+import { type AutocompleteItem, Spacer } from "@reactor/tui";
+import { APP_NAME, getProjectDir, setProjectDir } from "@reactor/utils";
+import { AutonomySessionRuntime } from "../autonomy/session-runtime";
 import { reset as resetCapabilities } from "../capability";
 import { COLLAB_GUEST_ALLOWED_COMMANDS, CollabGuestLink } from "../collab/guest";
 import { CollabHost } from "../collab/host";
@@ -296,6 +297,65 @@ const BUILTIN_SLASH_COMMAND_REGISTRY: ReadonlyArray<SlashCommandSpec> = [
 		handleTui: async (command, runtime) => {
 			await runtime.ctx.handleGoalModeCommand(command.args || undefined);
 			runtime.ctx.editor.setText("");
+		},
+	},
+	{
+		name: "react",
+		description: "Start and control bounded reliable autonomy",
+		subcommands: [
+			{ name: "start", description: "Start an objective", usage: "<objective>" },
+			{ name: "status", description: "Show autonomy state" },
+			{ name: "pause", description: "Pause autonomy" },
+			{ name: "resume", description: "Resume autonomy" },
+			{ name: "stop", description: "Stop autonomy" },
+		],
+		inlineHint: "<start|status|pause|resume|stop>",
+		allowArgs: true,
+		handle: async (command, runtime) => {
+			const [verb, ...rest] = command.args.trim().split(/\s+/).filter(Boolean);
+			const autonomy = AutonomySessionRuntime.forSession(runtime.session);
+			if (verb === "start") {
+				const objective = rest.join(" ").trim();
+				if (!objective) {
+					await runtime.output("Usage: /react start <objective>");
+					return;
+				}
+				await autonomy.start({ objective });
+				const state = await runtime.session.goalRuntime.createGoal({ objective });
+				runtime.session.setGoalModeState(state);
+				await runtime.session.setActiveToolsByName([
+					...new Set([...runtime.session.getEnabledToolNames(), "goal"]),
+				]);
+				await runtime.session.sendGoalModeContext({ deliverAs: "nextTurn" });
+				await runtime.output(`Autonomy started: ${objective}`);
+				return;
+			}
+			if (verb === "status" || !verb) {
+				const state = autonomy.controller.state;
+				await runtime.output(
+					state ? `${state.status} · ${state.phase} · ${state.objective}` : "Autonomy is inactive.",
+				);
+				return;
+			}
+			if (verb === "pause") {
+				await autonomy.controller.pause();
+				await runtime.session.goalRuntime.pauseGoal();
+				await runtime.output("Autonomy paused.");
+				return;
+			}
+			if (verb === "resume") {
+				await autonomy.controller.resume();
+				await runtime.session.goalRuntime.resumeGoal();
+				await runtime.output("Autonomy resumed.");
+				return;
+			}
+			if (verb === "stop") {
+				await autonomy.controller.stop();
+				await runtime.session.goalRuntime.dropGoal();
+				await runtime.output("Autonomy stopped.");
+				return;
+			}
+			await runtime.output("Usage: /react <start|status|pause|resume|stop>");
 		},
 	},
 	{

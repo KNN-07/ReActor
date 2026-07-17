@@ -1,8 +1,8 @@
 /**
  * Tool card chrome + per-tool dispatch. Works in the collab-web app and inside
- * the `<omp-tool-view>` web component embedded in HTML session exports.
+ * the `<reactor-tool-view>` web component embedded in HTML session exports.
  */
-import { INTENT_FIELD } from "@oh-my-pi/pi-wire";
+import { INTENT_FIELD } from "@reactor/wire";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { resolveToolRenderer } from "./registry";

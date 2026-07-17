@@ -2,14 +2,14 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it } from "bun:test
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
-import { Patch, Patcher } from "@oh-my-pi/hashline";
-import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { canonicalSnapshotKey, getFileSnapshotStore } from "@oh-my-pi/pi-coding-agent/edit/file-snapshot-store";
-import { HashlineFilesystem } from "@oh-my-pi/pi-coding-agent/edit/hashline/filesystem";
-import { writethroughNoop } from "@oh-my-pi/pi-coding-agent/lsp";
-import type { ToolSession } from "@oh-my-pi/pi-coding-agent/tools";
-import { WriteTool } from "@oh-my-pi/pi-coding-agent/tools/write";
-import { removeWithRetries } from "@oh-my-pi/pi-utils";
+import { Settings } from "@reactor/coding-agent/config/settings";
+import { canonicalSnapshotKey, getFileSnapshotStore } from "@reactor/coding-agent/edit/file-snapshot-store";
+import { HashlineFilesystem } from "@reactor/coding-agent/edit/hashline/filesystem";
+import { writethroughNoop } from "@reactor/coding-agent/lsp";
+import type { ToolSession } from "@reactor/coding-agent/tools";
+import { WriteTool } from "@reactor/coding-agent/tools/write";
+import { Patch, Patcher } from "@reactor/hashline";
+import { removeWithRetries } from "@reactor/utils";
 
 function createSession(cwd: string): ToolSession {
 	return {

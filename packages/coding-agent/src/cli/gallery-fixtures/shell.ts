@@ -103,7 +103,7 @@ export const shellFixtures: Record<string, GalleryFixture> = {
 	hub_logs: {
 		label: "Hub logs",
 		renderer: "hub",
-		args: { op: "logs", name: "comp-debug", lines: 100, follow: true, cursor: 233_512, timeout: 30 },
+		args: { op: "logs", name: "creactor-debug", lines: 100, follow: true, cursor: 233_512, timeout: 30 },
 		result: {
 			content: [
 				{
@@ -113,7 +113,7 @@ export const shellFixtures: Record<string, GalleryFixture> = {
 						"(lldb) run",
 						"Process 726 launched: '/tmp/compiler'",
 						"frame #0: 0x0000000100012f80 compiler`parse_expression",
-						"[comp-debug: ready; cursor=233797]",
+						"[creactor-debug: ready; cursor=233797]",
 					].join("\n"),
 				},
 			],
@@ -163,13 +163,13 @@ export const shellFixtures: Record<string, GalleryFixture> = {
 			content: [
 				{
 					type: "text",
-					text: ["@oh-my-pi/coding-agent v0.42.0", "37 dependencies"].join("\n"),
+					text: ["@reactor/coding-agent v0.42.0", "37 dependencies"].join("\n"),
 				},
 			],
 			details: {
 				language: "python",
 				languages: ["python"],
-				jsonOutputs: [["@ai-sdk/anthropic", "@oh-my-pi/pi-ai", "@oh-my-pi/pi-tui"]],
+				jsonOutputs: [["@ai-sdk/anthropic", "@reactor/ai", "@reactor/tui"]],
 				cells: [
 					{
 						index: 0,
@@ -185,7 +185,7 @@ export const shellFixtures: Record<string, GalleryFixture> = {
 							'print(f"{len(deps)} dependencies")',
 							"display(sorted(deps)[:3])",
 						].join("\n"),
-						output: ["@oh-my-pi/coding-agent v0.42.0", "37 dependencies"].join("\n"),
+						output: ["@reactor/coding-agent v0.42.0", "37 dependencies"].join("\n"),
 						status: "complete",
 						durationMs: 64,
 						exitCode: 0,

@@ -1,14 +1,14 @@
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import type { AgentEvent, AgentMessage } from "@oh-my-pi/pi-agent-core";
-import { RpcClient } from "@oh-my-pi/pi-coding-agent/modes/rpc/rpc-client";
+import type { AgentEvent, AgentMessage } from "@reactor/agent-core";
+import { RpcClient } from "@reactor/coding-agent/modes/rpc/rpc-client";
 import type {
 	BranchSummaryEntry,
 	CustomMessageEntry,
 	SessionMessageEntry,
-} from "@oh-my-pi/pi-coding-agent/session/session-entries";
-import { parseSessionEntries } from "@oh-my-pi/pi-coding-agent/session/session-loader";
+} from "@reactor/coding-agent/session/session-entries";
+import { parseSessionEntries } from "@reactor/coding-agent/session/session-loader";
 
 function extractText(message: AgentMessage): string {
 	if (message.role !== "assistant") return "";
@@ -34,12 +34,12 @@ function getLastAssistant(messages: AgentMessage[]): Extract<AgentMessage, { rol
 }
 
 async function main() {
-	const sessionDir = path.join(os.tmpdir(), `omp-checkpoint-rpc-qa-${Date.now()}`);
+	const sessionDir = path.join(os.tmpdir(), `reactor-checkpoint-rpc-qa-${Date.now()}`);
 	const projectRoot = path.join(import.meta.dir, "..");
 	const client = new RpcClient({
 		cliPath: path.join(projectRoot, "src/cli.ts"),
 		cwd: projectRoot,
-		env: { PI_CODING_AGENT_DIR: sessionDir },
+		env: { REACTOR_CODING_AGENT_DIR: sessionDir },
 		args: ["--no-color"],
 	});
 

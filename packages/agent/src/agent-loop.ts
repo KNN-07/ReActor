@@ -17,16 +17,16 @@ import {
 	type TSchema,
 	toolWireSchema,
 	validateToolArguments,
-} from "@oh-my-pi/pi-ai";
+} from "@reactor/ai";
 import {
 	type Dialect,
 	encodeInbandToolHistory,
 	renderInbandToolPrompt,
 	renderToolExamples,
 	wrapInbandToolStream,
-} from "@oh-my-pi/pi-ai/dialect";
-import * as AIError from "@oh-my-pi/pi-ai/error";
-import { type CursorExecResolvedCarrier, kCursorExecResolved } from "@oh-my-pi/pi-ai/utils/block-symbols";
+} from "@reactor/ai/dialect";
+import * as AIError from "@reactor/ai/error";
+import { type CursorExecResolvedCarrier, kCursorExecResolved } from "@reactor/ai/utils/block-symbols";
 import {
 	createHarmonyAuditEvent,
 	detectHarmonyLeakInAssistantMessage,
@@ -36,10 +36,10 @@ import {
 	isHarmonyLeakMitigationTarget,
 	recoverHarmonyToolCall,
 	signalListLabel,
-} from "@oh-my-pi/pi-ai/utils/harmony-leak";
-import { preferredDialect } from "@oh-my-pi/pi-catalog/identity";
-import { sanitizeText, structuredCloneJSON } from "@oh-my-pi/pi-utils";
-import { INTENT_FIELD } from "@oh-my-pi/pi-wire";
+} from "@reactor/ai/utils/harmony-leak";
+import { preferredDialect } from "@reactor/catalog/identity";
+import { sanitizeText, structuredCloneJSON } from "@reactor/utils";
+import { INTENT_FIELD } from "@reactor/wire";
 import { agentPauseGate } from "./pause";
 import { type AgentRunCoverage, type AgentRunSummary, ToolCallBlockedError } from "./run-collector";
 import {
@@ -141,7 +141,7 @@ export function createToolScopedAbortReason(
  * current run. External/user aborts still synthesize an aborted assistant
  * boundary; this reason stops after persisting the completed tool batch.
  */
-export const TERMINAL_TOOL_RESULT_ABORT_REASON = Symbol.for("pi-agent-core.terminal-tool-result");
+export const TERMINAL_TOOL_RESULT_ABORT_REASON = Symbol.for("agent-core.terminal-tool-result");
 
 const STEERING_INTERRUPT_POLL_MS = 250;
 
@@ -639,7 +639,7 @@ export function normalizeTools(
 	exampleDialect?: Dialect,
 	pruneDescriptions = false,
 ): Context["tools"] {
-	injectIntent = injectIntent && Bun.env.PI_NO_INTENT !== "1";
+	injectIntent = injectIntent && Bun.env.REACTOR_NO_INTENT !== "1";
 	return tools?.map(t => {
 		const intentMode = resolveIntentMode(t.intent);
 		const doInjectIntent = injectIntent && intentMode !== "omit";
@@ -1240,7 +1240,7 @@ async function streamAssistantResponse(
 	const llmMessages = await config.convertToLlm(messages);
 	const normalizedMessages = normalizeMessagesForProvider(llmMessages, model);
 
-	const ownedDialect: Dialect | undefined = config.dialect ?? resolveOwnedDialectFromEnv(Bun.env.PI_DIALECT);
+	const ownedDialect: Dialect | undefined = config.dialect ?? resolveOwnedDialectFromEnv(Bun.env.REACTOR_DIALECT);
 	const exampleDialect = ownedDialect ?? preferredDialect(model.id);
 	// Owned/in-band dialects carry the catalog in the prompt as text and send no
 	// native `tools`, so description pruning only applies to native tool calling.
@@ -1267,8 +1267,8 @@ async function streamAssistantResponse(
 	}
 
 	// Owned tool calling: take tool calls away from the provider and run them
-	// through the selected in-band prompt dialect. `PI_DIALECT=1` still
-	// force-enables GLM; `PI_DIALECT=<dialect>` force-enables that dialect.
+	// through the selected in-band prompt dialect. `REACTOR_DIALECT=1` still
+	// force-enables GLM; `REACTOR_DIALECT=<dialect>` force-enables that dialect.
 	let promptToolWireTools: Context["tools"];
 	if (ownedDialect && llmContext.tools && llmContext.tools.length > 0) {
 		promptToolWireTools = llmContext.tools;

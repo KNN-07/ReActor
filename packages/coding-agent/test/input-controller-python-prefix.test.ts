@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "bun:test";
-import type { ImageContent } from "@oh-my-pi/pi-ai";
-import { InputController } from "@oh-my-pi/pi-coding-agent/modes/controllers/input-controller";
-import type { InteractiveModeContext } from "@oh-my-pi/pi-coding-agent/modes/types";
+import type { ImageContent } from "@reactor/ai";
+import { InputController } from "@reactor/coding-agent/modes/controllers/input-controller";
+import type { InteractiveModeContext } from "@reactor/coding-agent/modes/types";
 
 type FakeEditor = {
 	onSubmit?: (text: string) => Promise<void>;
@@ -109,7 +109,7 @@ describe("InputController Python prompt prefix", () => {
 		]);
 	});
 
-	it("submits pasted shell-prompt transcripts with OMP chrome as a normal prompt", async () => {
+	it("submits pasted shell-prompt transcripts with ReActor chrome as a normal prompt", async () => {
 		const transcript =
 			"$ cd ~/project && sudo ./build-and-push.sh o5.7 2>&1 | tail -4\n" +
 			" |\n" +

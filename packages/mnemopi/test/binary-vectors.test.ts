@@ -9,7 +9,7 @@ import {
 	informationTheoreticScore,
 	maximallyInformativeBinarization,
 	quantizeInt8,
-} from "@oh-my-pi/pi-mnemopi/core/binary-vectors";
+} from "@reactor/mnemopi/core/binary-vectors";
 
 describe("binary vector helpers", () => {
 	it("packs positive signs into Moorcheh MIB bit vectors", () => {
@@ -41,11 +41,11 @@ describe("binary vector helpers", () => {
 		expect(cosineSimilarity([Number.NaN, 1], [1, 0])).toBe(0);
 	});
 
-	it("normalizes MNEMOPI_VEC_TYPE with Python-compatible fallback", () => {
-		expect(getVecType({ MNEMOPI_VEC_TYPE: "bit" })).toBe("bit");
-		expect(getVecType({ MNEMOPI_VEC_TYPE: "int8" })).toBe("int8");
-		expect(getVecType({ MNEMOPI_VEC_TYPE: "float32" })).toBe("float32");
-		expect(getVecType({ MNEMOPI_VEC_TYPE: "bogus" })).toBe("float32");
+	it("normalizes REACTOR_MNEMOPI_VEC_TYPE with Python-compatible fallback", () => {
+		expect(getVecType({ REACTOR_MNEMOPI_VEC_TYPE: "bit" })).toBe("bit");
+		expect(getVecType({ REACTOR_MNEMOPI_VEC_TYPE: "int8" })).toBe("int8");
+		expect(getVecType({ REACTOR_MNEMOPI_VEC_TYPE: "float32" })).toBe("float32");
+		expect(getVecType({ REACTOR_MNEMOPI_VEC_TYPE: "bogus" })).toBe("float32");
 		expect(getVecType({})).toBe("int8");
 	});
 });

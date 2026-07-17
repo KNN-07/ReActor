@@ -1,4 +1,4 @@
-import { logger } from "@oh-my-pi/pi-utils";
+import { logger } from "@reactor/utils";
 
 export class EventBus {
 	readonly #listeners = new Map<string, Set<(data: unknown) => void>>();

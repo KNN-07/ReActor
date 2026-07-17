@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "bun:test";
 import { stripVTControlCharacters } from "node:util";
-import { resetSettingsForTest, Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
+import { resetSettingsForTest, Settings } from "@reactor/coding-agent/config/settings";
 import {
 	SEARCH_PROVIDER_ORDER,
 	setExcludedSearchProviders,
 	setPreferredSearchProvider,
-} from "@oh-my-pi/pi-coding-agent/web/search/provider";
-import { __resetDirsFromEnvForTests, setAgentDir, TempDir } from "@oh-my-pi/pi-utils";
+} from "@reactor/coding-agent/web/search/provider";
+import { __resetDirsFromEnvForTests, setAgentDir, TempDir } from "@reactor/utils";
 import { runSearchCommand } from "../../../src/cli/web-search-cli";
 
 const WEB_SEARCH_ENV_KEYS = [
@@ -27,9 +27,9 @@ const WEB_SEARCH_ENV_KEYS = [
 	"XAI_API_KEY",
 ] as const;
 
-const originalAgentDir = process.env.PI_CODING_AGENT_DIR;
-const originalOmpProfile = process.env.OMP_PROFILE;
-const originalPiProfile = process.env.PI_PROFILE;
+const originalAgentDir = process.env.REACTOR_CODING_AGENT_DIR;
+const originalOmpProfile = process.env.REACTOR_PROFILE;
+const originalPiProfile = process.env.REACTOR_PROFILE;
 
 let tempAgentDir: TempDir | undefined;
 let originalEnv: Partial<Record<(typeof WEB_SEARCH_ENV_KEYS)[number], string | undefined>> = {};
@@ -83,7 +83,7 @@ beforeEach(async () => {
 	resetSettingsForTest();
 	setPreferredSearchProvider("auto");
 	setExcludedSearchProviders([]);
-	tempAgentDir = TempDir.createSync("@omp-search-cli-");
+	tempAgentDir = TempDir.createSync("@reactor-search-cli-");
 	setAgentDir(tempAgentDir.path());
 	await Settings.init({
 		inMemory: true,
@@ -104,9 +104,9 @@ afterEach(async () => {
 	for (const key of WEB_SEARCH_ENV_KEYS) {
 		restoreEnv(key, originalEnv[key]);
 	}
-	restoreEnv("PI_CODING_AGENT_DIR", originalAgentDir);
-	restoreEnv("OMP_PROFILE", originalOmpProfile);
-	restoreEnv("PI_PROFILE", originalPiProfile);
+	restoreEnv("REACTOR_CODING_AGENT_DIR", originalAgentDir);
+	restoreEnv("REACTOR_PROFILE", originalOmpProfile);
+	restoreEnv("REACTOR_PROFILE", originalPiProfile);
 	__resetDirsFromEnvForTests();
 	if (tempAgentDir) {
 		await tempAgentDir.remove();

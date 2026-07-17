@@ -2,16 +2,16 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from "bun:test";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import type { AgentTool } from "@oh-my-pi/pi-agent-core";
-import { AuthStorage } from "@oh-my-pi/pi-ai";
-import { getBundledModel } from "@oh-my-pi/pi-catalog/models";
-import { ModelRegistry } from "@oh-my-pi/pi-coding-agent/config/model-registry";
-import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import type { CustomTool } from "@oh-my-pi/pi-coding-agent/extensibility/custom-tools/types";
-import { createAgentSession } from "@oh-my-pi/pi-coding-agent/sdk";
-import type { AgentSession } from "@oh-my-pi/pi-coding-agent/session/agent-session";
-import { SessionManager } from "@oh-my-pi/pi-coding-agent/session/session-manager";
-import { removeSyncWithRetries, Snowflake } from "@oh-my-pi/pi-utils";
+import type { AgentTool } from "@reactor/agent-core";
+import { AuthStorage } from "@reactor/ai";
+import { getBundledModel } from "@reactor/catalog/models";
+import { ModelRegistry } from "@reactor/coding-agent/config/model-registry";
+import { Settings } from "@reactor/coding-agent/config/settings";
+import type { CustomTool } from "@reactor/coding-agent/extensibility/custom-tools/types";
+import { createAgentSession } from "@reactor/coding-agent/sdk";
+import type { AgentSession } from "@reactor/coding-agent/session/agent-session";
+import { SessionManager } from "@reactor/coding-agent/session/session-manager";
+import { removeSyncWithRetries, Snowflake } from "@reactor/utils";
 import { type } from "arktype";
 
 // Regression for issue #5305: image-gen is registered as a custom tool, and

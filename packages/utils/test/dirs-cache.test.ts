@@ -9,8 +9,8 @@ import {
 	getDocumentConversionCacheDir,
 	getProfileRootDir,
 	setAgentDir,
-} from "@oh-my-pi/pi-utils/dirs";
-import { Snowflake } from "@oh-my-pi/pi-utils/snowflake";
+} from "@reactor/utils/dirs";
+import { Snowflake } from "@reactor/utils/snowflake";
 
 function restoreEnv(key: string, value: string | undefined): void {
 	if (value === undefined) {
@@ -28,38 +28,38 @@ describe("document conversion cache directory", () => {
 	let originalXdgCacheHome: string | undefined;
 
 	beforeEach(async () => {
-		originalPiCodingAgentDir = process.env.PI_CODING_AGENT_DIR;
-		originalOmpProfile = process.env.OMP_PROFILE;
-		originalPiProfile = process.env.PI_PROFILE;
+		originalPiCodingAgentDir = process.env.REACTOR_CODING_AGENT_DIR;
+		originalOmpProfile = process.env.REACTOR_PROFILE;
+		originalPiProfile = process.env.REACTOR_PROFILE;
 		originalXdgCacheHome = process.env.XDG_CACHE_HOME;
-		tempRoot = path.join(os.tmpdir(), "pi-utils-document-cache", Snowflake.next());
+		tempRoot = path.join(os.tmpdir(), "utils-document-cache", Snowflake.next());
 		await fs.mkdir(tempRoot, { recursive: true });
 	});
 
 	afterEach(async () => {
-		restoreEnv("PI_CODING_AGENT_DIR", originalPiCodingAgentDir);
-		restoreEnv("OMP_PROFILE", originalOmpProfile);
-		restoreEnv("PI_PROFILE", originalPiProfile);
+		restoreEnv("REACTOR_CODING_AGENT_DIR", originalPiCodingAgentDir);
+		restoreEnv("REACTOR_PROFILE", originalOmpProfile);
+		restoreEnv("REACTOR_PROFILE", originalPiProfile);
 		restoreEnv("XDG_CACHE_HOME", originalXdgCacheHome);
 		__resetDirsFromEnvForTests();
 		await fs.rm(tempRoot, { recursive: true, force: true });
 	});
 
-	it("uses XDG_CACHE_HOME for the default agent dir when $XDG_CACHE_HOME/omp exists", async () => {
+	it("uses XDG_CACHE_HOME for the default agent dir when $XDG_CACHE_HOME/reactor exists", async () => {
 		if (process.platform === "win32") return;
 
 		process.env.XDG_CACHE_HOME = path.join(tempRoot, "cache");
-		await fs.mkdir(path.join(process.env.XDG_CACHE_HOME, "omp"), { recursive: true });
+		await fs.mkdir(path.join(process.env.XDG_CACHE_HOME, "reactor"), { recursive: true });
 
 		const defaultAgentDir = path.join(os.homedir(), getConfigDirName(), "agent");
 		setAgentDir(defaultAgentDir);
 
 		expect(getDocumentConversionCacheDir()).toBe(
-			path.join(process.env.XDG_CACHE_HOME, "omp", "cache", "document-conversions"),
+			path.join(process.env.XDG_CACHE_HOME, "reactor", "cache", "document-conversions"),
 		);
 	});
 
-	it("stays under a custom PI_CODING_AGENT_DIR", () => {
+	it("stays under a custom REACTOR_CODING_AGENT_DIR", () => {
 		const customAgentDir = path.join(tempRoot, "custom-agent");
 
 		setAgentDir(customAgentDir);
@@ -70,23 +70,23 @@ describe("document conversion cache directory", () => {
 
 describe("test directory state cleanup", () => {
 	it("restores the active profile from the current env after setAgentDir mutations", () => {
-		const originalPiCodingAgentDir = process.env.PI_CODING_AGENT_DIR;
-		const originalOmpProfile = process.env.OMP_PROFILE;
-		const originalPiProfile = process.env.PI_PROFILE;
+		const originalPiCodingAgentDir = process.env.REACTOR_CODING_AGENT_DIR;
+		const originalOmpProfile = process.env.REACTOR_PROFILE;
+		const originalPiProfile = process.env.REACTOR_PROFILE;
 		const originalXdgCacheHome = process.env.XDG_CACHE_HOME;
 		try {
-			process.env.OMP_PROFILE = "cache-profile";
-			delete process.env.PI_PROFILE;
-			delete process.env.PI_CODING_AGENT_DIR;
+			process.env.REACTOR_PROFILE = "cache-profile";
+			delete process.env.REACTOR_PROFILE;
+			delete process.env.REACTOR_CODING_AGENT_DIR;
 			delete process.env.XDG_CACHE_HOME;
 			__resetDirsFromEnvForTests();
 
-			setAgentDir(path.join(os.tmpdir(), "pi-utils-document-cache", Snowflake.next(), "agent"));
+			setAgentDir(path.join(os.tmpdir(), "utils-document-cache", Snowflake.next(), "agent"));
 			expect(getActiveProfile()).toBeUndefined();
 
-			process.env.OMP_PROFILE = "cache-profile";
-			delete process.env.PI_PROFILE;
-			delete process.env.PI_CODING_AGENT_DIR;
+			process.env.REACTOR_PROFILE = "cache-profile";
+			delete process.env.REACTOR_PROFILE;
+			delete process.env.REACTOR_CODING_AGENT_DIR;
 			__resetDirsFromEnvForTests();
 
 			expect(getActiveProfile()).toBe("cache-profile");
@@ -94,9 +94,9 @@ describe("test directory state cleanup", () => {
 				path.join(getProfileRootDir("cache-profile"), "agent", "cache", "document-conversions"),
 			);
 		} finally {
-			restoreEnv("PI_CODING_AGENT_DIR", originalPiCodingAgentDir);
-			restoreEnv("OMP_PROFILE", originalOmpProfile);
-			restoreEnv("PI_PROFILE", originalPiProfile);
+			restoreEnv("REACTOR_CODING_AGENT_DIR", originalPiCodingAgentDir);
+			restoreEnv("REACTOR_PROFILE", originalOmpProfile);
+			restoreEnv("REACTOR_PROFILE", originalPiProfile);
 			restoreEnv("XDG_CACHE_HOME", originalXdgCacheHome);
 			__resetDirsFromEnvForTests();
 		}

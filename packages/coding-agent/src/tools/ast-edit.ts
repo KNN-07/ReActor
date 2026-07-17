@@ -1,11 +1,11 @@
 import * as path from "node:path";
-import { formatHashlineHeader } from "@oh-my-pi/hashline";
-import type { AgentTool, AgentToolContext, AgentToolResult, AgentToolUpdateCallback } from "@oh-my-pi/pi-agent-core";
-import type { ToolExample } from "@oh-my-pi/pi-ai";
-import { type AstReplaceChange, type AstReplaceFileChange, astEdit } from "@oh-my-pi/pi-natives";
-import type { Component } from "@oh-my-pi/pi-tui";
-import { replaceTabs, Text } from "@oh-my-pi/pi-tui";
-import { $envpos, prompt, untilAborted } from "@oh-my-pi/pi-utils";
+import type { AgentTool, AgentToolContext, AgentToolResult, AgentToolUpdateCallback } from "@reactor/agent-core";
+import type { ToolExample } from "@reactor/ai";
+import { formatHashlineHeader } from "@reactor/hashline";
+import { type AstReplaceChange, type AstReplaceFileChange, astEdit } from "@reactor/natives";
+import type { Component } from "@reactor/tui";
+import { replaceTabs, Text } from "@reactor/tui";
+import { $envpos, prompt, untilAborted } from "@reactor/utils";
 import { type } from "arktype";
 import { canonicalSnapshotKey, getFileSnapshotStore } from "../edit/file-snapshot-store";
 import { normalizeToLF } from "../edit/normalize";
@@ -275,7 +275,7 @@ export class AstEditTool implements AgentTool<typeof astEditSchema, AstEditToolD
 				seenPatterns.add(pat);
 			}
 			const normalizedRewrites = Object.fromEntries(ops);
-			const maxFiles = $envpos("PI_MAX_AST_FILES", 1000);
+			const maxFiles = $envpos("REACTOR_MAX_AST_FILES", 1000);
 
 			const scope = await resolveToolSearchScope({
 				rawPaths: params.paths,

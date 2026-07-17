@@ -15,18 +15,18 @@
  *   CLI flags, scope globs — onto that pipeline.
  */
 
-import { ThinkingLevel } from "@oh-my-pi/pi-agent-core";
-import type { Api, Effort, KnownProvider, Model, ModelSpec } from "@oh-my-pi/pi-ai";
-import { buildModel } from "@oh-my-pi/pi-catalog/build";
-import { modelMatchesHost } from "@oh-my-pi/pi-catalog/hosts";
-import { buildModelProviderPriorityRank } from "@oh-my-pi/pi-catalog/identity";
-import { stripThinkingVariantToken } from "@oh-my-pi/pi-catalog/identity/family";
-import { clampThinkingLevelForModel } from "@oh-my-pi/pi-catalog/model-thinking";
-import { modelsAreEqual } from "@oh-my-pi/pi-catalog/models";
-import { DEFAULT_MODEL_PER_PROVIDER } from "@oh-my-pi/pi-catalog/provider-models";
-import { resolveBareVariantAlias, resolveVariantAlias } from "@oh-my-pi/pi-catalog/variant-collapse";
-import { fuzzyMatch } from "@oh-my-pi/pi-tui";
-import { logger } from "@oh-my-pi/pi-utils";
+import { ThinkingLevel } from "@reactor/agent-core";
+import type { Api, Effort, KnownProvider, Model, ModelSpec } from "@reactor/ai";
+import { buildModel } from "@reactor/catalog/build";
+import { modelMatchesHost } from "@reactor/catalog/hosts";
+import { buildModelProviderPriorityRank } from "@reactor/catalog/identity";
+import { stripThinkingVariantToken } from "@reactor/catalog/identity/family";
+import { clampThinkingLevelForModel } from "@reactor/catalog/model-thinking";
+import { modelsAreEqual } from "@reactor/catalog/models";
+import { DEFAULT_MODEL_PER_PROVIDER } from "@reactor/catalog/provider-models";
+import { resolveBareVariantAlias, resolveVariantAlias } from "@reactor/catalog/variant-collapse";
+import { fuzzyMatch } from "@reactor/tui";
+import { logger } from "@reactor/utils";
 import chalk from "chalk";
 import MODEL_PRIO from "../priority.json" with { type: "json" };
 import {
@@ -1654,7 +1654,7 @@ export function resolveCliModel(options: {
 			model: undefined,
 			selector: undefined,
 			warning: undefined,
-			error: `Unknown provider "${cliProvider}". Run "omp models" to see available providers/models.`,
+			error: `Unknown provider "${cliProvider}". Run "reactor models" to see available providers/models.`,
 		};
 	}
 
@@ -1728,7 +1728,7 @@ export function resolveCliModel(options: {
 			selector: undefined,
 			thinkingLevel: undefined,
 			warning,
-			error: `Model "${display}" not found. Run "omp models" to see available models.`,
+			error: `Model "${display}" not found. Run "reactor models" to see available models.`,
 		};
 	}
 

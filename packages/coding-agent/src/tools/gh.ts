@@ -8,9 +8,9 @@ import type {
 	AgentToolResult,
 	AgentToolUpdateCallback,
 	ToolApprovalDecision,
-} from "@oh-my-pi/pi-agent-core";
+} from "@reactor/agent-core";
 
-import { getWorktreeDir, hashPath, isEnoent, logger, prompt, untilAborted } from "@oh-my-pi/pi-utils";
+import { getWorktreeDir, hashPath, isEnoent, logger, prompt, untilAborted } from "@reactor/utils";
 import { type } from "arktype";
 import type { Settings } from "../config/settings";
 import githubDescription from "../prompts/tools/github.md" with { type: "text" };
@@ -1077,21 +1077,26 @@ async function resolvePrBranchPushTarget(
 	maintainerCanModify?: boolean;
 	isCrossRepository: boolean;
 }> {
-	const headRef = await git.config.getBranch(repoRoot, localBranch, "ompPrHeadRef", signal);
+	const headRef = await git.config.getBranch(repoRoot, localBranch, "reactorPrHeadRef", signal);
 	if (!headRef) {
 		throw new ToolError(`branch ${localBranch} has no PR push metadata; check it out via op: pr_checkout first`);
 	}
 
 	const pushRemote = await git.config.getBranch(repoRoot, localBranch, "pushRemote", signal);
 	const remote = await git.config.getBranch(repoRoot, localBranch, "remote", signal);
-	const prUrl = await git.config.getBranch(repoRoot, localBranch, "ompPrUrl", signal);
+	const prUrl = await git.config.getBranch(repoRoot, localBranch, "reactorPrUrl", signal);
 	const maintainerCanModifyValue = await git.config.getBranch(
 		repoRoot,
 		localBranch,
-		"ompPrMaintainerCanModify",
+		"reactorPrMaintainerCanModify",
 		signal,
 	);
-	const isCrossRepositoryValue = await git.config.getBranch(repoRoot, localBranch, "ompPrIsCrossRepository", signal);
+	const isCrossRepositoryValue = await git.config.getBranch(
+		repoRoot,
+		localBranch,
+		"reactorPrIsCrossRepository",
+		signal,
+	);
 
 	const remoteName = pushRemote ?? remote;
 	if (!remoteName) {
@@ -3304,19 +3309,19 @@ async function checkoutPullRequest(
 			await git.config.setBranch(repoRoot, localBranch, "remote", remote.name, signal);
 			await git.config.setBranch(repoRoot, localBranch, "merge", `refs/heads/${headRefName}`, signal);
 			await git.config.setBranch(repoRoot, localBranch, "pushRemote", remote.name, signal);
-			await git.config.setBranch(repoRoot, localBranch, "ompPrHeadRef", headRefName, signal);
-			await git.config.setBranch(repoRoot, localBranch, "ompPrUrl", data.url ?? "", signal);
+			await git.config.setBranch(repoRoot, localBranch, "reactorPrHeadRef", headRefName, signal);
+			await git.config.setBranch(repoRoot, localBranch, "reactorPrUrl", data.url ?? "", signal);
 			await git.config.setBranch(
 				repoRoot,
 				localBranch,
-				"ompPrIsCrossRepository",
+				"reactorPrIsCrossRepository",
 				String(Boolean(data.isCrossRepository)),
 				signal,
 			);
 			await git.config.setBranch(
 				repoRoot,
 				localBranch,
-				"ompPrMaintainerCanModify",
+				"reactorPrMaintainerCanModify",
 				String(Boolean(data.maintainerCanModify)),
 				signal,
 			);

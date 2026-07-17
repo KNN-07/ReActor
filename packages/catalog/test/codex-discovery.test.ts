@@ -3,11 +3,11 @@ import { describe, expect, it } from "bun:test";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
-import { buildModel } from "@oh-my-pi/pi-catalog/build";
-import { fetchCodexModels } from "@oh-my-pi/pi-catalog/discovery/codex";
-import { writeModelCache } from "@oh-my-pi/pi-catalog/model-cache";
-import { resolveProviderModels } from "@oh-my-pi/pi-catalog/model-manager";
-import type { ModelSpec } from "@oh-my-pi/pi-catalog/types";
+import { buildModel } from "@reactor/catalog/build";
+import { fetchCodexModels } from "@reactor/catalog/discovery/codex";
+import { writeModelCache } from "@reactor/catalog/model-cache";
+import { resolveProviderModels } from "@reactor/catalog/model-manager";
+import type { ModelSpec } from "@reactor/catalog/types";
 
 describe("Codex model discovery", () => {
 	it("marks discovered models for provider-native V2 compaction", async () => {
@@ -141,7 +141,7 @@ describe("Codex model discovery", () => {
 	});
 
 	it("ignores pre-V2 Codex discovery cache rows", async () => {
-		const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "pi-catalog-codex-v7-cache-"));
+		const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "catalog-codex-v7-cache-"));
 		const dbPath = path.join(tempDir, "models.db");
 		const cachedModel: ModelSpec<"openai-codex-responses"> = {
 			id: "gpt-5.5",
@@ -201,7 +201,7 @@ describe("Codex model discovery", () => {
 	});
 
 	it("does not silently promote legacy v2 Codex cache rows to the current schema", async () => {
-		const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "pi-catalog-codex-v2-cache-"));
+		const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "catalog-codex-v2-cache-"));
 		const dbPath = path.join(tempDir, "models.db");
 		try {
 			// Seed a v2 row directly, mirroring the shape written by very old

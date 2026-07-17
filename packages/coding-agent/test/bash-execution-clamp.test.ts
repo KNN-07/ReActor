@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from "bun:test";
-import { BashExecutionComponent } from "@oh-my-pi/pi-coding-agent/modes/components/bash-execution";
-import { getThemeByName, setThemeInstance } from "@oh-my-pi/pi-coding-agent/modes/theme/theme";
-import type { TUI } from "@oh-my-pi/pi-tui";
-import { visibleWidth } from "@oh-my-pi/pi-tui";
+import { BashExecutionComponent } from "@reactor/coding-agent/modes/components/bash-execution";
+import { getThemeByName, setThemeInstance } from "@reactor/coding-agent/modes/theme/theme";
+import type { TUI } from "@reactor/tui";
+import { visibleWidth } from "@reactor/tui";
 
 const MAX_DISPLAY_LINE_CHARS = 4000;
 

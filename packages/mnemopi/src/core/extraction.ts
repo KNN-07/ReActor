@@ -28,19 +28,19 @@ function envInt(name: string, defaultValue: number): number {
 }
 
 function llmEnabled(): boolean {
-	return envBool("MNEMOPI_LLM_ENABLED", true);
+	return envBool("REACTOR_MNEMOPI_LLM_ENABLED", true);
 }
 
 function hostLlmEnabled(): boolean {
-	return envBool("MNEMOPI_HOST_LLM_ENABLED", false);
+	return envBool("REACTOR_MNEMOPI_HOST_LLM_ENABLED", false);
 }
 
 function llmMaxTokens(): number {
-	return envInt("MNEMOPI_LLM_MAX_TOKENS", 2048);
+	return envInt("REACTOR_MNEMOPI_LLM_MAX_TOKENS", 2048);
 }
 
 export const EXTRACTION_PROMPT_TEMPLATE =
-	env("MNEMOPI_EXTRACTION_PROMPT") ||
+	env("REACTOR_MNEMOPI_EXTRACTION_PROMPT") ||
 	`You are an expert structured memory extractor for Mnemopi v3.0+ MEMORIA tables.
 The user message below may be in English, German, Russian, or another language.
 First detect the language, then extract ONLY high-signal, long-term relevant items.
@@ -328,8 +328,8 @@ async function tryHostExtraction(prompt: string): Promise<[boolean, string | nul
 		maxTokens: llmMaxTokens(),
 		temperature: 0,
 		timeout: 15,
-		provider: env("MNEMOPI_HOST_LLM_PROVIDER").trim() || null,
-		model: env("MNEMOPI_HOST_LLM_MODEL").trim() || null,
+		provider: env("REACTOR_MNEMOPI_HOST_LLM_PROVIDER").trim() || null,
+		model: env("REACTOR_MNEMOPI_HOST_LLM_MODEL").trim() || null,
 	});
 	const text = typeof raw === "string" ? raw.trim() : "";
 	return [true, text === "" ? null : text];

@@ -2,7 +2,7 @@ import type { Dirent } from "node:fs";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
-import { isEnoent } from "@oh-my-pi/pi-utils";
+import { isEnoent } from "@reactor/utils";
 import { $ } from "bun";
 import {
 	getBehaviorDashboardStats,
@@ -26,18 +26,18 @@ const EMBEDDED_CLIENT_ARCHIVE = decodeEmbeddedClientArchive(embeddedClientArchiv
 const CLIENT_DIR = path.join(import.meta.dir, "client");
 const STATIC_DIR = path.join(import.meta.dir, "..", "dist", "client");
 const IS_BUN_COMPILED =
-	Boolean(process.env.PI_COMPILED || Bun.env.PI_COMPILED) ||
+	Boolean(process.env.REACTOR_COMPILED || Bun.env.REACTOR_COMPILED) ||
 	import.meta.url.includes("$bunfs") ||
 	import.meta.url.includes("~BUN") ||
 	import.meta.url.includes("%7EBUN");
 // The prepacked npm bundle (coding-agent dist/cli.js) constant-folds
-// process.env.PI_BUNDLED at build time. Like compiled binaries, it ships no
+// process.env.REACTOR_BUNDLED at build time. Like compiled binaries, it ships no
 // dashboard sources or prebuilt dist/client next to the bundle, so the
 // embedded archive is the only viable asset source.
-const IS_PREBUILT = IS_BUN_COMPILED || Boolean(process.env.PI_BUNDLED || Bun.env.PI_BUNDLED);
+const IS_PREBUILT = IS_BUN_COMPILED || Boolean(process.env.REACTOR_BUNDLED || Bun.env.REACTOR_BUNDLED);
 const USE_EMBEDDED_CLIENT = EMBEDDED_CLIENT_ARCHIVE !== null || IS_PREBUILT;
 
-const EMBEDDED_CLIENT_DIR_ROOT = path.join(os.tmpdir(), "omp-stats-client");
+const EMBEDDED_CLIENT_DIR_ROOT = path.join(os.tmpdir(), "reactor-stats-client");
 let embeddedClientDirPromise: Promise<string> | null = null;
 
 function sanitizeArchivePath(archivePath: string): string | null {
@@ -69,7 +69,7 @@ async function getEmbeddedClientDir(): Promise<string> {
 
 	if (!EMBEDDED_CLIENT_ARCHIVE) {
 		throw new Error(
-			"Embedded stats client bundle missing. Rebuild the omp binary or npm bundle with embedded stats assets.",
+			"Embedded stats client bundle missing. Rebuild the reactor binary or npm bundle with embedded stats assets.",
 		);
 	}
 

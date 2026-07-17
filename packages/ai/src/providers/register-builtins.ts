@@ -189,9 +189,9 @@ function hasFinalResult(
 
 /**
  * floor used when neither caller option nor env var pins a value. Generic env
- * vars (`PI_STREAM_FIRST_EVENT_TIMEOUT_MS`, `PI_STREAM_IDLE_TIMEOUT_MS`) still
+ * vars (`REACTOR_STREAM_FIRST_EVENT_TIMEOUT_MS`, `REACTOR_STREAM_IDLE_TIMEOUT_MS`) still
  * take precedence unless a provider opts into OpenAI-family idle flooring for
- * local backends that users historically tuned with `PI_OPENAI_STREAM_IDLE_TIMEOUT_MS`.
+ * local backends that users historically tuned with `REACTOR_OPENAI_STREAM_IDLE_TIMEOUT_MS`.
  */
 interface LazyStreamLimits {
 	defaultFirstEventTimeoutMs?: number;
@@ -204,7 +204,7 @@ interface LazyStreamLimits {
 	/**
 	 * Apply OpenAI-family idle timeout precedence in the lazy wrapper. Used by
 	 * local backends whose users historically tune slow prompt-processing gaps
-	 * with `PI_OPENAI_STREAM_IDLE_TIMEOUT_MS`.
+	 * with `REACTOR_OPENAI_STREAM_IDLE_TIMEOUT_MS`.
 	 */
 	openAIIdleEnvFloorsFirstEvent?: boolean;
 }

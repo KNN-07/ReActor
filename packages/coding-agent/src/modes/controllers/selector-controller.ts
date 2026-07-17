@@ -1,10 +1,10 @@
-import { ThinkingLevel } from "@oh-my-pi/pi-agent-core";
-import { PASTE_CODE_LOGIN_PROVIDERS } from "@oh-my-pi/pi-ai";
-import { getOAuthProviders } from "@oh-my-pi/pi-ai/oauth";
-import type { OAuthProvider } from "@oh-my-pi/pi-ai/oauth/types";
-import type { Component, OverlayHandle } from "@oh-my-pi/pi-tui";
-import { Loader, Spacer, setTuiTight, Text } from "@oh-my-pi/pi-tui";
-import { getAgentDbPath, getAgentDir, getProjectDir, normalizePathForComparison } from "@oh-my-pi/pi-utils";
+import { ThinkingLevel } from "@reactor/agent-core";
+import { PASTE_CODE_LOGIN_PROVIDERS } from "@reactor/ai";
+import { getOAuthProviders } from "@reactor/ai/oauth";
+import type { OAuthProvider } from "@reactor/ai/oauth/types";
+import type { Component, OverlayHandle } from "@reactor/tui";
+import { Loader, Spacer, setTuiTight, Text } from "@reactor/tui";
+import { getAgentDbPath, getAgentDir, getProjectDir, normalizePathForComparison } from "@reactor/utils";
 import {
 	type AdvisorConfigScope,
 	discoverAdvisorConfigs,

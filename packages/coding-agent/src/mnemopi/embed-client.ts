@@ -1,4 +1,4 @@
-import { logger } from "@oh-my-pi/pi-utils";
+import { logger } from "@reactor/utils";
 import {
 	createUnavailableWorker,
 	createWorkerHandle,
@@ -32,18 +32,18 @@ type PendingRequest =
  * Hidden subcommand on the main CLI that boots the mnemopi embeddings worker
  * in the spawned subprocess. Kept in sync with the dispatch in `cli.ts`.
  */
-export const MNEMOPI_EMBED_WORKER_ARG = "__omp_worker_mnemopi_embed";
+export const REACTOR_MNEMOPI_EMBED_WORKER_ARG = "__reactor_worker_mnemopi_embed";
 
 /**
  * Spawn the mnemopi embeddings worker as a subprocess. Exported for tests and
  * the smoke probe; production callers go through {@link spawnMnemopiEmbedWorker}.
  * The child inherits the parent env verbatim — fastembed honours `HF_HUB_*`,
- * `HTTPS_PROXY`, etc., and our `loadFastembed()` reads the same `OMP_*`
+ * `HTTPS_PROXY`, etc., and our `loadFastembed()` reads the same `REACTOR_*`
  * runtime-install knobs the parent uses.
  */
 export function createMnemopiEmbedSubprocess(): SpawnedSubprocess<MnemopiEmbedWorkerOutbound> {
 	return createWorkerSubprocess<MnemopiEmbedWorkerOutbound>({
-		spawnCommand: resolveWorkerSpawnCmd(MNEMOPI_EMBED_WORKER_ARG),
+		spawnCommand: resolveWorkerSpawnCmd(REACTOR_MNEMOPI_EMBED_WORKER_ARG),
 		env: workerEnvFromParent(),
 		exitLabel: "mnemopi embed subprocess",
 	});

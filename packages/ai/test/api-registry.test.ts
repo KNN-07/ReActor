@@ -5,8 +5,8 @@ import {
 	getCustomApi,
 	registerCustomApi,
 	unregisterCustomApis,
-} from "@oh-my-pi/pi-ai/api-registry";
-import type { AssistantMessageEventStream } from "@oh-my-pi/pi-ai/types";
+} from "@reactor/ai/api-registry";
+import type { AssistantMessageEventStream } from "@reactor/ai/types";
 
 afterEach(() => {
 	clearCustomApis();

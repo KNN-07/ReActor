@@ -12,7 +12,7 @@ import {
 	setTerminalDeccara,
 	TERMINAL,
 	TUI,
-} from "@oh-my-pi/pi-tui";
+} from "@reactor/tui";
 import { VirtualTerminal } from "./virtual-terminal";
 
 // Truecolor background open token used throughout the integration tests.
@@ -130,12 +130,12 @@ describe("detectRectangularSgrSupport", () => {
 		expect(detectRectangularSgrSupport("trueColor", {})).toBe(false);
 	});
 
-	it("honors the PI_NO_DECCARA kill switch (truthy values only)", () => {
-		expect(detectRectangularSgrSupport("kitty", { PI_NO_DECCARA: "1" })).toBe(false);
-		expect(detectRectangularSgrSupport("kitty", { PI_NO_DECCARA: "true" })).toBe(false);
+	it("honors the REACTOR_NO_DECCARA kill switch (truthy values only)", () => {
+		expect(detectRectangularSgrSupport("kitty", { REACTOR_NO_DECCARA: "1" })).toBe(false);
+		expect(detectRectangularSgrSupport("kitty", { REACTOR_NO_DECCARA: "true" })).toBe(false);
 		// A falsey assignment is not a kill: support stays on.
-		expect(detectRectangularSgrSupport("kitty", { PI_NO_DECCARA: "0" })).toBe(true);
-		expect(detectRectangularSgrSupport("kitty", { PI_NO_DECCARA: "false" })).toBe(true);
+		expect(detectRectangularSgrSupport("kitty", { REACTOR_NO_DECCARA: "0" })).toBe(true);
+		expect(detectRectangularSgrSupport("kitty", { REACTOR_NO_DECCARA: "false" })).toBe(true);
 	});
 
 	it("disables under tmux/screen/zellij/cmux multiplexers", () => {
@@ -285,17 +285,17 @@ describe("planDeccaraFills", () => {
 
 describe("TUI DECCARA integration", () => {
 	const savedDeccara = TERMINAL.deccara;
-	const savedForceSyncOutput = Bun.env.PI_FORCE_SYNC_OUTPUT;
-	const savedNoSyncOutput = Bun.env.PI_NO_SYNC_OUTPUT;
-	const savedTuiSyncOutput = Bun.env.PI_TUI_SYNC_OUTPUT;
+	const savedForceSyncOutput = Bun.env.REACTOR_FORCE_SYNC_OUTPUT;
+	const savedNoSyncOutput = Bun.env.REACTOR_NO_SYNC_OUTPUT;
+	const savedTuiSyncOutput = Bun.env.REACTOR_TUI_SYNC_OUTPUT;
 
 	beforeEach(() => {
-		Bun.env.PI_FORCE_SYNC_OUTPUT = "1";
-		process.env.PI_FORCE_SYNC_OUTPUT = "1";
-		delete Bun.env.PI_NO_SYNC_OUTPUT;
-		delete process.env.PI_NO_SYNC_OUTPUT;
-		delete Bun.env.PI_TUI_SYNC_OUTPUT;
-		delete process.env.PI_TUI_SYNC_OUTPUT;
+		Bun.env.REACTOR_FORCE_SYNC_OUTPUT = "1";
+		process.env.REACTOR_FORCE_SYNC_OUTPUT = "1";
+		delete Bun.env.REACTOR_NO_SYNC_OUTPUT;
+		delete process.env.REACTOR_NO_SYNC_OUTPUT;
+		delete Bun.env.REACTOR_TUI_SYNC_OUTPUT;
+		delete process.env.REACTOR_TUI_SYNC_OUTPUT;
 		let monotonic = 0;
 		vi.spyOn(performance, "now").mockImplementation(() => {
 			monotonic += 20;
@@ -305,25 +305,25 @@ describe("TUI DECCARA integration", () => {
 
 	afterEach(() => {
 		if (savedForceSyncOutput === undefined) {
-			delete Bun.env.PI_FORCE_SYNC_OUTPUT;
-			delete process.env.PI_FORCE_SYNC_OUTPUT;
+			delete Bun.env.REACTOR_FORCE_SYNC_OUTPUT;
+			delete process.env.REACTOR_FORCE_SYNC_OUTPUT;
 		} else {
-			Bun.env.PI_FORCE_SYNC_OUTPUT = savedForceSyncOutput;
-			process.env.PI_FORCE_SYNC_OUTPUT = savedForceSyncOutput;
+			Bun.env.REACTOR_FORCE_SYNC_OUTPUT = savedForceSyncOutput;
+			process.env.REACTOR_FORCE_SYNC_OUTPUT = savedForceSyncOutput;
 		}
 		if (savedNoSyncOutput === undefined) {
-			delete Bun.env.PI_NO_SYNC_OUTPUT;
-			delete process.env.PI_NO_SYNC_OUTPUT;
+			delete Bun.env.REACTOR_NO_SYNC_OUTPUT;
+			delete process.env.REACTOR_NO_SYNC_OUTPUT;
 		} else {
-			Bun.env.PI_NO_SYNC_OUTPUT = savedNoSyncOutput;
-			process.env.PI_NO_SYNC_OUTPUT = savedNoSyncOutput;
+			Bun.env.REACTOR_NO_SYNC_OUTPUT = savedNoSyncOutput;
+			process.env.REACTOR_NO_SYNC_OUTPUT = savedNoSyncOutput;
 		}
 		if (savedTuiSyncOutput === undefined) {
-			delete Bun.env.PI_TUI_SYNC_OUTPUT;
-			delete process.env.PI_TUI_SYNC_OUTPUT;
+			delete Bun.env.REACTOR_TUI_SYNC_OUTPUT;
+			delete process.env.REACTOR_TUI_SYNC_OUTPUT;
 		} else {
-			Bun.env.PI_TUI_SYNC_OUTPUT = savedTuiSyncOutput;
-			process.env.PI_TUI_SYNC_OUTPUT = savedTuiSyncOutput;
+			Bun.env.REACTOR_TUI_SYNC_OUTPUT = savedTuiSyncOutput;
+			process.env.REACTOR_TUI_SYNC_OUTPUT = savedTuiSyncOutput;
 		}
 		setTerminalDeccara(savedDeccara);
 		vi.restoreAllMocks();
@@ -376,7 +376,7 @@ describe("TUI DECCARA integration", () => {
 
 	it("keeps padded fallback bytes when synchronized output is disabled", async () => {
 		await withEnvPatch(
-			{ PI_NO_SYNC_OUTPUT: "1", PI_FORCE_SYNC_OUTPUT: undefined, PI_TUI_SYNC_OUTPUT: undefined },
+			{ REACTOR_NO_SYNC_OUTPUT: "1", REACTOR_FORCE_SYNC_OUTPUT: undefined, REACTOR_TUI_SYNC_OUTPUT: undefined },
 			async () => {
 				setTerminalDeccara(true);
 				const term = new VirtualTerminal(40, 8);

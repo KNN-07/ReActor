@@ -1,0 +1,78 @@
+# syntax=docker/dockerfile:1.7-labs
+###############################################################################
+# reactor-worker — GitHub triage+fix bot orchestrator.
+#
+# Extends `reactor-base` (from /Dockerfile, default target ReActor/reactor:dev) and adds
+# the reactor-worker Python package + a Vite-built SolidJS dashboard bundle. The pi
+# toolchain (python + bun + rustup launcher + reactor-natives + reactor_rpc wheel +
+# /usr/local/bin/reactor shim) all comes from REACTOR_BASE; this file only layers what's
+# reactor-worker-specific.
+#
+# Build (from pi root):
+#     bun run pi:image                              # build ReActor/reactor:dev first
+#     docker build -f Dockerfile.reactor-worker -t reactor-worker:dev .
+#
+# Compose (recommended):
+#     docker compose --project-directory python/reactor-worker build
+###############################################################################
+
+ARG REACTOR_BASE=ReActor/reactor:dev
+ARG BUN_VERSION=1.3.14
+
+############################
+# 1) web-builder — Bun + Vite, builds the SolidJS dashboard bundle.
+############################
+FROM oven/bun:${BUN_VERSION}-slim AS web-builder
+WORKDIR /work
+# Root manifests + the web workspace manifest are enough for `bun install
+# --filter reactor-worker-web` to hydrate just the dashboard's node_modules.
+COPY package.json bun.lock ./
+COPY python/reactor-worker/web/package.json ./python/reactor-worker/web/package.json
+# Root package.json declares patchedDependencies, so the patch file must be
+# present before any root-level `bun install` (even a filtered one).
+COPY patches/*.patch ./patches/
+RUN bun install --filter reactor-worker-web
+COPY --exclude=node_modules --exclude=dist python/reactor-worker/web/ ./python/reactor-worker/web/
+RUN bun --cwd=python/reactor-worker/web run build
+
+############################
+# 2) runtime — reactor-base + reactor-worker src + web bundle + pip install
+############################
+FROM ${REACTOR_BASE} AS runtime
+
+# reactor-worker runs against the host pi checkout mounted at /work/pi read-only.
+ENV REACTOR_ROOT=/work/pi
+
+WORKDIR /app
+
+# reactor-worker itself. Drop the Vite-built dashboard into the package tree before
+# `pip install` so it lands in the installed wheel (`static/**/*` is declared
+# as package-data in pyproject.toml).
+COPY python/reactor-worker/pyproject.toml ./
+COPY python/reactor-worker/src/ ./src/
+COPY --from=web-builder /work/python/reactor-worker/web/dist/ ./src/static/
+
+RUN pip install --no-cache-dir \
+        "fastapi>=0.112" "uvicorn[standard]>=0.30" "httpx>=0.27" \
+        "pydantic>=2.6" "pydantic-settings>=2.2" "python-dotenv>=1.0" \
+        "click>=8.1" \
+    && pip install --no-cache-dir --no-deps .
+
+# Host agent config is mounted read-only under /srv/agent-home-stage with
+# host-controlled permissions. The entrypoint copies it into root-owned
+# world-readable files under /srv/agent-home; the agent subprocess runs with
+# HOME=/srv/agent-home, so ~/.reactor and ~/.agent resolve there without exposing
+# mutable host mounts.
+RUN mkdir -p /srv/agent-home/.agent /srv/agent-home/.reactor/agent \
+    && mkdir -p /srv/agent-home-stage/.agent /srv/agent-home-stage/.reactor/agent \
+    && printf '[install]\nbackend = "copyfile"\n' > /srv/agent-home/.bunfig.toml
+
+COPY python/reactor-worker/entrypoint.sh /usr/local/bin/reactor-worker-entrypoint
+RUN chmod +x /usr/local/bin/reactor-worker-entrypoint
+
+VOLUME ["/data"]
+EXPOSE 8080
+EXPOSE 8081
+
+ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/reactor-worker-entrypoint"]
+CMD ["python", "-m", "reactor-worker", "serve"]

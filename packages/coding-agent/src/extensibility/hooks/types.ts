@@ -1,6 +1,6 @@
-import type { ImageContent, Message, Model, TextContent } from "@oh-my-pi/pi-ai";
-import type { Component, TUI } from "@oh-my-pi/pi-tui";
-import type { logger as PiLogger } from "@oh-my-pi/pi-utils";
+import type { ImageContent, Message, Model, TextContent } from "@reactor/ai";
+import type { Component, TUI } from "@reactor/tui";
+import type { logger as PiLogger } from "@reactor/utils";
 import type { Type } from "arktype";
 import type * as zod from "zod/v4";
 import type { ModelRegistry } from "../../config/model-registry";
@@ -589,7 +589,7 @@ export interface HookAPI {
 	arktype: typeof Type;
 	/** Injected zod/v4 module for canonical hook validation. */
 	zod: typeof zod;
-	/** Injected pi-coding-agent exports */
+	/** Injected coding-agent exports */
 	pi: typeof PiCodingAgent;
 }
 

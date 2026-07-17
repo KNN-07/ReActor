@@ -1,5 +1,5 @@
-import type { AgentMessage } from "@oh-my-pi/pi-agent-core";
-import type { ImageContent, MessageAttribution, ServiceTierByFamily, TextContent } from "@oh-my-pi/pi-ai";
+import type { AgentMessage } from "@reactor/agent-core";
+import type { ImageContent, MessageAttribution, ServiceTierByFamily, TextContent } from "@reactor/ai";
 
 export const CURRENT_SESSION_VERSION = 3;
 
@@ -142,7 +142,7 @@ export interface TitleChangeEntry extends SessionEntryBase {
 	trigger?: string;
 }
 
-declare module "@oh-my-pi/pi-agent-core/compaction/entries" {
+declare module "@reactor/agent-core/compaction/entries" {
 	interface CustomCompactionSessionEntries {
 		titleChange: TitleChangeEntry;
 	}

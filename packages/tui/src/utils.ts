@@ -7,18 +7,18 @@ import {
 	truncateToWidth as nativeTruncateToWidth,
 	wrapTextWithAnsi as nativeWrapTextWithAnsi,
 	type SliceResult,
-} from "@oh-my-pi/pi-natives";
-import { DEFAULT_TAB_WIDTH } from "@oh-my-pi/pi-utils";
+} from "@reactor/natives";
+import { DEFAULT_TAB_WIDTH } from "@reactor/utils";
 
-export { Ellipsis } from "@oh-my-pi/pi-natives";
+export { Ellipsis } from "@reactor/natives";
 
-export { DEFAULT_TAB_WIDTH } from "@oh-my-pi/pi-utils";
+export { DEFAULT_TAB_WIDTH } from "@reactor/utils";
 
 export type HangulCompatibilityJamoWidth = "platform" | "unicode" | 1 | 2;
 
 let hangulCompatibilityJamoWidth: HangulCompatibilityJamoWidth = "platform";
 
-// Wire encoding for the native override (see crates/pi-natives text.rs):
+// Wire encoding for the native override (see crates/reactor-natives text.rs):
 // 0 = platform default, 1 = narrow, 2 = wide, 3 = unicode (no correction).
 function nativeHangulCompatibilityJamoOverride(width: HangulCompatibilityJamoWidth): number {
 	if (width === "unicode") return 3;
@@ -204,7 +204,7 @@ const HANGUL_COMPAT_JAMO_BUN_WIDTH = 2;
 
 // Effective target cell width for Compatibility Jamo, or `null` to follow the
 // Unicode width (no correction). Mirrors `hangul_compat_jamo_target_width` in
-// crates/pi-natives/src/text.rs.
+// crates/reactor-natives/src/text.rs.
 function hangulCompatibilityJamoTargetWidth(): 1 | 2 | null {
 	switch (hangulCompatibilityJamoWidth) {
 		case 1:
@@ -223,7 +223,7 @@ function hangulCompatibilityJamoTargetWidth(): 1 | 2 | null {
 // width engine: subtract Bun's per-jamo cell count and add back the effective
 // width — the runtime target when one is active, otherwise the `unicode-width`
 // value. Mirrors `char_width_corrected` / `apply_hangul_compat_jamo_delta` in
-// crates/pi-natives/src/text.rs, including the rule that the zero-width filler
+// crates/reactor-natives/src/text.rs, including the rule that the zero-width filler
 // (U+3164) is never widened past the narrow correction (a wide terminal still
 // renders it at its Unicode width of 0).
 function correctHangulCompatibilityJamoWidth(width: number, str: string): number {

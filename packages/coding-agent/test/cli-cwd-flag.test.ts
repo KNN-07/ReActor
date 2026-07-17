@@ -2,9 +2,9 @@ import { afterEach, describe, expect, it } from "bun:test";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { parseArgs } from "@oh-my-pi/pi-coding-agent/cli/args";
-import { applyStartupCwd } from "@oh-my-pi/pi-coding-agent/cli/startup-cwd";
-import { getProjectDir, normalizePathForComparison, setProjectDir } from "@oh-my-pi/pi-utils";
+import { parseArgs } from "@reactor/coding-agent/cli/args";
+import { applyStartupCwd } from "@reactor/coding-agent/cli/startup-cwd";
+import { getProjectDir, normalizePathForComparison, setProjectDir } from "@reactor/utils";
 
 const originalProjectDir = getProjectDir();
 
@@ -33,8 +33,8 @@ describe("parseArgs — --cwd flag", () => {
 		expect(result.messages).toEqual(["hello"]);
 	});
 	it("applies --cwd before session lookup callers read the project directory", async () => {
-		const launchDir = fs.mkdtempSync(path.join(os.tmpdir(), "omp-cwd-launch-"));
-		const targetDir = fs.mkdtempSync(path.join(os.tmpdir(), "omp-cwd-target-"));
+		const launchDir = fs.mkdtempSync(path.join(os.tmpdir(), "reactor-cwd-launch-"));
+		const targetDir = fs.mkdtempSync(path.join(os.tmpdir(), "reactor-cwd-target-"));
 		setProjectDir(launchDir);
 
 		const parsed = parseArgs(["--cwd", targetDir, "--continue"]);
@@ -46,7 +46,7 @@ describe("parseArgs — --cwd flag", () => {
 	});
 
 	it("normalizes a relative --cwd target to the resolved absolute path", async () => {
-		const launchDir = fs.mkdtempSync(path.join(os.tmpdir(), "omp-cwd-rel-"));
+		const launchDir = fs.mkdtempSync(path.join(os.tmpdir(), "reactor-cwd-rel-"));
 		const childName = "repo";
 		const childDir = path.join(launchDir, childName);
 		fs.mkdirSync(childDir);

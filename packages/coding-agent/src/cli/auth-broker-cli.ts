@@ -1,5 +1,5 @@
 /**
- * `omp auth-broker` command handlers.
+ * `reactor auth-broker` command handlers.
  *
  * Sub-verbs:
  *   - `serve [--bind=…]` — boots the broker against the local SQLite store.
@@ -31,10 +31,10 @@ import {
 	PASTE_CODE_LOGIN_PROVIDERS,
 	PROVIDER_REGISTRY,
 	SqliteAuthCredentialStore,
-} from "@oh-my-pi/pi-ai";
-import { AuthBrokerClient, DEFAULT_AUTH_BROKER_BIND, startAuthBroker } from "@oh-my-pi/pi-ai/auth-broker";
-import { $which, APP_NAME, getAgentDbPath, getConfigRootDir, isEnoent, logger, VERSION } from "@oh-my-pi/pi-utils";
-import { setTransports as setLoggerTransports } from "@oh-my-pi/pi-utils/logger";
+} from "@reactor/ai";
+import { AuthBrokerClient, DEFAULT_AUTH_BROKER_BIND, startAuthBroker } from "@reactor/ai/auth-broker";
+import { $which, APP_NAME, getAgentDbPath, getConfigRootDir, isEnoent, logger, VERSION } from "@reactor/utils";
+import { setTransports as setLoggerTransports } from "@reactor/utils/logger";
 import { $ } from "bun";
 import chalk from "chalk";
 import { resolveAuthBrokerConfig } from "../session/auth-broker-config";
@@ -122,7 +122,7 @@ async function ensureToken(): Promise<string> {
 async function runServe(flags: AuthBrokerCommandArgs["flags"]): Promise<void> {
 	// The broker is a long-running headless service: route structured logs to
 	// stdout so a process supervisor (pm2, journald, k8s) captures them, and
-	// skip the rotating ~/.omp/logs/ file the TUI default would have used.
+	// skip the rotating ~/.reactor/logs/ file the TUI default would have used.
 	setLoggerTransports({ console: true, file: false });
 
 	const bind = flags.bind ?? DEFAULT_AUTH_BROKER_BIND;
@@ -183,7 +183,7 @@ async function runLogin(flags: AuthBrokerCommandArgs["flags"]): Promise<void> {
 	if (!providerArg) {
 		if (flags.via) {
 			throw new Error(
-				"Usage: omp auth-broker login <provider> --via=user@host (provider required for remote login)",
+				"Usage: reactor auth-broker login <provider> --via=user@host (provider required for remote login)",
 			);
 		}
 		providerArg = await pickProviderInteractively(providers);
@@ -225,12 +225,12 @@ async function runLocalLogin(provider: OAuthProvider): Promise<void> {
 			onAuth({ url, launchUrl, instructions }) {
 				process.stdout.write("\nOpen this URL in your browser:\n");
 				// Full URL first so the CLI works from any machine, including SSH
-				// sessions where a `launchUrl` (loopback `/launch` on the OMP
+				// sessions where a `launchUrl` (loopback `/launch` on the ReActor
 				// host) would resolve against the caller's browser and fail.
 				// Headless capture is unaffected: it reads the first URL line.
 				process.stdout.write(`${url}\n`);
 				if (launchUrl && launchUrl !== url) {
-					// Local shortcut for the machine running OMP. Terminals or
+					// Local shortcut for the machine running ReActor. Terminals or
 					// screen-scrapers narrower than the full URL still get an
 					// unbroken copy target here.
 					process.stdout.write(`Local shortcut (this machine only): ${launchUrl}\n`);
@@ -423,7 +423,7 @@ async function runList(flags: AuthBrokerCommandArgs["flags"]): Promise<void> {
 // ─── CLIProxyAPI import ─────────────────────────────────────────────────
 
 /**
- * Maps the `type` field of a CLIProxyAPI credential JSON to the omp provider id.
+ * Maps the `type` field of a CLIProxyAPI credential JSON to the reactor provider id.
  * The filename also encodes the type (e.g. `claude-foo@bar.json`), but the
  * in-file `type` is authoritative — we only fall back to filename if absent.
  */
@@ -519,7 +519,7 @@ async function loadImportPlan(
 		if (!provider) {
 			skipped.push({
 				file,
-				reason: `cannot determine omp provider from type=${json.type ?? "?"} (pass --provider to override)`,
+				reason: `cannot determine reactor provider from type=${json.type ?? "?"} (pass --provider to override)`,
 			});
 			continue;
 		}
@@ -565,7 +565,9 @@ function describeImportEntry(entry: ImportPlanEntry): string {
 async function runImport(flags: AuthBrokerCommandArgs["flags"]): Promise<void> {
 	const target = flags.source;
 	if (!target) {
-		throw new Error("Usage: omp auth-broker import <file|dir> [--provider=<id>] [--include-disabled] [--dry-run]");
+		throw new Error(
+			"Usage: reactor auth-broker import <file|dir> [--provider=<id>] [--include-disabled] [--dry-run]",
+		);
 	}
 	const resolvedTarget = path.resolve(target.startsWith("~") ? target.replace(/^~/, os.homedir()) : target);
 	const { entries, skipped } = await loadImportPlan(resolvedTarget, flags.provider, flags.includeDisabled === true);
@@ -723,12 +725,12 @@ async function runMigrate(flags: AuthBrokerCommandArgs["flags"]): Promise<void> 
 	const brokerConfig = await resolveAuthBrokerConfig();
 	if (!brokerConfig) {
 		throw new Error(
-			"OMP_AUTH_BROKER_URL must be set (or `auth.broker.url` in config.yml). `migrate` uploads local credentials to a configured broker.",
+			"REACTOR_AUTH_BROKER_URL must be set (or `auth.broker.url` in config.yml). `migrate` uploads local credentials to a configured broker.",
 		);
 	}
 	if (flags.fromLocal !== true) {
 		throw new Error(
-			"`omp auth-broker migrate` requires an explicit source. Pass `--from-local` to migrate from the local SQLite store and env vars.",
+			"`reactor auth-broker migrate` requires an explicit source. Pass `--from-local` to migrate from the local SQLite store and env vars.",
 		);
 	}
 
@@ -746,7 +748,7 @@ async function runMigrate(flags: AuthBrokerCommandArgs["flags"]): Promise<void> 
 	const plannedApiKeyProviders = new Set<string>();
 	try {
 		for (const row of localStore.listAuthCredentials()) {
-			// Skip placeholder sentinels that pi-ai treats as "authenticated via
+			// Skip placeholder sentinels that ai treats as "authenticated via
 			// out-of-band mechanism" (Bedrock/Vertex `<authenticated>`). They
 			// aren't real keys and uploading them would store garbage on the
 			// broker. Mirrors the env-var path's guard below.
@@ -876,7 +878,7 @@ async function runMigrate(flags: AuthBrokerCommandArgs["flags"]): Promise<void> 
 async function runStatus(flags: AuthBrokerCommandArgs["flags"]): Promise<void> {
 	const cfg = await resolveAuthBrokerConfig();
 	if (!cfg) {
-		const message = "No auth-broker configured (set OMP_AUTH_BROKER_URL to enable).";
+		const message = "No auth-broker configured (set REACTOR_AUTH_BROKER_URL to enable).";
 		if (flags.json) process.stdout.write(`${JSON.stringify({ ok: false, reason: "not_configured" })}\n`);
 		else process.stdout.write(`${chalk.yellow(message)}\n`);
 		return;

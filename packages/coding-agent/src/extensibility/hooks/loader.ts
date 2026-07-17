@@ -2,7 +2,7 @@
  * Hook loader - loads TypeScript hook modules using native Bun import.
  */
 import * as path from "node:path";
-import { logger } from "@oh-my-pi/pi-utils";
+import { logger } from "@reactor/utils";
 import * as arktype from "arktype";
 import * as zodModule from "zod/v4";
 import { hookCapability } from "../../capability/hook";
@@ -212,7 +212,7 @@ export async function loadHooks(paths: string[], cwd: string): Promise<LoadHooks
 /**
  * Discover and load hooks from all registered providers.
  * Uses the capability API to discover hook paths from:
- * 1. OMP native configs (.omp/.pi hooks/)
+ * 1. ReActor native configs (.reactor/.pi hooks/)
  * 2. Installed plugins
  * 3. Other editor/IDE configurations
  *

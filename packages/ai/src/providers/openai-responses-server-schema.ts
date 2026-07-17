@@ -226,7 +226,7 @@ export const toolChoiceSchema = type("'auto' | 'none' | 'required'")
 export const reasoningConfigSchema = type({
 	"effort?": "string",
 	// `none` maps to hideThinkingSummary; auto/concise/detailed mean "show
-	// summary". pi-ai has no per-level plumbing for the latter — walker logs
+	// summary". ai has no per-level plumbing for the latter — walker logs
 	// once and treats them as default.
 	"summary?": "'auto' | 'concise' | 'detailed' | 'none'",
 });

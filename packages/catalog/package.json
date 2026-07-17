@@ -1,18 +1,19 @@
 {
   "type": "module",
-  "name": "@oh-my-pi/pi-catalog",
-  "version": "17.0.2",
-  "description": "Model catalog for omp: bundled model database, provider discovery descriptors, model identity, classification, and equivalence",
-  "homepage": "https://omp.sh",
+  "name": "@reactor/catalog",
+	"private": true,
+  "version": "0.1.0",
+  "description": "Model catalog for reactor: bundled model database, provider discovery descriptors, model identity, classification, and equivalence",
+  "homepage": "https://reactor.sh",
   "author": "Can Boluk",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/can1357/oh-my-pi.git",
+    "url": "git+https://github.com/KNN-07/ReActor.git",
     "directory": "packages/catalog"
   },
   "bugs": {
-    "url": "https://github.com/can1357/oh-my-pi/issues"
+    "url": "https://github.com/KNN-07/ReActor/issues"
   },
   "keywords": [
     "ai",
@@ -34,12 +35,12 @@
   },
   "dependencies": {
     "@bufbuild/protobuf": "catalog:",
-    "@oh-my-pi/pi-utils": "catalog:",
+    "@reactor/utils": "workspace:*",
     "arktype": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@oh-my-pi/pi-ai": "catalog:",
+    "@reactor/ai": "workspace:*",
     "@types/bun": "catalog:"
   },
   "engines": {

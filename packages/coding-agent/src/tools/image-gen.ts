@@ -1,15 +1,15 @@
 import * as os from "node:os";
 import * as path from "node:path";
-import { type ApiKey, type FetchImpl, getEnvApiKey, type Model, withAuth } from "@oh-my-pi/pi-ai";
-import { ProviderHttpError } from "@oh-my-pi/pi-ai/error";
+import { type ApiKey, type FetchImpl, getEnvApiKey, type Model, withAuth } from "@reactor/ai";
+import { ProviderHttpError } from "@reactor/ai/error";
 import {
 	CODEX_BASE_URL,
 	getCodexAccountId,
 	OPENAI_HEADER_VALUES,
 	OPENAI_HEADERS,
 	URL_PATHS,
-} from "@oh-my-pi/pi-catalog/wire/codex";
-import { getAntigravityUserAgent } from "@oh-my-pi/pi-catalog/wire/gemini-headers";
+} from "@reactor/catalog/wire/codex";
+import { getAntigravityUserAgent } from "@reactor/catalog/wire/gemini-headers";
 import {
 	$env,
 	isEnoent,
@@ -19,7 +19,7 @@ import {
 	readSseJson,
 	Snowflake,
 	untilAborted,
-} from "@oh-my-pi/pi-utils";
+} from "@reactor/utils";
 import { type } from "arktype";
 import packageJson from "../../package.json" with { type: "json" };
 import { isAuthenticated, type ModelRegistry } from "../config/model-registry";
@@ -717,7 +717,7 @@ function getExtensionForMime(mimeType: string): string {
 
 async function saveImageToTemp(image: InlineImageData): Promise<string> {
 	const ext = getExtensionForMime(image.mimeType);
-	const filename = `omp-image-${Snowflake.next()}.${ext}`;
+	const filename = `reactor-image-${Snowflake.next()}.${ext}`;
 	const filepath = path.join(os.tmpdir(), filename);
 	await Bun.write(filepath, Buffer.from(image.data, "base64"));
 	return filepath;
@@ -1487,7 +1487,7 @@ export const imageGenTool: CustomTool<typeof imageGenSchema, ImageGenToolDetails
 									headers: {
 										"Content-Type": "application/json",
 										Authorization: `Bearer ${key}`,
-										"HTTP-Referer": "https://omp.sh/",
+										"HTTP-Referer": "https://reactor.sh/",
 										"X-OpenRouter-Title": "Oh-My-Pi",
 										"X-OpenRouter-Categories": "cli-agent",
 									},

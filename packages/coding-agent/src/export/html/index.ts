@@ -1,7 +1,7 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import type { AgentState } from "@oh-my-pi/pi-agent-core";
-import { APP_NAME, isEnoent } from "@oh-my-pi/pi-utils";
+import type { AgentState } from "@reactor/agent-core";
+import { APP_NAME, isEnoent } from "@reactor/utils";
 import { getResolvedThemeColors, getThemeExportColors } from "../../modes/theme/theme";
 import type { SessionEntry, SessionHeader } from "../../session/session-entries";
 import { loadEntriesFromFile } from "../../session/session-loader";
@@ -39,9 +39,9 @@ export interface ExportOptions {
 	outputPath?: string;
 	/**
 	 * Which color palette the export ships with.
-	 * - `"web"` (default) — the omp brand identity (collab-web pink/purple),
+	 * - `"web"` (default) — the reactor brand identity (collab-web pink/purple),
 	 *   so public HTML exports and the `/s/<id>` share viewer match the live
-	 *   `my.omp.sh` client. See `web-palette.ts`.
+	 *   `my.reactor.sh` client. See `web-palette.ts`.
 	 * - `"theme"` — derive from `themeName` (or the active TUI theme), preserving
 	 *   the pre-15.12 behavior where an export mirrored the user's terminal.
 	 */
@@ -120,9 +120,9 @@ function deriveExportColors(baseColor: string): { pageBg: string; cardBg: string
  *
  * Two call shapes:
  *   • `generateThemeVars("web" | "theme", themeName?)` — explicit palette.
- *     `"web"` (the default for public artifacts) returns the fixed omp brand
+ *     `"web"` (the default for public artifacts) returns the fixed reactor brand
  *     palette from `web-palette.ts` — collab-web pink/purple identity, shared
- *     with the live `my.omp.sh` client, so exports and the share viewer render
+ *     with the live `my.reactor.sh` client, so exports and the share viewer render
  *     identically to it. `"theme"` derives from the TUI theme via
  *     `getResolvedThemeColors(themeName)` plus the three
  *     `export.{pageBg,cardBg,infoBg}` surface overrides.

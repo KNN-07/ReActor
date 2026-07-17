@@ -1,18 +1,18 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "bun:test";
 import * as path from "node:path";
-import { runConfigCommand } from "@oh-my-pi/pi-coding-agent/cli/config-cli";
-import { resetSettingsForTest } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { AgentStorage } from "@oh-my-pi/pi-coding-agent/session/agent-storage";
-import { getConfigRootDir, setAgentDir, TempDir } from "@oh-my-pi/pi-utils";
+import { runConfigCommand } from "@reactor/coding-agent/cli/config-cli";
+import { resetSettingsForTest } from "@reactor/coding-agent/config/settings";
+import { AgentStorage } from "@reactor/coding-agent/session/agent-storage";
+import { getConfigRootDir, setAgentDir, TempDir } from "@reactor/utils";
 
 let testAgentDir: TempDir | undefined;
-const originalAgentDir = process.env.PI_CODING_AGENT_DIR;
+const originalAgentDir = process.env.REACTOR_CODING_AGENT_DIR;
 const fallbackAgentDir = path.join(getConfigRootDir(), "agent");
 const cliEntry = path.join(import.meta.dir, "..", "src", "cli.ts");
 
 beforeEach(() => {
 	resetSettingsForTest();
-	testAgentDir = TempDir.createSync("@omp-config-cli-");
+	testAgentDir = TempDir.createSync("@reactor-config-cli-");
 	setAgentDir(testAgentDir.path());
 });
 
@@ -24,7 +24,7 @@ afterEach(async () => {
 		setAgentDir(originalAgentDir);
 	} else {
 		setAgentDir(fallbackAgentDir);
-		delete process.env.PI_CODING_AGENT_DIR;
+		delete process.env.REACTOR_CODING_AGENT_DIR;
 	}
 	if (testAgentDir) {
 		try {
@@ -175,7 +175,7 @@ describe("config CLI schema coverage", () => {
 			env: {
 				...process.env,
 				NO_COLOR: "1",
-				PI_CODING_AGENT_DIR: testAgentDir.path(),
+				REACTOR_CODING_AGENT_DIR: testAgentDir.path(),
 			},
 		});
 		const stdout = new Response(proc.stdout).text();

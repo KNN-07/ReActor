@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, spyOn, vi } from "bun:test";
-import { resolveModels, runTinyModelsCommand } from "@oh-my-pi/pi-coding-agent/cli/tiny-models-cli";
-import { TINY_LOCAL_MODELS } from "@oh-my-pi/pi-coding-agent/tiny/models";
-import { tinyTitleClient } from "@oh-my-pi/pi-coding-agent/tiny/title-client";
+import { resolveModels, runTinyModelsCommand } from "@reactor/coding-agent/cli/tiny-models-cli";
+import { TINY_LOCAL_MODELS } from "@reactor/coding-agent/tiny/models";
+import { tinyTitleClient } from "@reactor/coding-agent/tiny/title-client";
 
 afterEach(() => {
 	vi.restoreAllMocks();
@@ -82,8 +82,8 @@ describe("tiny-models download model resolution", () => {
 		const diagnostic = [
 			"Error: Failed to load ONNX Runtime CUDA execution provider",
 			"ONNX Runtime CUDA diagnostics:",
-			"  PI_TINY_DEVICE=cuda requested CUDAExecutionProvider",
-			"  side runtime: /home/user/.omp/cache/tiny-title-runtime/transformers-test/node_modules",
+			"  REACTOR_TINY_DEVICE=cuda requested CUDAExecutionProvider",
+			"  side runtime: /home/user/.reactor/cache/tiny-title-runtime/transformers-test/node_modules",
 			"  cause: libcudnn.so.9: cannot open shared object file",
 		].join("\n");
 		Object.defineProperty(process.stdout, "isTTY", { configurable: true, value: false });
@@ -107,7 +107,7 @@ describe("tiny-models download model resolution", () => {
 
 		const text = output.join("");
 		expect(text).toContain("Failed to download LFM2 700M:");
-		expect(text).toContain("PI_TINY_DEVICE=cuda");
+		expect(text).toContain("REACTOR_TINY_DEVICE=cuda");
 		expect(text).toContain("libcudnn.so.9");
 		expect(text).toContain("tiny-title-runtime");
 	});

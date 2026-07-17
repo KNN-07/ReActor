@@ -15,16 +15,16 @@ section() {
 }
 
 smoke_cli() {
-   local omp_bin="$1"
+   local reactor_bin="$1"
    local runtime_dir
    runtime_dir="$(mktemp -d "$WORK_DIR/compiled-runtime.XXXXXX")"
-   XDG_DATA_HOME="$runtime_dir/xdg" HOME="$runtime_dir/home" "$omp_bin" --version
-   XDG_DATA_HOME="$runtime_dir/xdg" HOME="$runtime_dir/home" "$omp_bin" --help >/dev/null
-   XDG_DATA_HOME="$runtime_dir/xdg" HOME="$runtime_dir/home" "$omp_bin" stats --summary >/dev/null
+   XDG_DATA_HOME="$runtime_dir/xdg" HOME="$runtime_dir/home" "$reactor_bin" --version
+   XDG_DATA_HOME="$runtime_dir/xdg" HOME="$runtime_dir/home" "$reactor_bin" --help >/dev/null
+   XDG_DATA_HOME="$runtime_dir/xdg" HOME="$runtime_dir/home" "$reactor_bin" stats --summary >/dev/null
    # Spawns bundled workers and serves the stats dashboard once. Regression
    # probe for #1011/#1027 worker loading and for npm/compiled distributions
    # missing the dashboard assets that `stats --summary` never touches.
-   XDG_DATA_HOME="$runtime_dir/xdg" HOME="$runtime_dir/home" "$omp_bin" --smoke-test
+   XDG_DATA_HOME="$runtime_dir/xdg" HOME="$runtime_dir/home" "$reactor_bin" --smoke-test
 }
 
 find_tarball() {
@@ -48,8 +48,8 @@ bun --cwd=packages/coding-agent run build
 
 BINARY_DIR="$WORK_DIR/binary-bin"
 mkdir -p "$BINARY_DIR"
-cp packages/coding-agent/dist/omp "$BINARY_DIR/omp"
-smoke_cli "$BINARY_DIR/omp"
+cp packages/coding-agent/dist/reactor "$BINARY_DIR/reactor"
+smoke_cli "$BINARY_DIR/reactor"
 
 section "Source install smoke"
 SOURCE_BUN_HOME="$WORK_DIR/bun-source"
@@ -57,7 +57,7 @@ SOURCE_BUN_HOME="$WORK_DIR/bun-source"
    export BUN_INSTALL="$SOURCE_BUN_HOME"
    export PATH="$BUN_INSTALL/bin:$PATH"
    bun --cwd="$ROOT_DIR/packages/coding-agent" link
-   smoke_cli "$BUN_INSTALL/bin/omp"
+   smoke_cli "$BUN_INSTALL/bin/reactor"
 )
 
 section "Tarball install smoke"
@@ -101,7 +101,7 @@ for pkg in utils wire hashline catalog ai mnemopi snapcompact agent tui stats co
 done
 
 # 4. Pack the coding agent with its *published* manifest: release swaps
-#    `bin.omp` from `src/cli.ts` to the prepack bundle `dist/cli.js`. The repo
+#    `bin.reactor` from `src/cli.ts` to the prepack bundle `dist/cli.js`. The repo
 #    manifest keeps pointing at source so `bun link`/`install.sh --source`
 #    work without a build, so the swap must be reproduced here for the smoke
 #    to exercise the bundled worker-host entry the published package ships.
@@ -116,20 +116,20 @@ agent_rc=0
 cp "$agent_pkg_backup" "$ROOT_DIR/packages/coding-agent/package.json"
 [ "$agent_rc" -eq 0 ] || exit "$agent_rc"
 
-utils_tgz="$(find_tarball "$TARBALL_DIR"/oh-my-pi-pi-utils-*.tgz)"
-wire_tgz="$(find_tarball "$TARBALL_DIR"/oh-my-pi-pi-wire-*.tgz)"
-natives_tgz="$(find_tarball "$TARBALL_DIR"/oh-my-pi-pi-natives-[0-9]*.tgz)"
-natives_leaf_tgz="$(find_tarball "$TARBALL_DIR"/oh-my-pi-pi-natives-"$host_tag"-*.tgz)"
-hashline_tgz="$(find_tarball "$TARBALL_DIR"/oh-my-pi-hashline-*.tgz)"
-catalog_tgz="$(find_tarball "$TARBALL_DIR"/oh-my-pi-pi-catalog-*.tgz)"
-ai_tgz="$(find_tarball "$TARBALL_DIR"/oh-my-pi-pi-ai-*.tgz)"
-mnemopi_tgz="$(find_tarball "$TARBALL_DIR"/oh-my-pi-pi-mnemopi-*.tgz)"
-snapcompact_tgz="$(find_tarball "$TARBALL_DIR"/oh-my-pi-snapcompact-*.tgz)"
-agent_tgz="$(find_tarball "$TARBALL_DIR"/oh-my-pi-pi-agent-core-*.tgz)"
-tui_tgz="$(find_tarball "$TARBALL_DIR"/oh-my-pi-pi-tui-*.tgz)"
-stats_tgz="$(find_tarball "$TARBALL_DIR"/oh-my-pi-omp-stats-*.tgz)"
-coding_agent_tgz="$(find_tarball "$TARBALL_DIR"/oh-my-pi-pi-coding-agent-*.tgz)"
-collab_web_tgz="$(find_tarball "$TARBALL_DIR"/oh-my-pi-collab-web-*.tgz)"
+utils_tgz="$(find_tarball "$TARBALL_DIR"/ReActor-utils-*.tgz)"
+wire_tgz="$(find_tarball "$TARBALL_DIR"/ReActor-wire-*.tgz)"
+natives_tgz="$(find_tarball "$TARBALL_DIR"/ReActor-reactor-natives-[0-9]*.tgz)"
+natives_leaf_tgz="$(find_tarball "$TARBALL_DIR"/ReActor-reactor-natives-"$host_tag"-*.tgz)"
+hashline_tgz="$(find_tarball "$TARBALL_DIR"/ReActor-hashline-*.tgz)"
+catalog_tgz="$(find_tarball "$TARBALL_DIR"/ReActor-catalog-*.tgz)"
+ai_tgz="$(find_tarball "$TARBALL_DIR"/ReActor-ai-*.tgz)"
+mnemopi_tgz="$(find_tarball "$TARBALL_DIR"/ReActor-mnemopi-*.tgz)"
+snapcompact_tgz="$(find_tarball "$TARBALL_DIR"/ReActor-snapcompact-*.tgz)"
+agent_tgz="$(find_tarball "$TARBALL_DIR"/ReActor-agent-core-*.tgz)"
+tui_tgz="$(find_tarball "$TARBALL_DIR"/ReActor-tui-*.tgz)"
+stats_tgz="$(find_tarball "$TARBALL_DIR"/ReActor-reactor-stats-*.tgz)"
+coding_agent_tgz="$(find_tarball "$TARBALL_DIR"/ReActor-coding-agent-*.tgz)"
+collab_web_tgz="$(find_tarball "$TARBALL_DIR"/ReActor-collab-web-*.tgz)"
 
 TARBALL_APP_DIR="$WORK_DIR/tarball-install"
 mkdir -p "$TARBALL_APP_DIR"
@@ -142,20 +142,20 @@ mkdir -p "$TARBALL_APP_DIR"
    node -e "
 		const pkg = JSON.parse(require('fs').readFileSync('package.json', 'utf8'));
 		pkg.overrides = {
-			'@oh-my-pi/pi-utils': '$utils_tgz',
-			'@oh-my-pi/pi-wire': '$wire_tgz',
-			'@oh-my-pi/pi-natives': '$natives_tgz',
-			'@oh-my-pi/pi-natives-$host_tag': '$natives_leaf_tgz',
-			'@oh-my-pi/hashline': '$hashline_tgz',
-			'@oh-my-pi/pi-ai': '$ai_tgz',
-			'@oh-my-pi/pi-catalog': '$catalog_tgz',
-			'@oh-my-pi/pi-mnemopi': '$mnemopi_tgz',
-			'@oh-my-pi/snapcompact': '$snapcompact_tgz',
-			'@oh-my-pi/pi-agent-core': '$agent_tgz',
-			'@oh-my-pi/pi-tui': '$tui_tgz',
-			'@oh-my-pi/omp-stats': '$stats_tgz',
-			'@oh-my-pi/pi-coding-agent': '$coding_agent_tgz',
-			'@oh-my-pi/collab-web': '$collab_web_tgz'
+			'@reactor/utils': '$utils_tgz',
+			'@reactor/wire': '$wire_tgz',
+			'@reactor/natives': '$natives_tgz',
+			'@reactor/natives-$host_tag': '$natives_leaf_tgz',
+			'@reactor/hashline': '$hashline_tgz',
+			'@reactor/ai': '$ai_tgz',
+			'@reactor/catalog': '$catalog_tgz',
+			'@reactor/mnemopi': '$mnemopi_tgz',
+			'@reactor/snapcompact': '$snapcompact_tgz',
+			'@reactor/agent-core': '$agent_tgz',
+			'@reactor/tui': '$tui_tgz',
+			'@reactor/stats': '$stats_tgz',
+			'@reactor/coding-agent': '$coding_agent_tgz',
+			'@reactor/collab-web': '$collab_web_tgz'
 		};
 		require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));
 	"
@@ -164,21 +164,21 @@ mkdir -p "$TARBALL_APP_DIR"
    # The platform leaf must arrive through the core's optionalDependencies +
    # override, not as a direct dependency — assert it landed before smoking so a
    # resolution regression is distinguishable from a runtime loader bug.
-   leaf_dir="node_modules/@oh-my-pi/pi-natives-$host_tag"
+   leaf_dir="node_modules/@reactor/natives-$host_tag"
    [ -d "$leaf_dir" ] || {
       echo "Platform leaf package not installed: $leaf_dir"
       exit 1
    }
-   wire_proto="$(bun -e 'import { COLLAB_PROTO } from "@oh-my-pi/pi-wire"; process.stdout.write(String(COLLAB_PROTO));')"
+   wire_proto="$(bun -e 'import { COLLAB_PROTO } from "@reactor/wire"; process.stdout.write(String(COLLAB_PROTO));')"
    [ "$wire_proto" = "3" ] || {
-      echo "Unexpected @oh-my-pi/pi-wire COLLAB_PROTO: $wire_proto"
+      echo "Unexpected @reactor/wire COLLAB_PROTO: $wire_proto"
       exit 1
    }
-   [ -f "node_modules/@oh-my-pi/collab-web/dist/index.html" ] || {
+   [ -f "node_modules/@reactor/collab-web/dist/index.html" ] || {
       echo "Collab web tarball did not install built dist/index.html"
       exit 1
    }
-   smoke_cli ./node_modules/.bin/omp
+   smoke_cli ./node_modules/.bin/reactor
 )
 
 echo ""

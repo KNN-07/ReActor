@@ -1,5 +1,5 @@
 /**
- * Regression for https://github.com/can1357/oh-my-pi/issues/1832
+ * Regression for https://github.com/KNN-07/ReActor/issues/1832
  *
  * Before the fix:
  *   - `remember()`/`rememberBatch()` never invoked `embed()`, so the
@@ -17,13 +17,10 @@ import { randomBytes } from "node:crypto";
 import { rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import "./setup";
-import { cmdRemember } from "@oh-my-pi/pi-mnemopi/cli";
-import { BeamMemory } from "@oh-my-pi/pi-mnemopi/core/beam";
-import { Mnemopi } from "@oh-my-pi/pi-mnemopi/core/memory";
-import {
-	type ResolvedMnemopiRuntimeOptions,
-	withMnemopiRuntimeOptions,
-} from "@oh-my-pi/pi-mnemopi/core/runtime-options";
+import { cmdRemember } from "@reactor/mnemopi/cli";
+import { BeamMemory } from "@reactor/mnemopi/core/beam";
+import { Mnemopi } from "@reactor/mnemopi/core/memory";
+import { type ResolvedMnemopiRuntimeOptions, withMnemopiRuntimeOptions } from "@reactor/mnemopi/core/runtime-options";
 
 interface EmbeddingRow {
 	readonly memory_id: string;

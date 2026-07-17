@@ -1,7 +1,7 @@
 /**
  * Regression test for issue #1234.
  *
- * `omp acp` must not auto-discover host `.mcp.json` servers when creating a
+ * `reactor acp` must not auto-discover host `.mcp.json` servers when creating a
  * session for an ACP client. MCP server ownership belongs entirely to the ACP
  * client (`session/new.mcpServers` → `AcpAgent#configureMcpServers`); letting
  * `createAgentSession` run on-disk discovery in parallel registers host MCP
@@ -13,13 +13,13 @@
  */
 
 import { describe, expect, it } from "bun:test";
-import { ModelRegistry } from "@oh-my-pi/pi-coding-agent/config/model-registry";
-import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { createAcpSessionFactory } from "@oh-my-pi/pi-coding-agent/main";
-import type { CreateAgentSessionOptions, CreateAgentSessionResult } from "@oh-my-pi/pi-coding-agent/sdk";
-import type { AgentSession } from "@oh-my-pi/pi-coding-agent/session/agent-session";
-import { AuthStorage } from "@oh-my-pi/pi-coding-agent/session/auth-storage";
-import { TempDir } from "@oh-my-pi/pi-utils";
+import { ModelRegistry } from "@reactor/coding-agent/config/model-registry";
+import { Settings } from "@reactor/coding-agent/config/settings";
+import { createAcpSessionFactory } from "@reactor/coding-agent/main";
+import type { CreateAgentSessionOptions, CreateAgentSessionResult } from "@reactor/coding-agent/sdk";
+import type { AgentSession } from "@reactor/coding-agent/session/agent-session";
+import { AuthStorage } from "@reactor/coding-agent/session/auth-storage";
+import { TempDir } from "@reactor/utils";
 
 describe("createAcpSessionFactory MCP isolation (issue #1234)", () => {
 	it("forces enableMCP=false even when baseOptions opts in", async () => {
@@ -86,7 +86,7 @@ describe("createAcpSessionFactory TITLE_SYSTEM.md per-cwd resolution (PR #3736)"
 			const settings = Settings.isolated({});
 
 			const projectDir = tempDir.join("project");
-			await Bun.write(`${projectDir}/.omp/TITLE_SYSTEM.md`, "Project-specific title policy.");
+			await Bun.write(`${projectDir}/.reactor/TITLE_SYSTEM.md`, "Project-specific title policy.");
 
 			const fakeSession = {} as AgentSession;
 			const captured: CreateAgentSessionOptions[] = [];

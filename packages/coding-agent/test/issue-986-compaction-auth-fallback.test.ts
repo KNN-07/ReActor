@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "bun:test";
 import * as path from "node:path";
-import { Agent } from "@oh-my-pi/pi-agent-core";
-import * as compactionModule from "@oh-my-pi/pi-agent-core/compaction";
-import { getBundledModel } from "@oh-my-pi/pi-catalog/models";
-import { ModelRegistry } from "@oh-my-pi/pi-coding-agent/config/model-registry";
-import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import { AgentSession } from "@oh-my-pi/pi-coding-agent/session/agent-session";
-import { AuthStorage } from "@oh-my-pi/pi-coding-agent/session/auth-storage";
-import { SessionManager } from "@oh-my-pi/pi-coding-agent/session/session-manager";
-import { TempDir } from "@oh-my-pi/pi-utils";
+import { Agent } from "@reactor/agent-core";
+import * as compactionModule from "@reactor/agent-core/compaction";
+import { getBundledModel } from "@reactor/catalog/models";
+import { ModelRegistry } from "@reactor/coding-agent/config/model-registry";
+import { Settings } from "@reactor/coding-agent/config/settings";
+import { AgentSession } from "@reactor/coding-agent/session/agent-session";
+import { AuthStorage } from "@reactor/coding-agent/session/auth-storage";
+import { SessionManager } from "@reactor/coding-agent/session/session-manager";
+import { TempDir } from "@reactor/utils";
 import { assistantMsg, userMsg } from "./utilities";
 
 describe("issue #986 compaction auth fallback", () => {
@@ -141,7 +141,7 @@ describe("issue #986 compaction auth fallback", () => {
 
 	it("falls back when the current provider returns a real HTTP 401 from the compaction call", async () => {
 		// Companion to the auth_unavailable test above: that case exercises the
-		// pi-native gateway synthetic ("no credential configured"), this one
+		// reactor-native gateway synthetic ("no credential configured"), this one
 		// exercises a configured-but-rejected credential (rotated/revoked
 		// Anthropic key, expired OAuth token, wrong workspace). Before the
 		// status-aware detector landed, only the synthetic was caught — a real

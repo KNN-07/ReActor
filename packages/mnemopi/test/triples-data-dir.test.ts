@@ -2,10 +2,10 @@ import { afterEach, describe, expect, it } from "bun:test";
 import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { defaultTripleDbPath, TripleStore } from "@oh-my-pi/pi-mnemopi/core/triples";
+import { defaultTripleDbPath, TripleStore } from "@reactor/mnemopi/core/triples";
 
 const originalHome = process.env.HOME;
-const originalDataDir = process.env.MNEMOPI_DATA_DIR;
+const originalDataDir = process.env.REACTOR_MNEMOPI_DATA_DIR;
 const roots: string[] = [];
 
 function tempRoot(): string {
@@ -17,8 +17,8 @@ function tempRoot(): string {
 afterEach(() => {
 	if (originalHome === undefined) delete process.env.HOME;
 	else process.env.HOME = originalHome;
-	if (originalDataDir === undefined) delete process.env.MNEMOPI_DATA_DIR;
-	else process.env.MNEMOPI_DATA_DIR = originalDataDir;
+	if (originalDataDir === undefined) delete process.env.REACTOR_MNEMOPI_DATA_DIR;
+	else process.env.REACTOR_MNEMOPI_DATA_DIR = originalDataDir;
 	while (roots.length > 0) rmSync(roots.pop() as string, { recursive: true, force: true });
 });
 
@@ -28,7 +28,7 @@ describe("TripleStore default data-directory handling", () => {
 		const home = join(root, "home");
 		const dataDir = join(root, "configured-data");
 		process.env.HOME = home;
-		process.env.MNEMOPI_DATA_DIR = dataDir;
+		process.env.REACTOR_MNEMOPI_DATA_DIR = dataDir;
 
 		const store = new TripleStore();
 		try {
@@ -41,13 +41,13 @@ describe("TripleStore default data-directory handling", () => {
 		}
 	});
 
-	it("copies an existing legacy triples database into MNEMOPI_DATA_DIR", () => {
+	it("copies an existing legacy triples database into REACTOR_MNEMOPI_DATA_DIR", () => {
 		const root = tempRoot();
 		const home = join(root, "home");
 		const dataDir = join(root, "configured-data");
 		const legacyDb = join(home, ".hermes", "mnemopi", "data", "triples.db");
 		process.env.HOME = home;
-		process.env.MNEMOPI_DATA_DIR = dataDir;
+		process.env.REACTOR_MNEMOPI_DATA_DIR = dataDir;
 
 		const legacy = new TripleStore(legacyDb);
 		try {

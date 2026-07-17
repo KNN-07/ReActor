@@ -2,17 +2,12 @@ import { describe, expect, it, spyOn } from "bun:test";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
-import type {
-	ResetCreditAccountStatus,
-	ResetCreditRedeemOutcome,
-	ResetCreditTarget,
-	UsageReport,
-} from "@oh-my-pi/pi-ai";
-import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import type { AgentSession } from "@oh-my-pi/pi-coding-agent/session/agent-session";
-import type { SessionManager } from "@oh-my-pi/pi-coding-agent/session/session-manager";
-import { executeAcpBuiltinSlashCommand } from "@oh-my-pi/pi-coding-agent/slash-commands/acp-builtins";
-import { removeWithRetries, setProjectDir } from "@oh-my-pi/pi-utils";
+import type { ResetCreditAccountStatus, ResetCreditRedeemOutcome, ResetCreditTarget, UsageReport } from "@reactor/ai";
+import { Settings } from "@reactor/coding-agent/config/settings";
+import type { AgentSession } from "@reactor/coding-agent/session/agent-session";
+import type { SessionManager } from "@reactor/coding-agent/session/session-manager";
+import { executeAcpBuiltinSlashCommand } from "@reactor/coding-agent/slash-commands/acp-builtins";
+import { removeWithRetries, setProjectDir } from "@reactor/utils";
 
 interface FakeAcpBuiltinSession {
 	fastMode: boolean;
@@ -380,13 +375,13 @@ describe("ACP builtin slash commands", () => {
 	it("dump: outputs transcript with LLM request JSON path when sidecar succeeds", async () => {
 		const { output, runtime } = createRuntime();
 		runtime.session.formatSessionAsText = () => "Session content here";
-		runtime.session.dumpLlmRequestToTmpDir = async () => "/tmp/omp-llm-request-test.json";
+		runtime.session.dumpLlmRequestToTmpDir = async () => "/tmp/reactor-llm-request-test.json";
 
 		const result = await executeAcpBuiltinSlashCommand("/dump", runtime);
 
 		expect(result).toEqual({ consumed: true });
 		expect(output[0]).toContain("Session content here");
-		expect(output[0]).toContain("LLM request JSON: /tmp/omp-llm-request-test.json");
+		expect(output[0]).toContain("LLM request JSON: /tmp/reactor-llm-request-test.json");
 		expect(output[0]).toContain("persists on disk");
 	});
 
@@ -746,7 +741,7 @@ describe("wave 3 commands", () => {
 
 	it("/move: relocates the current session instead of switching to an empty target session", async () => {
 		const { output, runtime, session, fakeSessionManager } = createRuntime();
-		const targetDir = await fs.mkdtemp(path.join(os.tmpdir(), "omp-move-target-"));
+		const targetDir = await fs.mkdtemp(path.join(os.tmpdir(), "reactor-move-target-"));
 		const originalProjectDir = process.cwd();
 		const reloadForCwd = spyOn(runtime.settings, "reloadForCwd");
 		let configNotified = 0;
@@ -974,9 +969,9 @@ describe("wave 5 — adapters and polish", () => {
 
 	// /mcp add — verify parsing and output message
 	it("/mcp add foo --url https://example.com --token X --scope project: outputs success or propagates write error", async () => {
-		// Uses project scope so it writes to /tmp/project/.omp/mcp.json which test infra controls.
+		// Uses project scope so it writes to /tmp/project/.reactor/mcp.json which test infra controls.
 		// We verify the command either reports success or a meaningful error (not a parse error).
-		const mcpModule = await import("@oh-my-pi/pi-coding-agent/mcp/config-writer");
+		const mcpModule = await import("@reactor/coding-agent/mcp/config-writer");
 		const spy = spyOn(mcpModule, "addMCPServer").mockResolvedValue(undefined);
 		try {
 			const { output, runtime } = createRuntime();
@@ -1014,7 +1009,7 @@ describe("wave 5 — adapters and polish", () => {
 
 	// /ssh add — spy on addSSHHost
 	it("/ssh add foo --host x --user y --scope user: calls addSSHHost", async () => {
-		const sshModule = await import("@oh-my-pi/pi-coding-agent/ssh/config-writer");
+		const sshModule = await import("@reactor/coding-agent/ssh/config-writer");
 		const spy = spyOn(sshModule, "addSSHHost").mockResolvedValue(undefined);
 		try {
 			const { output, runtime } = createRuntime();
@@ -1119,7 +1114,7 @@ describe("wave 5 — adapters and polish", () => {
 
 	// /marketplace discover bulleted list
 	it("/marketplace discover: output is bulleted with '  - ' token", async () => {
-		const { MarketplaceManager } = await import("@oh-my-pi/pi-coding-agent/extensibility/plugins/marketplace");
+		const { MarketplaceManager } = await import("@reactor/coding-agent/extensibility/plugins/marketplace");
 		const discoverSpy = spyOn(MarketplaceManager.prototype, "listAvailablePlugins").mockResolvedValue([
 			{ name: "hello", version: "1.0.0", description: "A greeting plugin" } as never,
 			{ name: "world", version: "2.0.0", description: undefined } as never,
@@ -1138,7 +1133,7 @@ describe("wave 5 — adapters and polish", () => {
 
 describe("/move preflight flush", () => {
 	it("aborts text-mode /move when pending settings flush fails", async () => {
-		const targetDir = await fs.mkdtemp(path.join(os.tmpdir(), "omp-acp-move-"));
+		const targetDir = await fs.mkdtemp(path.join(os.tmpdir(), "reactor-acp-move-"));
 		try {
 			const { output, fakeSessionManager, runtime } = createRuntime();
 			spyOn(runtime.settings, "flush").mockRejectedValue(new Error("disk full"));
@@ -1154,7 +1149,7 @@ describe("/move preflight flush", () => {
 	});
 
 	it("completes text-mode /move when flush succeeds", async () => {
-		const targetDir = await fs.mkdtemp(path.join(os.tmpdir(), "omp-acp-move-ok-"));
+		const targetDir = await fs.mkdtemp(path.join(os.tmpdir(), "reactor-acp-move-ok-"));
 		const originalProjectDir = process.cwd();
 		try {
 			const { output, fakeSessionManager, runtime } = createRuntime();

@@ -7,7 +7,7 @@ import {
 	isApiModel,
 	resetEmbeddingProviderForTests,
 	setEmbeddingProviderForTests,
-} from "@oh-my-pi/pi-mnemopi/core/embeddings";
+} from "@reactor/mnemopi/core/embeddings";
 
 function withEnvValue<T>(key: string, value: string | undefined, fn: () => T): T {
 	const previous = process.env[key];
@@ -54,7 +54,7 @@ function withEnvValues<T>(updates: Record<string, string | undefined>, fn: () =>
 
 describe("multilingual embedding metadata", () => {
 	it("detects English, Chinese, multilingual, Jina, and OpenAI dimensions", () => {
-		withEnvValue("MNEMOPI_EMBEDDING_DIM", undefined, () => {
+		withEnvValue("REACTOR_MNEMOPI_EMBEDDING_DIM", undefined, () => {
 			expect(embeddingDimFor("BAAI/bge-small-en-v1.5")).toBe(384);
 			expect(embeddingDimFor("BAAI/bge-base-en-v1.5")).toBe(768);
 			expect(embeddingDimFor("BAAI/bge-large-en-v1.5")).toBe(1024);
@@ -72,8 +72,8 @@ describe("multilingual embedding metadata", () => {
 			expect(embeddingDimFor("some/unknown-model")).toBe(384);
 		});
 	});
-	it("allows MNEMOPI_EMBEDDING_DIM to override model dimensions", () => {
-		withEnvValue("MNEMOPI_EMBEDDING_DIM", "768", () => {
+	it("allows REACTOR_MNEMOPI_EMBEDDING_DIM to override model dimensions", () => {
+		withEnvValue("REACTOR_MNEMOPI_EMBEDDING_DIM", "768", () => {
 			expect(embeddingDimFor("BAAI/bge-small-en-v1.5")).toBe(768);
 			expect(embeddingDimFor("unknown-model")).toBe(768);
 		});
@@ -82,8 +82,8 @@ describe("multilingual embedding metadata", () => {
 	it("routes only explicit API models or custom endpoints to the API", () => {
 		withEnvValues(
 			{
-				MNEMOPI_EMBEDDING_API_URL: undefined,
-				MNEMOPI_EMBEDDINGS_VIA_API: undefined,
+				REACTOR_MNEMOPI_EMBEDDING_API_URL: undefined,
+				REACTOR_MNEMOPI_EMBEDDINGS_VIA_API: undefined,
 				OPENROUTER_BASE_URL: undefined,
 			},
 			() => {
@@ -97,8 +97,8 @@ describe("multilingual embedding metadata", () => {
 
 		withEnvValues(
 			{
-				MNEMOPI_EMBEDDING_API_URL: undefined,
-				MNEMOPI_EMBEDDINGS_VIA_API: undefined,
+				REACTOR_MNEMOPI_EMBEDDING_API_URL: undefined,
+				REACTOR_MNEMOPI_EMBEDDINGS_VIA_API: undefined,
 				OPENROUTER_BASE_URL: "https://llama.example/v1",
 			},
 			() => {
@@ -109,8 +109,8 @@ describe("multilingual embedding metadata", () => {
 
 		withEnvValues(
 			{
-				MNEMOPI_EMBEDDING_API_URL: undefined,
-				MNEMOPI_EMBEDDINGS_VIA_API: undefined,
+				REACTOR_MNEMOPI_EMBEDDING_API_URL: undefined,
+				REACTOR_MNEMOPI_EMBEDDINGS_VIA_API: undefined,
 				OPENROUTER_BASE_URL: "https://openrouter.ai/api/v1",
 			},
 			() => {

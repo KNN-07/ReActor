@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { prompt } from "@oh-my-pi/pi-utils";
+import { prompt } from "@reactor/utils";
 import planModeActivePrompt from "../prompts/system/plan-mode-active.md" with { type: "text" };
 
 const BASE = {

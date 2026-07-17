@@ -64,21 +64,21 @@ export interface KittyGraphicsFeatures {
  *
  * Kitty and Ghostty advertise placeholder support directly. A tmux session
  * cannot use cursor-positioned placements because the outer terminal does not
- * know pane scroll/reflow state, so an explicit `PI_FORCE_IMAGE_PROTOCOL=kitty`
+ * know pane scroll/reflow state, so an explicit `REACTOR_FORCE_IMAGE_PROTOCOL=kitty`
  * also opts into placeholders there — matching `timg -pk`. Automatic tmux
  * fallback stays off because the unknown outer terminal may render U+10EEEE as
  * literal PUA boxes (#1877).
  *
- * `PI_NO_KITTY_PLACEHOLDERS=1` and `PI_KITTY_PLACEHOLDERS=0` remain hard
- * opt-outs; `PI_KITTY_PLACEHOLDERS=1` explicitly opts in anywhere else.
+ * `REACTOR_NO_KITTY_PLACEHOLDERS=1` and `REACTOR_KITTY_PLACEHOLDERS=0` remain hard
+ * opt-outs; `REACTOR_KITTY_PLACEHOLDERS=1` explicitly opts in anywhere else.
  */
 export function detectKittyUnicodePlaceholdersSupport(terminalId: string, env: NodeJS.ProcessEnv = Bun.env): boolean {
-	const offRaw = env.PI_NO_KITTY_PLACEHOLDERS?.trim().toLowerCase();
+	const offRaw = env.REACTOR_NO_KITTY_PLACEHOLDERS?.trim().toLowerCase();
 	if (offRaw === "1" || offRaw === "true" || offRaw === "on" || offRaw === "yes" || offRaw === "y") return false;
-	const force = env.PI_KITTY_PLACEHOLDERS?.trim().toLowerCase();
+	const force = env.REACTOR_KITTY_PLACEHOLDERS?.trim().toLowerCase();
 	if (force === "1" || force === "true" || force === "on" || force === "yes" || force === "y") return true;
 	if (force === "0" || force === "false" || force === "off" || force === "no" || force === "n") return false;
-	if (env.TMUX && env.PI_FORCE_IMAGE_PROTOCOL?.trim().toLowerCase() === "kitty") return true;
+	if (env.TMUX && env.REACTOR_FORCE_IMAGE_PROTOCOL?.trim().toLowerCase() === "kitty") return true;
 	return terminalId === "kitty" || terminalId === "ghostty";
 }
 

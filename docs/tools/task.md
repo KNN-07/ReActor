@@ -14,7 +14,7 @@
   - `packages/coding-agent/src/registry/agent-registry.ts` — process-global agent directory (`running | idle | parked | aborted`).
   - `packages/coding-agent/src/async/job-manager.ts` — background job registration, progress, and result delivery.
   - `packages/coding-agent/src/task/parallel.ts` — `Semaphore` used for the session-scoped concurrency bound.
-  - `@oh-my-pi/pi-natives` (`crates/pi-iso`) — isolation PAL: `isoResolve` / `isoStart` / `isoStop` backend resolution and fallback.
+  - `@reactor/natives` (`crates/reactor-iso`) — isolation PAL: `isoResolve` / `isoStart` / `isoStop` backend resolution and fallback.
   - `packages/coding-agent/src/task/worktree.ts` — isolation mode mapping (`parseIsolationMode`) and lifecycle (`ensureIsolation`/`cleanupIsolation`), patch capture, branch merge.
   - `packages/coding-agent/src/task/output-manager.ts` — session-scoped `agent://` id allocation.
   - `packages/coding-agent/src/task/name-generator.ts` — default AdjectiveNoun agent ids.
@@ -83,7 +83,7 @@ Artifacts and side channels:
    - a failed or aborted run throws `TaskJobError` so the job lands `failed`, but the agent itself stays registered and interrogable.
    - a mixed call registers the async jobs first, then runs its blocking items inline and returns once they settle — the text combines the inline summaries with the spawned-job listing, and the block keeps rendering the still-running background rows beside the inline results.
 5. `#executeSync(...)` runs the spawn path (`#runSpawn`), which rediscovers agents from disk, so runtime resolution can differ from the create-time description.
-6. It resolves each spawn's requested `agent` type, rejects unknown or settings-disabled agents, and enforces parent spawn policy plus `PI_BLOCKED_AGENT` self-recursion prevention.
+6. It resolves each spawn's requested `agent` type, rejects unknown or settings-disabled agents, and enforces parent spawn policy plus `REACTOR_BLOCKED_AGENT` self-recursion prevention.
 7. Output schema priority: agent frontmatter `output` → inherited parent session schema (the call itself never carries one).
 8. Plan mode swaps in an `effectiveAgent` with a read-only tool subset and plan-mode prompt; `runSubprocess(...)` receives the effective agent.
 9. If `isolated`, it requires a git repo (`getRepoRoot(...)` / `captureBaseline(...)`), maps `task.isolation.mode` to a backend-kind hint (`parseIsolationMode`), and materializes the workspace via the natives PAL (`ensureIsolation` → `isoResolve`/`isoStart`), walking the candidate list when a backend is unavailable.
@@ -106,7 +106,7 @@ Artifacts and side channels:
   - on — `{ context, tasks[] }`: one independent spawn per item, required `context` shared across the call's spawns, `agent`/`isolated` per item. Lifecycle, revival, and concurrency semantics match N parallel single calls.
   - off — single spawn per call; `tasks`/`context` are rejected and removed from the schema.
 - Isolation mode (`task.isolation.mode`): `none`, `auto`, `apfs`, `btrfs`, `zfs`, `reflink`, `overlayfs`, `projfs`, `block-clone`, `rcopy` (legacy `worktree`, `fuse-overlay`, `fuse-projfs` accepted for back-compat); the PAL resolves the actual backend with fallback.
-- Isolation merge strategy: patch mode (capture/apply root patches) or branch mode (commit to `omp/task/<id>`, cherry-pick into parent).
+- Isolation merge strategy: patch mode (capture/apply root patches) or branch mode (commit to `reactor/task/<id>`, cherry-pick into parent).
 - Agent source precedence: project custom agents, then user custom agents, then bundled agents (`scout`, `designer`, `reviewer`, `task`, `sonic`, `librarian`).
 
 ## Side Effects
@@ -117,7 +117,7 @@ Artifacts and side channels:
   - Child sessions may use whichever networked tools/models their active tool set permits.
   - MCP proxy tools can call existing parent MCP connections with a 60_000 ms timeout.
 - Subprocesses / native bindings
-  - Isolation backends run through the `pi-natives` PAL (`crates/pi-iso`): kernel `overlay` with `fuse-overlayfs`/`fusermount[3]` fallback on Linux, APFS/Btrfs/ZFS/reflink clones, ProjFS on Windows, recursive copy as last resort.
+  - Isolation backends run through the `reactor-natives` PAL (`crates/reactor-iso`): kernel `overlay` with `fuse-overlayfs`/`fusermount[3]` fallback on Linux, APFS/Btrfs/ZFS/reflink clones, ProjFS on Windows, recursive copy as last resort.
   - Git operations for baseline capture, patch apply, worktrees, branches, stash, cherry-pick, commits.
 - Session state (transcript, memory, jobs, checkpoints, registries)
   - Creates child `AgentSession` instances with isolated settings snapshots; finished sessions stay registered in the process-global `AgentRegistry` as `idle`/`parked` until process teardown or explicit release.
@@ -133,7 +133,7 @@ Artifacts and side channels:
 ## Limits & Caps
 - Concurrency: one session-scoped `Semaphore` sized from `task.maxConcurrency` at first use (later setting changes do not resize it) bounds concurrent subagents across parallel `task` calls — both async job bodies and the sync fallback acquire it.
 - Idle TTL: `task.agentIdleTtlMs`, default `420_000` ms (7 min); `<= 0` disables parking and keeps idle sessions live until exit.
-- Per-subagent output truncation: `MAX_OUTPUT_BYTES = 500_000` and `MAX_OUTPUT_LINES = 5000` in `packages/coding-agent/src/task/types.ts` (overridable via `PI_TASK_MAX_OUTPUT_BYTES` / `PI_TASK_MAX_OUTPUT_LINES`). Full raw output is still written to `<id>.md`.
+- Per-subagent output truncation: `MAX_OUTPUT_BYTES = 500_000` and `MAX_OUTPUT_LINES = 5000` in `packages/coding-agent/src/task/types.ts` (overridable via `REACTOR_TASK_MAX_OUTPUT_BYTES` / `REACTOR_TASK_MAX_OUTPUT_LINES`). Full raw output is still written to `<id>.md`.
 - Progress coalescing: `PROGRESS_COALESCE_MS = 150`; recent-output tail: `RECENT_OUTPUT_TAIL_BYTES = 8 * 1024` (last 8 non-empty lines).
 - Missing-`yield` reminder retries: `MAX_YIELD_RETRIES = 3`; MCP proxy timeout: `MCP_CALL_TIMEOUT_MS = 60_000` — both in `packages/coding-agent/src/task/executor.ts`.
 - Name/label caps: the wire `name` has no schema length cap (prompt text suggests `≤32` chars — guidance only); one-line display text (roster line, registry `displayName`) is normalized by `oneLineLabel(...)` and capped at `LABEL_MAX = 80` chars in `packages/coding-agent/src/task/types.ts`.
@@ -160,7 +160,7 @@ Artifacts and side channels:
 - Prefer messaging an existing agent (`hub`) over a fresh spawn for follow-up work: it already holds the relevant context. `hub` op:"list" shows idle/parked candidates; messaging a parked agent revives it. `history://<id>` shows what an agent has done.
 - Peer-messaging availability is derived, not configured (`isIrcEnabled` in `packages/coding-agent/src/tools/hub/messaging.ts`): it exists exactly when there is someone to message — the session can spawn subagents, or it is a subagent itself. Messaging is the only follow-up path to a finished subagent, so task without hub messaging would strand idle agents.
 - Subagents are internally synchronous: the executor forces `async.enabled = false` and `bash.autoBackground.enabled = false` in the child settings snapshot, so there are no fire-and-forget grandchildren.
-- Agent discovery precedence is first-wins by exact name: project `.omp` agents dir before the user `.omp` dir (task agents only load from `.omp` roots; `.claude`/`.codex`/`.gemini` agent dirs are skipped), Claude plugin agent dirs after config dirs, bundled agents last. Create-time discovery is memoized per cwd for the prompt description; execution-time discovery stays fresh.
+- Agent discovery precedence is first-wins by exact name: project `.reactor` agents dir before the user `.reactor` dir (task agents only load from `.reactor` roots; `.claude`/`.codex`/`.gemini` agent dirs are skipped), Claude plugin agent dirs after config dirs, bundled agents last. Create-time discovery is memoized per cwd for the prompt description; execution-time discovery stays fresh.
 - Child sessions do not inherit conversation history. Built-in carry-over is the workspace tree/skills/context files, the shared `local://` root, and the approved-plan reference when one exists.
 - When the parent passes `mcpManager`, child sessions disable standalone MCP discovery and get proxy tools that reuse parent connections.
 - Branch-mode merge temporarily stashes the parent repo before cherry-picking; a stash-pop conflict does not unmerge the cherry-picked commits — they stay on HEAD, the stash entry is preserved, and the conflict is surfaced separately as `stashConflict`. Patch mode only applies the combined root patch when `git.patch.canApplyText(...)` succeeds; failures leave the `.patch` artifact for manual handling.

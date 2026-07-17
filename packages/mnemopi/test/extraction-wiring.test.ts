@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, spyOn } from "bun:test";
-import { Mnemopi } from "@oh-my-pi/pi-mnemopi/core/memory";
-import type { MnemopiLlmCompletion } from "@oh-my-pi/pi-mnemopi/core/runtime-options";
+import { Mnemopi } from "@reactor/mnemopi/core/memory";
+import type { MnemopiLlmCompletion } from "@reactor/mnemopi/core/runtime-options";
 
 const instances: Mnemopi[] = [];
 
@@ -95,8 +95,8 @@ describe("remember(extract) wires the LLM fact extractor", () => {
 	});
 
 	it("uses a runtime-configured remote LLM in background extraction", async () => {
-		const previousEnabled = process.env.MNEMOPI_LLM_ENABLED;
-		const previousBaseUrl = process.env.MNEMOPI_LLM_BASE_URL;
+		const previousEnabled = process.env.REACTOR_MNEMOPI_LLM_ENABLED;
+		const previousBaseUrl = process.env.REACTOR_MNEMOPI_LLM_BASE_URL;
 		let requestedUrl = "";
 		let requestedBody = "";
 		const fetchMock: typeof fetch = Object.assign(
@@ -116,8 +116,8 @@ describe("remember(extract) wires the LLM fact extractor", () => {
 		);
 		const fetchSpy = spyOn(globalThis, "fetch").mockImplementation(fetchMock);
 		try {
-			process.env.MNEMOPI_LLM_ENABLED = "true";
-			delete process.env.MNEMOPI_LLM_BASE_URL;
+			process.env.REACTOR_MNEMOPI_LLM_ENABLED = "true";
+			delete process.env.REACTOR_MNEMOPI_LLM_BASE_URL;
 			const memory = new Mnemopi({
 				sessionId: "extract-remote-runtime",
 				dbPath: ":memory:",
@@ -141,10 +141,10 @@ describe("remember(extract) wires the LLM fact extractor", () => {
 			).toBe(true);
 		} finally {
 			fetchSpy.mockRestore();
-			if (previousEnabled === undefined) delete process.env.MNEMOPI_LLM_ENABLED;
-			else process.env.MNEMOPI_LLM_ENABLED = previousEnabled;
-			if (previousBaseUrl === undefined) delete process.env.MNEMOPI_LLM_BASE_URL;
-			else process.env.MNEMOPI_LLM_BASE_URL = previousBaseUrl;
+			if (previousEnabled === undefined) delete process.env.REACTOR_MNEMOPI_LLM_ENABLED;
+			else process.env.REACTOR_MNEMOPI_LLM_ENABLED = previousEnabled;
+			if (previousBaseUrl === undefined) delete process.env.REACTOR_MNEMOPI_LLM_BASE_URL;
+			else process.env.REACTOR_MNEMOPI_LLM_BASE_URL = previousBaseUrl;
 		}
 	});
 

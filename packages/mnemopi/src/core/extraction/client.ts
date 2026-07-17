@@ -1,10 +1,10 @@
-import { type ApiKey, type FetchImpl, withAuth } from "@oh-my-pi/pi-ai";
-import * as AIError from "@oh-my-pi/pi-ai/error";
+import { type ApiKey, type FetchImpl, withAuth } from "@reactor/ai";
+import * as AIError from "@reactor/ai/error";
 
 import { getDiagnostics } from "./diagnostics";
 import { EXTRACTION_SYSTEM_PROMPT, EXTRACTION_USER_TEMPLATE } from "./prompts";
 
-export const DEFAULT_EXTRACTION_MODEL = process.env.MNEMOPI_EXTRACTION_MODEL || "google/gemini-2.5-flash";
+export const DEFAULT_EXTRACTION_MODEL = process.env.REACTOR_MNEMOPI_EXTRACTION_MODEL || "google/gemini-2.5-flash";
 export const OPENROUTER_BASE_URL = (process.env.OPENROUTER_BASE_URL || "https://openrouter.ai/api/v1").replace(
 	/\/+$/,
 	"",

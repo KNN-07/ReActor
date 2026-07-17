@@ -5,7 +5,7 @@
  * `xd://report_issue`, and the system prompt tells the model to write
  * `<tool>: <concise description>` there when auto-QA is enabled.
  *
- * Enabled by default; gated behind PI_AUTO_QA=1 / `dev.autoqa` so a user who
+ * Enabled by default; gated behind REACTOR_AUTO_QA=1 / `dev.autoqa` so a user who
  * flips the setting off short-circuits injection entirely.
  * Records grievances to a local SQLite database; never throws from the device
  * dispatch path.
@@ -17,18 +17,18 @@
  * subagents) read the cached decision without prompting.
  *
  * When the user grants consent, push is automatically active against the
- * bundled endpoint (`dev.autoqaPush.endpoint`, default `qa.omp.sh`). Each
+ * bundled endpoint (`dev.autoqaPush.endpoint`, default `qa.reactor.sh`). Each
  * insert schedules a background flush that POSTs pending rows and deletes them
- * on HTTP 2xx. `PI_AUTO_QA_PUSH=1` forces push in non-interactive environments
+ * on HTTP 2xx. `REACTOR_AUTO_QA_PUSH=1` forces push in non-interactive environments
  * where the consent dialog never fires. Device execution is never blocked on
  * the network and never throws.
  */
 import { Database } from "bun:sqlite";
-import type { AgentToolResult } from "@oh-my-pi/pi-agent-core";
-import type { FetchImpl } from "@oh-my-pi/pi-ai";
-import type { Component } from "@oh-my-pi/pi-tui";
-import { Text } from "@oh-my-pi/pi-tui";
-import { $env, $flag, getAutoQaDbDir, getInstallId, logger, VERSION } from "@oh-my-pi/pi-utils";
+import type { AgentToolResult } from "@reactor/agent-core";
+import type { FetchImpl } from "@reactor/ai";
+import type { Component } from "@reactor/tui";
+import { Text } from "@reactor/tui";
+import { $env, $flag, getAutoQaDbDir, getInstallId, logger, VERSION } from "@reactor/utils";
 import type { Settings } from "..";
 import type { Theme } from "../modes/theme/theme";
 import { renderStatusLine, truncateToWidth } from "../tui";
@@ -89,7 +89,7 @@ function parseReportIssueBody(text: string): { tool: string; report: string } {
 }
 
 export function isAutoQaEnabled(settings?: Settings): boolean {
-	return $flag("PI_AUTO_QA", !!settings?.get("dev.autoqa"));
+	return $flag("REACTOR_AUTO_QA", !!settings?.get("dev.autoqa"));
 }
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -233,7 +233,7 @@ let cachedDb: Database | null = null;
 
 /**
  * Open (or return the cached handle for) the auto-QA SQLite database at
- * `~/.omp/agent/autoqa.db`, creating the schema lazily. Returns `null` when
+ * `~/.reactor/agent/autoqa.db`, creating the schema lazily. Returns `null` when
  * the agent data dir cannot be resolved.
  */
 export function openAutoQaDb(): Database | null {
@@ -274,7 +274,7 @@ export interface FlushResult {
 }
 
 /**
- * Optional per-flush controls. Used by `omp grievances push` to surface
+ * Optional per-flush controls. Used by `reactor grievances push` to surface
  * progress to a TTY and to skip the user-facing consent gate (manual
  * pushes are the user's explicit intent, not a side effect of a device write).
  */
@@ -341,18 +341,18 @@ function resolvePushConfig(settings: Settings | undefined, bypassConsent: boolea
 	if (!isAutoQaEnabled(settings)) return null;
 
 	// Consent IS the push opt-in for the auto-flush path. `bypassConsent`
-	// covers explicit user-driven pushes (`omp grievances push`) where the
+	// covers explicit user-driven pushes (`reactor grievances push`) where the
 	// user clearly intends to ship regardless of dialog state. The
-	// `PI_AUTO_QA_PUSH` env flag stays as a CI/headless override too.
+	// `REACTOR_AUTO_QA_PUSH` env flag stays as a CI/headless override too.
 	if (!bypassConsent) {
 		const consented = settings?.get("dev.autoqaConsent") === "granted";
-		if (!consented && !$flag("PI_AUTO_QA_PUSH")) return null;
+		if (!consented && !$flag("REACTOR_AUTO_QA_PUSH")) return null;
 	}
 
-	const endpoint = envOverrideString("PI_AUTO_QA_PUSH_URL") ?? settings?.get("dev.autoqaPush.endpoint");
+	const endpoint = envOverrideString("REACTOR_AUTO_QA_PUSH_URL") ?? settings?.get("dev.autoqaPush.endpoint");
 	if (!endpoint || endpoint.trim().length === 0) return null;
 
-	const token = envOverrideString("PI_AUTO_QA_PUSH_TOKEN") ?? settings?.get("dev.autoqaPush.token");
+	const token = envOverrideString("REACTOR_AUTO_QA_PUSH_TOKEN") ?? settings?.get("dev.autoqaPush.token");
 	return { endpoint: endpoint.trim(), token: token && token.length > 0 ? token : undefined };
 }
 
@@ -382,7 +382,7 @@ async function performFlush(db: Database, config: PushConfig, options: FlushOpti
 		if (rows.length === 0) return { pushed: totalPushed, ok: true };
 
 		const body = JSON.stringify({
-			agent: { name: "omp", version: VERSION },
+			agent: { name: "reactor", version: VERSION },
 			installId: getInstallId(),
 			// Coarse host fingerprint for triage — `darwin`/`linux`/`win32` +
 			// `arm64`/`x64`. Useful for "is this bug arch-specific?" without
