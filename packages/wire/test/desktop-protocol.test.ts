@@ -44,4 +44,24 @@ describe("desktop protocol contract", () => {
 		expect(discard.confirmed).toBe(false);
 		expect(autonomy.objective).toContain("desktop");
 	});
+
+	test("supports command execution, thinking controls, and attachments", () => {
+		const command: DesktopCommand = {
+			version: DESKTOP_PROTOCOL_VERSION,
+			type: "execute_command",
+			id: "command-1",
+			sessionId: "session-1",
+			text: "/compact",
+		};
+		const prompt: DesktopCommand = {
+			version: DESKTOP_PROTOCOL_VERSION,
+			type: "prompt",
+			id: "prompt-1",
+			sessionId: "session-1",
+			text: "Inspect this image",
+			attachments: [{ name: "screen.png", mimeType: "image/png", data: "aW1hZ2U=" }],
+		};
+		expect(command.type).toBe("execute_command");
+		expect(prompt.attachments?.[0]?.mimeType).toBe("image/png");
+	});
 });

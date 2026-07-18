@@ -120,6 +120,22 @@ fn send_frame(frame: String, state: State<'_, Sidecar>) -> Result<(), String> {
 	stdin.flush().map_err(|e| e.to_string())
 }
 
+#[tauri::command]
+fn read_file(path: String, root: Option<String>) -> Result<Vec<u8>, String> {
+	let requested = std::fs::canonicalize(&path).map_err(|error| error.to_string())?;
+	if let Some(root) = root {
+		let allowed = std::fs::canonicalize(root).map_err(|error| error.to_string())?;
+		if !requested.starts_with(allowed) {
+			return Err("Attachment must be inside the active workspace".to_string());
+		}
+	}
+	let metadata = std::fs::metadata(&requested).map_err(|error| error.to_string())?;
+	if metadata.len() > 10 * 1024 * 1024 {
+		return Err("Attachment exceeds the 10 MiB limit".to_string());
+	}
+	std::fs::read(requested).map_err(|error| error.to_string())
+}
+
 fn stop_sidecar(app: &AppHandle, state: &Sidecar) -> Result<(), String> {
 	let mut slot = state
 		.0
@@ -157,7 +173,7 @@ fn main() {
 		.plugin(tauri_plugin_opener::init())
 		.plugin(tauri_plugin_store::Builder::default().build())
 		.manage(Sidecar(Arc::new(Mutex::new(None))))
-		.invoke_handler(tauri::generate_handler![start_host, query_host, send_frame, stop_host])
+		.invoke_handler(tauri::generate_handler![start_host, query_host, send_frame, read_file, stop_host])
 		.setup(|app| {
 			let _ = app.emit("desktop-lifecycle", Lifecycle { state: "starting" });
 			start_host(app.handle().clone(), app.state()).map_err(std::io::Error::other)?;

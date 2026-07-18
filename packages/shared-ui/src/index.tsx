@@ -115,6 +115,27 @@ export function snapshotToTranscript(snapshot: DesktopSnapshot): TranscriptItem[
 						status: "running",
 					});
 				}
+				if (
+					(part.type === "thinking" || part.type === "redactedThinking") &&
+					"thinking" in part &&
+					typeof part.thinking === "string"
+				) {
+					items.push({
+						id: `${snapshot.sessionId}-${index}-${contentIndex}`,
+						role: "tool",
+						text: part.thinking,
+						label: part.type === "redactedThinking" ? "Redacted reasoning" : "Reasoning",
+						status: "complete",
+					});
+				}
+				if (part.type === "image") {
+					items.push({
+						id: `${snapshot.sessionId}-${index}-${contentIndex}`,
+						role: "assistant",
+						text: "[Image attachment]",
+						label: "ReActor",
+					});
+				}
 			}
 			return items;
 		}

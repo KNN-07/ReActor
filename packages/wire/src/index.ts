@@ -503,6 +503,22 @@ export interface DesktopSnapshot {
 	header: unknown;
 	entries: unknown[];
 	status: DesktopSessionStatus;
+	model?: DesktopModelSummary;
+	thinkingLevel?: string;
+	queuedMessageCount?: number;
+	todoPhases?: unknown[];
+}
+
+export interface DesktopModelSummary {
+	provider: string;
+	id: string;
+	name: string;
+}
+
+export interface DesktopAttachment {
+	name: string;
+	mimeType: string;
+	data: string;
 }
 
 export interface DesktopGitState {
@@ -517,12 +533,23 @@ export type DesktopCommand =
 	| { version: number; type: "handshake"; id: string; clientVersion: string }
 	| { version: number; type: "health"; id: string }
 	| { version: number; type: "list_sessions"; id: string; cwd?: string }
+	| { version: number; type: "list_models"; id: string }
+	| { version: number; type: "list_commands"; id: string; sessionId: string }
+	| { version: number; type: "execute_command"; id: string; sessionId: string; text: string }
 	| { version: number; type: "create_session"; id: string; cwd: string }
 	| { version: number; type: "open_session"; id: string; sessionId: string; cwd: string }
 	| { version: number; type: "snapshot"; id: string; sessionId: string }
-	| { version: number; type: "prompt"; id: string; sessionId: string; text: string }
-	| { version: number; type: "steer"; id: string; sessionId: string; text: string }
-	| { version: number; type: "follow_up"; id: string; sessionId: string; text: string }
+	| { version: number; type: "set_model"; id: string; sessionId: string; provider: string; modelId: string }
+	| { version: number; type: "prompt"; id: string; sessionId: string; text: string; attachments?: DesktopAttachment[] }
+	| { version: number; type: "steer"; id: string; sessionId: string; text: string; attachments?: DesktopAttachment[] }
+	| {
+			version: number;
+			type: "follow_up";
+			id: string;
+			sessionId: string;
+			text: string;
+			attachments?: DesktopAttachment[];
+	  }
 	| { version: number; type: "abort"; id: string; sessionId: string }
 	| { version: number; type: "close_session"; id: string; sessionId: string }
 	| { version: number; type: "rename_session"; id: string; sessionId: string; title: string }
@@ -537,6 +564,9 @@ export type DesktopCommand =
 	| { version: number; type: "autonomy_start"; id: string; sessionId: string; objective: string }
 	| { version: number; type: "autonomy_pause"; id: string; sessionId: string }
 	| { version: number; type: "autonomy_resume"; id: string; sessionId: string }
+	| { version: number; type: "autonomy_stop"; id: string; sessionId: string }
+	| { version: number; type: "set_thinking_level"; id: string; sessionId: string; level: string }
+	| { version: number; type: "set_follow_up_mode"; id: string; sessionId: string; mode: "all" | "one-at-a-time" }
 	| {
 			version: number;
 			type: "ui_response";
@@ -557,6 +587,7 @@ export type DesktopFrame =
 	| { version: number; type: "session_status"; sessionId: string; status: DesktopSessionStatus }
 	| { version: number; type: "git_state"; cwd: string; state: DesktopGitState }
 	| { version: number; type: "autonomy_state"; sessionId: string; state: unknown }
+	| { version: number; type: "command_output"; sessionId: string; text: string }
 	| {
 			version: number;
 			type: "ui_request";

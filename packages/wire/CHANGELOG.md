@@ -6,6 +6,7 @@
 
 - Added versioned dependency-free desktop NDJSON command and event frames for the Tauri shell and ReActor sidecar.
 - Added guarded workspace Git commands, archive metadata, and autonomy state frames to the desktop protocol.
+- Added desktop model catalog and active-session model selection frames.
 
 ## [16.3.0] - 2026-07-02
 

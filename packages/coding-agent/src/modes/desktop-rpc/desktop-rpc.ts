@@ -5,17 +5,22 @@ import {
 	DESKTOP_PROTOCOL_VERSION,
 	type DesktopCommand,
 	type DesktopFrame,
+	type DesktopModelSummary,
 	type DesktopSessionStatus,
 	type DesktopSnapshot,
 } from "@reactor/wire";
 import { AutonomySessionRuntime } from "../../autonomy/session-runtime";
 import { ModelRegistry } from "../../config/model-registry";
 import type { ExtensionUIContext } from "../../extensibility/extensions";
+import { loadSlashCommands } from "../../extensibility/slash-commands";
 import { type CreateAgentSessionResult, createAgentSession, discoverAuthStorage } from "../../sdk";
 import type { AgentSession } from "../../session/agent-session";
 import type { AuthStorage } from "../../session/auth-storage";
 import { listAllSessions } from "../../session/session-listing";
 import { SessionManager } from "../../session/session-manager";
+import { executeAcpBuiltinSlashCommand } from "../../slash-commands/acp-builtins";
+import { buildAvailableSlashCommands } from "../../slash-commands/available-commands";
+import type { ConfiguredThinkingLevel } from "../../thinking";
 import { commit, diff, head, repo, restore, stage, status } from "../../utils/git";
 
 type ManagedDesktopSession = {
@@ -235,6 +240,12 @@ export class ManagedAgentSessionHost {
 			header: manager.getHeader(),
 			entries: manager.getEntries(),
 			status: record.status,
+			model: record.session.model
+				? { provider: record.session.model.provider, id: record.session.model.id, name: record.session.model.name }
+				: undefined,
+			thinkingLevel: record.session.configuredThinkingLevel(),
+			queuedMessageCount: record.session.queuedMessageCount,
+			todoPhases: record.session.getTodoPhases(),
 		};
 	}
 
@@ -254,6 +265,54 @@ export class ManagedAgentSessionHost {
 			case "health":
 				writeFrame(response(command.id, { ready: !this.#shuttingDown, sessions: this.#sessions.size }));
 				return true;
+			case "list_models": {
+				const models: DesktopModelSummary[] = (await this.#services()).modelRegistry.getAvailable().map(model => ({
+					provider: model.provider,
+					id: model.id,
+					name: model.name,
+				}));
+				writeFrame(response(command.id, { kind: "models", models }));
+				return true;
+			}
+			case "list_commands": {
+				const record = this.#record(command.sessionId);
+				const commands = await buildAvailableSlashCommands(
+					{
+						extensionRunner: record.session.extensionRunner,
+						customCommands: record.session.customCommands,
+						mcpPromptCommands: record.session.mcpPromptCommands,
+						skills: [...record.session.skills],
+						skillsSettings: record.session.skillsSettings,
+						setSlashCommands: slashCommands => record.session.setSlashCommands(slashCommands),
+						sessionManager: record.session.sessionManager,
+					},
+					cwd => loadSlashCommands({ cwd }),
+				);
+				writeFrame(response(command.id, { kind: "commands", commands }));
+				return true;
+			}
+			case "execute_command": {
+				const record = this.#record(command.sessionId);
+				const result = await executeAcpBuiltinSlashCommand(command.text, {
+					session: record.session,
+					sessionManager: record.session.sessionManager,
+					settings: record.session.settings,
+					cwd: record.session.sessionManager.getCwd(),
+					output: text =>
+						writeFrame({
+							version: DESKTOP_PROTOCOL_VERSION,
+							type: "command_output",
+							sessionId: record.session.sessionId,
+							text,
+						}),
+					refreshCommands: () => {},
+					reloadPlugins: async () => {},
+				});
+				if (result === false) throw new Error("Unsupported desktop command");
+				if ("prompt" in result) await record.session.prompt(result.prompt);
+				writeFrame(response(command.id, result));
+				return true;
+			}
 			case "list_sessions": {
 				const desktopState = await this.#desktopState();
 				const active = [...this.#sessions.values()].map(record => {
@@ -338,6 +397,20 @@ export class ManagedAgentSessionHost {
 					snapshot,
 				});
 				writeFrame(response(command.id, snapshot));
+				return true;
+			}
+			case "set_model": {
+				const record = this.#record(command.sessionId);
+				const model = record.session.modelRegistry.find(command.provider, command.modelId);
+				if (!model) throw new Error(`Unknown model: ${command.provider}/${command.modelId}`);
+				await record.session.setModel(model);
+				writeFrame(response(command.id, { model: { provider: model.provider, id: model.id, name: model.name } }));
+				writeFrame({
+					version: DESKTOP_PROTOCOL_VERSION,
+					type: "session_snapshot",
+					sessionId: record.session.sessionId,
+					snapshot: this.#snapshot(record),
+				});
 				return true;
 			}
 			case "rename_session": {
@@ -433,6 +506,31 @@ export class ManagedAgentSessionHost {
 				writeFrame(response(command.id, state));
 				return true;
 			}
+			case "autonomy_stop": {
+				const record = this.#record(command.sessionId);
+				const state = await record.autonomy.controller.stop();
+				await record.session.goalRuntime.dropGoal();
+				writeFrame({
+					version: DESKTOP_PROTOCOL_VERSION,
+					type: "autonomy_state",
+					sessionId: command.sessionId,
+					state,
+				});
+				writeFrame(response(command.id, state));
+				return true;
+			}
+			case "set_thinking_level": {
+				const record = this.#record(command.sessionId);
+				record.session.setThinkingLevel(command.level as ConfiguredThinkingLevel);
+				writeFrame(response(command.id, { thinkingLevel: record.session.configuredThinkingLevel() }));
+				return true;
+			}
+			case "set_follow_up_mode": {
+				const record = this.#record(command.sessionId);
+				record.session.setFollowUpMode(command.mode);
+				writeFrame(response(command.id, { followUpMode: record.session.followUpMode }));
+				return true;
+			}
 			case "ui_response": {
 				const pending = this.#pendingUi.get(command.requestId);
 				if (!pending) throw new Error(`Unknown UI request: ${command.requestId}`);
@@ -446,12 +544,39 @@ export class ManagedAgentSessionHost {
 			case "steer":
 			case "follow_up": {
 				const record = this.#record(command.sessionId);
-				const operation =
-					command.type === "prompt"
-						? record.session.prompt(command.text)
-						: command.type === "steer"
-							? record.session.steer(command.text)
-							: record.session.followUp(command.text);
+				const images = command.attachments?.map(attachment => ({
+					type: "image" as const,
+					data: attachment.data,
+					mimeType: attachment.mimeType,
+				}));
+				const operation = (async (): Promise<boolean> => {
+					if (command.type === "prompt") {
+						const result = await executeAcpBuiltinSlashCommand(command.text, {
+							session: record.session,
+							sessionManager: record.session.sessionManager,
+							settings: record.session.settings,
+							cwd: record.session.sessionManager.getCwd(),
+							output: text =>
+								writeFrame({
+									version: DESKTOP_PROTOCOL_VERSION,
+									type: "command_output",
+									sessionId: record.session.sessionId,
+									text,
+								}),
+							refreshCommands: () => {},
+							reloadPlugins: async () => {},
+						});
+						if (result !== false) {
+							if ("prompt" in result)
+								return record.session.prompt(result.prompt, images ? { images } : undefined);
+							return false;
+						}
+						return record.session.prompt(command.text, images ? { images } : undefined);
+					}
+					if (command.type === "steer") await record.session.steer(command.text, images);
+					else await record.session.followUp(command.text, images);
+					return false;
+				})();
 				void operation
 					.then(() => writeFrame(response(command.id)))
 					.catch(error => {
