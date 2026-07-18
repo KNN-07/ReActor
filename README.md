@@ -17,7 +17,13 @@
   <a href="https://bun.sh"><img src="https://img.shields.io/badge/runtime-Bun-f472b6?style=flat&colorA=222222" alt="Bun"></a>
 </p>
 
-ReActor is a batteries-included coding agent for macOS, Linux, and Windows. It combines a fast terminal UI with code intelligence, native search and editing, persistent execution kernels, browser and web access, debugging, memory, subagents, collaboration, and broad model-provider support.
+<p align="center">
+  <em>The Pi you love, with batteries included.</em>
+</p>
+
+ReActor is the public [KNN-07 fork](https://github.com/KNN-07/ReActor) of Can Bölük's [oh-my-pi](https://github.com/can1357/oh-my-pi), itself built on Mario Zechner's [Pi](https://github.com/badlogic/pi-mono). It preserves that terminal-first coding-agent foundation while developing a distinct, batteries-included product under the `reactor`, `@reactor/*`, `.reactor`, and `REACTOR_*` identity.
+
+ReActor runs on macOS, Linux, and Windows. It combines a fast terminal UI with code intelligence, native search and editing, persistent execution kernels, browser and web access, debugging, memory, subagents, collaboration, and broad model-provider support.
 
 Use it interactively, run a bounded autonomous objective, invoke it once from a script, embed the TypeScript SDK, or connect an editor over ACP.
 
@@ -216,7 +222,7 @@ This public fork tracks a pinned upstream revision through a reviewable sync wor
 
 ReActor is available under the [MIT License](LICENSE).
 
-Maintained by [norman (KNN-07)](https://github.com/KNN-07). ReActor builds on the work of Mario Zechner's [Pi](https://github.com/badlogic/pi-mono) and subsequent contributors.
+Maintained by [norman (KNN-07)](https://github.com/KNN-07). ReActor is a fork of [oh-my-pi](https://github.com/can1357/oh-my-pi) and builds on the work of Can Bölük, Mario Zechner's [Pi](https://github.com/badlogic/pi-mono), and subsequent contributors.
 
 © 2025 Mario Zechner<br>
 © 2025–2026 Can Bölük<br>
