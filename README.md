@@ -27,6 +27,12 @@ ReActor runs on macOS, Linux, and Windows. It combines a fast terminal UI with c
 
 Use it interactively, run a bounded autonomous objective, invoke it once from a script, embed the TypeScript SDK, or connect an editor over ACP.
 
+> [!NOTE]
+> This fork keeps the upstream `oh-my-pi` lineage, but its supported public surface is `reactor`, `@reactor/*`, `.reactor`, and `REACTOR_*`. Legacy command aliases and data-directory fallbacks are intentionally not shipped.
+
+> [!TIP]
+> Start with `reactor` in a project directory. Use `reactor --help` for the complete command and flag reference, or browse the [documentation](https://reactor.norman.id.vn/docs) for deeper workflows.
+
 ## Highlights
 
 - **IDE-grade code intelligence** — LSP diagnostics, references, symbols, code actions, and workspace-aware renames are available to the agent.
@@ -38,6 +44,15 @@ Use it interactively, run a bounded autonomous objective, invoke it once from a 
 - **Open model routing** — use direct APIs, subscription plans, gateways, or local OpenAI-compatible servers; assign separate models to default, fast, reasoning, planning, and commit roles.
 - **Extensible and collaborative** — load skills, rules, hooks, MCP servers, custom tools, and plugins; share encrypted live sessions in a terminal or browser.
 - **Multiple front ends** — the same runtime powers the TUI, print mode, RPC, the TypeScript SDK, and Agent Client Protocol integrations.
+
+| Surface | Start here | Best for |
+| --- | --- | --- |
+| TUI | `reactor` | Interactive coding and approvals |
+| Print mode | `reactor -p "..."` | Scripts and one-shot tasks |
+| Autonomous run | `reactor run "..."` | Bounded, resumable objectives |
+| Desktop GUI | `bun --cwd apps/desktop run tauri:dev` | Native desktop workflows |
+| RPC | `reactor --mode rpc --no-session` | Process integrations over stdio |
+| ACP | `reactor acp` | Editor integrations |
 
 ## Install
 
@@ -97,6 +112,9 @@ reactor @error.log @screenshot.png "Diagnose this failure"
 ```
 
 Run `reactor --help` for all flags and `reactor <command> --help` for command-specific help.
+
+> [!WARNING]
+> Autonomous execution is opt-in. `reactor run` uses bounded continuations, time limits, failure limits, and verification evidence; approval requests, interruptions, or exhausted limits pause the goal.
 
 ### Shell completions
 
@@ -185,6 +203,13 @@ bun --cwd apps/desktop run tauri:dev  # native GUI with the ReActor sidecar
 ```
 
 See [ReActor Desktop](apps/desktop/README.md) for development and packaging, and [the desktop architecture](docs/desktop.md) for its security and recovery model.
+
+<details>
+<summary>Desktop architecture at a glance</summary>
+
+The Tauri shell owns the native window and sidecar lifecycle. The renderer communicates with `reactor --mode desktop-rpc` through validated, versioned NDJSON frames; it has no arbitrary shell or filesystem capability. Sessions, credentials, models, Git operations, and autonomy remain in the existing ReActor runtime.
+
+</details>
 
 ## Research workflows
 
