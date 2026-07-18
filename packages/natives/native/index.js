@@ -23,8 +23,8 @@ export const PtySession = nativeBindings.PtySession;
 export const Shell = nativeBindings.Shell;
 
 // functions
+export const __piNativesV0_1_0 = nativeBindings.__piNativesV0_1_0;
 export const __reactorInstallTokioRuntime = nativeBindings.__reactorInstallTokioRuntime;
-export const __piNativesV17_0_2 = nativeBindings.__piNativesV17_0_2;
 export const astEdit = nativeBindings.astEdit;
 export const astGrep = nativeBindings.astGrep;
 export const astMatch = nativeBindings.astMatch;

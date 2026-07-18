@@ -140,6 +140,11 @@ export class ManagedAgentSessionHost {
 			head.resolve(cwd).catch(() => null),
 			repo.root(cwd).catch(() => null),
 		]);
+		const openRoots = await Promise.all(
+			[...this.#sessions.values()].map(record =>
+				repo.root(record.session.sessionManager.getCwd()).catch(() => null),
+			),
+		);
 		return {
 			version: DESKTOP_PROTOCOL_VERSION,
 			type: "git_state",
@@ -149,7 +154,7 @@ export class ManagedAgentSessionHost {
 				status: gitStatus,
 				diff: gitDiff,
 				branch: gitHead?.kind === "ref" ? gitHead.branchName : null,
-				sharedWorktree: repoRoot !== null && repoRoot !== cwd,
+				sharedWorktree: repoRoot !== null && openRoots.filter(openRoot => openRoot === repoRoot).length > 1,
 			},
 		};
 	}
@@ -181,7 +186,19 @@ export class ManagedAgentSessionHost {
 		await record.autonomy.recover();
 		record.unsubscribe = record.session.subscribe(event => {
 			if (event.type === "agent_start") record.status = "running";
-			if (event.type === "agent_end") record.status = "idle";
+			if (event.type === "agent_end") {
+				record.status = "idle";
+				void this.#gitState(record.session.sessionManager.getCwd())
+					.then(writeFrame)
+					.catch(error => {
+						writeFrame({
+							version: DESKTOP_PROTOCOL_VERSION,
+							type: "notice",
+							level: "warning",
+							message: `Unable to refresh Git status: ${error instanceof Error ? error.message : String(error)}`,
+						});
+					});
+			}
 			writeFrame({
 				version: DESKTOP_PROTOCOL_VERSION,
 				type: "session_event",
@@ -284,6 +301,17 @@ export class ManagedAgentSessionHost {
 				return true;
 			}
 			case "open_session": {
+				const existing = this.#sessions.get(command.sessionId);
+				if (existing) {
+					writeFrame(response(command.id, { sessionId: existing.session.sessionId }));
+					writeFrame({
+						version: DESKTOP_PROTOCOL_VERSION,
+						type: "session_snapshot",
+						sessionId: existing.session.sessionId,
+						snapshot: this.#snapshot(existing),
+					});
+					return true;
+				}
 				const info = (await listAllSessions()).find(candidate => candidate.id === command.sessionId);
 				if (!info) throw new Error(`Persisted session not found: ${command.sessionId}`);
 				const manager = await SessionManager.open(info.path, `${getAgentDir()}/sessions`, undefined, {
@@ -302,7 +330,14 @@ export class ManagedAgentSessionHost {
 			}
 			case "snapshot": {
 				const record = this.#record(command.sessionId);
-				writeFrame(response(command.id, this.#snapshot(record)));
+				const snapshot = this.#snapshot(record);
+				writeFrame({
+					version: DESKTOP_PROTOCOL_VERSION,
+					type: "session_snapshot",
+					sessionId: record.session.sessionId,
+					snapshot,
+				});
+				writeFrame(response(command.id, snapshot));
 				return true;
 			}
 			case "rename_session": {
@@ -411,10 +446,17 @@ export class ManagedAgentSessionHost {
 			case "steer":
 			case "follow_up": {
 				const record = this.#record(command.sessionId);
-				if (command.type === "prompt") await record.session.prompt(command.text);
-				else if (command.type === "steer") await record.session.steer(command.text);
-				else await record.session.followUp(command.text);
-				writeFrame(response(command.id));
+				const operation =
+					command.type === "prompt"
+						? record.session.prompt(command.text)
+						: command.type === "steer"
+							? record.session.steer(command.text)
+							: record.session.followUp(command.text);
+				void operation
+					.then(() => writeFrame(response(command.id)))
+					.catch(error => {
+						writeFrame(errorResponse(command.id, error));
+					});
 				return true;
 			}
 			case "abort":

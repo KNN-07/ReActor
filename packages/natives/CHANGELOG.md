@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Aligned the compiled native addon's version sentinel with the ReActor package version so bundled desktop and CLI binaries can load their embedded native bindings.
+
 ## [17.0.2] - 2026-07-17
 
 ### Fixed

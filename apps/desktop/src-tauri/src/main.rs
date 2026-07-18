@@ -1,5 +1,6 @@
 use std::{
 	io::{BufRead, BufReader, Write},
+	path::PathBuf,
 	process::{Child, Command, Stdio},
 	sync::{Arc, Mutex},
 };
@@ -14,14 +15,32 @@ struct Lifecycle {
 	state: &'static str,
 }
 
-fn sidecar_path(app: &AppHandle) -> Result<std::path::PathBuf, String> {
-	let resource = app.path().resource_dir().map_err(|e| e.to_string())?;
+#[derive(Serialize)]
+struct HostStatus {
+	state: &'static str,
+	pid:   Option<u32>,
+}
+
+fn sidecar_path(app: &AppHandle) -> Result<PathBuf, String> {
 	let name = if cfg!(target_os = "windows") {
 		"reactor-sidecar.exe"
 	} else {
 		"reactor-sidecar"
 	};
-	Ok(resource.join(name))
+	let mut candidates = Vec::new();
+	if let Ok(executable) = std::env::current_exe() {
+		if let Some(directory) = executable.parent() {
+			candidates.push(directory.join(name));
+		}
+	}
+	if let Ok(resource) = app.path().resource_dir() {
+		candidates.push(resource.join(name));
+		candidates.push(resource.join("binaries").join(name));
+	}
+	candidates
+		.into_iter()
+		.find(|candidate| candidate.is_file())
+		.ok_or_else(|| format!("bundled ReActor sidecar not found ({name})"))
 }
 
 #[tauri::command]
@@ -46,16 +65,44 @@ fn start_host(app: AppHandle, state: State<'_, Sidecar>) -> Result<(), String> {
 		.map_err(|e| format!("failed to start ReActor sidecar: {e}"))?;
 	let mut child = child;
 	let stdout = child.stdout.take().ok_or("sidecar stdout unavailable")?;
+	let stderr = child.stderr.take().ok_or("sidecar stderr unavailable")?;
 	let handle = app.clone();
 	std::thread::spawn(move || {
-		for line in BufReader::new(stdout).lines().flatten() {
+		for line in BufReader::new(stdout).lines().map_while(Result::ok) {
 			let _ = handle.emit("desktop-frame", line);
 		}
 		let _ = handle.emit("desktop-lifecycle", Lifecycle { state: "disconnected" });
 	});
+	let error_handle = app.clone();
+	std::thread::spawn(move || {
+		for line in BufReader::new(stderr).lines().map_while(Result::ok) {
+			let frame = serde_json::json!({
+				"version": 1,
+				"type": "notice",
+				"level": "error",
+				"message": format!("ReActor backend: {line}"),
+			});
+			let _ = error_handle.emit("desktop-frame", frame.to_string());
+		}
+	});
 	let _ = app.emit("desktop-lifecycle", Lifecycle { state: "running" });
 	*slot = Some(child);
 	Ok(())
+}
+
+#[tauri::command]
+fn query_host(state: State<'_, Sidecar>) -> Result<HostStatus, String> {
+	let mut slot = state
+		.0
+		.lock()
+		.map_err(|_| "sidecar lock poisoned".to_string())?;
+	if let Some(child) = slot.as_mut() {
+		if child.try_wait().map_err(|e| e.to_string())?.is_none() {
+			return Ok(HostStatus { state: "running", pid: Some(child.id()) });
+		}
+		*slot = None;
+	}
+	Ok(HostStatus { state: "stopped", pid: None })
 }
 
 #[tauri::command]
@@ -73,8 +120,7 @@ fn send_frame(frame: String, state: State<'_, Sidecar>) -> Result<(), String> {
 	stdin.flush().map_err(|e| e.to_string())
 }
 
-#[tauri::command]
-fn stop_host(app: AppHandle, state: State<'_, Sidecar>) -> Result<(), String> {
+fn stop_sidecar(app: &AppHandle, state: &Sidecar) -> Result<(), String> {
 	let mut slot = state
 		.0
 		.lock()
@@ -99,14 +145,30 @@ fn stop_host(app: AppHandle, state: State<'_, Sidecar>) -> Result<(), String> {
 	Ok(())
 }
 
+#[tauri::command]
+fn stop_host(app: AppHandle, state: State<'_, Sidecar>) -> Result<(), String> {
+	stop_sidecar(&app, &state)
+}
+
 fn main() {
-	tauri::Builder::default()
+	let app = tauri::Builder::default()
+		.plugin(tauri_plugin_dialog::init())
+		.plugin(tauri_plugin_notification::init())
+		.plugin(tauri_plugin_opener::init())
+		.plugin(tauri_plugin_store::Builder::default().build())
 		.manage(Sidecar(Arc::new(Mutex::new(None))))
-		.invoke_handler(tauri::generate_handler![start_host, send_frame, stop_host])
+		.invoke_handler(tauri::generate_handler![start_host, query_host, send_frame, stop_host])
 		.setup(|app| {
 			let _ = app.emit("desktop-lifecycle", Lifecycle { state: "starting" });
+			start_host(app.handle().clone(), app.state()).map_err(std::io::Error::other)?;
 			Ok(())
 		})
-		.run(tauri::generate_context!())
+		.build(tauri::generate_context!())
 		.expect("error while running ReActor Desktop");
+	app.run(|handle, event| {
+		if matches!(event, tauri::RunEvent::ExitRequested { .. }) {
+			let state = handle.state::<Sidecar>();
+			let _ = stop_sidecar(handle, &state);
+		}
+	});
 }

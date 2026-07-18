@@ -3,7 +3,30 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "scripts": { "dev": "vite", "build": "vite build", "check": "biome check . && tsgo -p tsconfig.json --noEmit", "test": "bun test" },
-  "dependencies": { "@reactor/shared-ui": "workspace:*", "@reactor/wire": "workspace:*", "react": "catalog:", "react-dom": "catalog:", "vite": "catalog:" },
-  "devDependencies": { "@types/react": "catalog:", "@types/react-dom": "catalog:" }
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "sidecar": "bun scripts/prepare-sidecar.ts",
+    "tauri:dev": "bun run sidecar && tauri dev",
+    "tauri:build": "bun run sidecar && tauri build",
+    "check": "biome check --no-errors-on-unmatched . && tsgo -p tsconfig.json --noEmit",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@reactor/shared-ui": "workspace:*",
+    "@reactor/wire": "workspace:*",
+    "@tauri-apps/api": "2.11.1",
+    "@tauri-apps/plugin-dialog": "2.7.1",
+    "@tauri-apps/plugin-notification": "2.3.3",
+    "@tauri-apps/plugin-opener": "2.5.4",
+    "@tauri-apps/plugin-store": "2.4.3",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "vite": "catalog:"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "2.11.4",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:"
+  }
 }
