@@ -2108,9 +2108,9 @@ checksum = "b9e0384b61958566e926dc50660321d12159025e767c18e043daf26b70104c39"
 
 [[package]]
 name = "ignore"
-version = "0.4.29"
+version = "0.4.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d4ffa3a0547a138e59ddd6fa3b7c672ed47e6ad6a3cd177984ff1116aa5ba742"
+checksum = "7b009b6744c1445efd7244084e25e498636412effb6760b55067553baa925cc7"
 dependencies = [
  "crossbeam-deque",
  "globset",
@@ -3263,267 +3263,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "reactor-ast"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "ast-grep-core",
- "globset",
- "ignore",
- "phf 0.13.1",
- "serde",
- "tree-sitter",
- "tree-sitter-astro-next",
- "tree-sitter-bash",
- "tree-sitter-c",
- "tree-sitter-c-sharp",
- "tree-sitter-clojure",
- "tree-sitter-cmake",
- "tree-sitter-cpp",
- "tree-sitter-css",
- "tree-sitter-dart",
- "tree-sitter-diff",
- "tree-sitter-dockerfile-updated",
- "tree-sitter-elisp",
- "tree-sitter-elixir",
- "tree-sitter-erlang",
- "tree-sitter-fortran",
- "tree-sitter-go",
- "tree-sitter-graphql",
- "tree-sitter-haskell",
- "tree-sitter-hcl",
- "tree-sitter-html",
- "tree-sitter-ini",
- "tree-sitter-java",
- "tree-sitter-javascript",
- "tree-sitter-json",
- "tree-sitter-julia",
- "tree-sitter-just",
- "tree-sitter-kotlin-sg",
- "tree-sitter-lua",
- "tree-sitter-make",
- "tree-sitter-md",
- "tree-sitter-nix",
- "tree-sitter-objc",
- "tree-sitter-ocaml",
- "tree-sitter-odin",
- "tree-sitter-php",
- "tree-sitter-powershell",
- "tree-sitter-proto",
- "tree-sitter-python",
- "tree-sitter-r",
- "tree-sitter-regex",
- "tree-sitter-ruby",
- "tree-sitter-rust",
- "tree-sitter-scala",
- "tree-sitter-sequel",
- "tree-sitter-solidity",
- "tree-sitter-starlark",
- "tree-sitter-svelte-next",
- "tree-sitter-swift",
- "tree-sitter-tlaplus",
- "tree-sitter-toml-ng",
- "tree-sitter-typescript",
- "tree-sitter-verilog",
- "tree-sitter-vue-next",
- "tree-sitter-xml",
- "tree-sitter-yaml",
- "tree-sitter-zig",
-]
-
-[[package]]
-name = "reactor-iso"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "libc",
- "parking_lot",
- "similar 3.1.1",
- "tokio",
- "windows-sys 0.61.2",
-]
-
-[[package]]
-name = "reactor-natives"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "arboard",
- "ast-grep-core",
- "base64",
- "clap",
- "clipboard-win",
- "flume",
- "fontdue",
- "globset",
- "grep-matcher",
- "grep-pcre2",
- "grep-regex",
- "grep-searcher",
- "html-to-markdown-rs",
- "icy_sixel",
- "ignore",
- "image",
- "inferno",
- "libc",
- "napi",
- "napi-build",
- "napi-derive",
- "parking_lot",
- "phf 0.13.1",
- "reactor-ast",
- "reactor-iso",
- "reactor-shell",
- "reactor-uutils-ctx",
- "reactor-walker",
- "png",
- "portable-pty",
- "rayon",
- "regex",
- "serde",
- "serde_json",
- "similar 3.1.1",
- "smallvec",
- "syntect",
- "tiktoken-rs",
- "tokio",
- "tokio-util",
- "toml",
- "unicode-segmentation",
- "unicode-width 0.2.2",
- "windows-sys 0.61.2",
- "winreg 0.56.0",
- "xxhash-rust",
-]
-
-[[package]]
-name = "reactor-shell"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "brush-builtins",
- "brush-core",
- "brush-parser 0.3.0",
- "bytes",
- "clap",
- "flume",
- "globset",
- "ignore",
- "jaq",
- "libc",
- "os_pipe",
- "parking_lot",
- "reactor-uutils-ctx",
- "reactor-walker",
- "reactor_uu_diff",
- "reactor_uu_grep",
- "regex",
- "serde",
- "serde_json",
- "smallvec",
- "tokio",
- "tokio-util",
- "toml",
- "uu_b2sum",
- "uu_base64",
- "uu_basename",
- "uu_cat",
- "uu_comm",
- "uu_cut",
- "uu_date",
- "uu_dirname",
- "uu_find",
- "uu_head",
- "uu_hostname",
- "uu_ln",
- "uu_ls",
- "uu_md5sum",
- "uu_mkdir",
- "uu_mktemp",
- "uu_mv",
- "uu_nproc",
- "uu_paste",
- "uu_printenv",
- "uu_readlink",
- "uu_realpath",
- "uu_rm",
- "uu_sed",
- "uu_seq",
- "uu_sha1sum",
- "uu_sha224sum",
- "uu_sha256sum",
- "uu_sha384sum",
- "uu_sha512sum",
- "uu_sort",
- "uu_stat",
- "uu_tac",
- "uu_tail",
- "uu_tee",
- "uu_touch",
- "uu_tr",
- "uu_truncate",
- "uu_uname",
- "uu_uniq",
- "uu_wc",
- "uu_whoami",
- "uu_xargs",
- "uu_yes",
- "windows-sys 0.61.2",
- "winreg 0.56.0",
- "xxhash-rust",
-]
-
-[[package]]
-name = "reactor-uutils-ctx"
-version = "0.1.0"
-dependencies = [
- "libc",
-]
-
-[[package]]
-name = "reactor-walker"
-version = "0.1.0"
-dependencies = [
- "dashmap",
- "globset",
- "ignore",
- "libc",
- "parking_lot",
- "rayon",
- "windows-sys 0.61.2",
-]
-
-[[package]]
-name = "reactor_uu_diff"
-version = "0.8.0"
-dependencies = [
- "clap",
- "parking_lot",
- "reactor-uutils-ctx",
- "similar 3.1.1",
- "tempfile",
-]
-
-[[package]]
-name = "reactor_uu_grep"
-version = "0.8.0"
-dependencies = [
- "clap",
- "globset",
- "grep-cli",
- "grep-matcher",
- "grep-pcre2",
- "grep-printer",
- "grep-regex",
- "grep-searcher",
- "ignore",
- "parking_lot",
- "reactor-uutils-ctx",
- "reactor-walker",
- "serde_json",
-]
-
-[[package]]
 name = "pin-project-lite"
 version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3560,9 +3299,9 @@ dependencies = [
 
 [[package]]
 name = "portable-atomic"
-version = "1.13.1"
+version = "1.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c33a9471896f1c69cecef8d20cbe2f7accd12527ce60845ff44c153bb2a21b49"
+checksum = "3d20d5497ef88037a52ff98267d066e7f11fcc5e99bbfbd58a42336193aacec3"
 
 [[package]]
 name = "portable-atomic-util"
@@ -3814,6 +3553,267 @@ checksum = "22e18b0f0062d30d4230b2e85ff77fdfe4326feb054b9783a3460d8435c8ab91"
 dependencies = [
  "crossbeam-deque",
  "crossbeam-utils",
+]
+
+[[package]]
+name = "reactor-ast"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "ast-grep-core",
+ "globset",
+ "ignore",
+ "phf 0.13.1",
+ "serde",
+ "tree-sitter",
+ "tree-sitter-astro-next",
+ "tree-sitter-bash",
+ "tree-sitter-c",
+ "tree-sitter-c-sharp",
+ "tree-sitter-clojure",
+ "tree-sitter-cmake",
+ "tree-sitter-cpp",
+ "tree-sitter-css",
+ "tree-sitter-dart",
+ "tree-sitter-diff",
+ "tree-sitter-dockerfile-updated",
+ "tree-sitter-elisp",
+ "tree-sitter-elixir",
+ "tree-sitter-erlang",
+ "tree-sitter-fortran",
+ "tree-sitter-go",
+ "tree-sitter-graphql",
+ "tree-sitter-haskell",
+ "tree-sitter-hcl",
+ "tree-sitter-html",
+ "tree-sitter-ini",
+ "tree-sitter-java",
+ "tree-sitter-javascript",
+ "tree-sitter-json",
+ "tree-sitter-julia",
+ "tree-sitter-just",
+ "tree-sitter-kotlin-sg",
+ "tree-sitter-lua",
+ "tree-sitter-make",
+ "tree-sitter-md",
+ "tree-sitter-nix",
+ "tree-sitter-objc",
+ "tree-sitter-ocaml",
+ "tree-sitter-odin",
+ "tree-sitter-php",
+ "tree-sitter-powershell",
+ "tree-sitter-proto",
+ "tree-sitter-python",
+ "tree-sitter-r",
+ "tree-sitter-regex",
+ "tree-sitter-ruby",
+ "tree-sitter-rust",
+ "tree-sitter-scala",
+ "tree-sitter-sequel",
+ "tree-sitter-solidity",
+ "tree-sitter-starlark",
+ "tree-sitter-svelte-next",
+ "tree-sitter-swift",
+ "tree-sitter-tlaplus",
+ "tree-sitter-toml-ng",
+ "tree-sitter-typescript",
+ "tree-sitter-verilog",
+ "tree-sitter-vue-next",
+ "tree-sitter-xml",
+ "tree-sitter-yaml",
+ "tree-sitter-zig",
+]
+
+[[package]]
+name = "reactor-iso"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "libc",
+ "parking_lot",
+ "similar 3.1.1",
+ "tokio",
+ "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "reactor-natives"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "arboard",
+ "ast-grep-core",
+ "base64",
+ "clap",
+ "clipboard-win",
+ "flume",
+ "fontdue",
+ "globset",
+ "grep-matcher",
+ "grep-pcre2",
+ "grep-regex",
+ "grep-searcher",
+ "html-to-markdown-rs",
+ "icy_sixel",
+ "ignore",
+ "image",
+ "inferno",
+ "libc",
+ "napi",
+ "napi-build",
+ "napi-derive",
+ "parking_lot",
+ "phf 0.13.1",
+ "png",
+ "portable-pty",
+ "rayon",
+ "reactor-ast",
+ "reactor-iso",
+ "reactor-shell",
+ "reactor-uutils-ctx",
+ "reactor-walker",
+ "regex",
+ "serde",
+ "serde_json",
+ "similar 3.1.1",
+ "smallvec",
+ "syntect",
+ "tiktoken-rs",
+ "tokio",
+ "tokio-util",
+ "toml",
+ "unicode-segmentation",
+ "unicode-width 0.2.2",
+ "windows-sys 0.61.2",
+ "winreg 0.56.0",
+ "xxhash-rust",
+]
+
+[[package]]
+name = "reactor-shell"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "brush-builtins",
+ "brush-core",
+ "brush-parser 0.3.0",
+ "bytes",
+ "clap",
+ "flume",
+ "globset",
+ "ignore",
+ "jaq",
+ "libc",
+ "os_pipe",
+ "parking_lot",
+ "reactor-uutils-ctx",
+ "reactor-walker",
+ "reactor_uu_diff",
+ "reactor_uu_grep",
+ "regex",
+ "serde",
+ "serde_json",
+ "smallvec",
+ "tokio",
+ "tokio-util",
+ "toml",
+ "uu_b2sum",
+ "uu_base64",
+ "uu_basename",
+ "uu_cat",
+ "uu_comm",
+ "uu_cut",
+ "uu_date",
+ "uu_dirname",
+ "uu_find",
+ "uu_head",
+ "uu_hostname",
+ "uu_ln",
+ "uu_ls",
+ "uu_md5sum",
+ "uu_mkdir",
+ "uu_mktemp",
+ "uu_mv",
+ "uu_nproc",
+ "uu_paste",
+ "uu_printenv",
+ "uu_readlink",
+ "uu_realpath",
+ "uu_rm",
+ "uu_sed",
+ "uu_seq",
+ "uu_sha1sum",
+ "uu_sha224sum",
+ "uu_sha256sum",
+ "uu_sha384sum",
+ "uu_sha512sum",
+ "uu_sort",
+ "uu_stat",
+ "uu_tac",
+ "uu_tail",
+ "uu_tee",
+ "uu_touch",
+ "uu_tr",
+ "uu_truncate",
+ "uu_uname",
+ "uu_uniq",
+ "uu_wc",
+ "uu_whoami",
+ "uu_xargs",
+ "uu_yes",
+ "windows-sys 0.61.2",
+ "winreg 0.56.0",
+ "xxhash-rust",
+]
+
+[[package]]
+name = "reactor-uutils-ctx"
+version = "0.1.0"
+dependencies = [
+ "libc",
+]
+
+[[package]]
+name = "reactor-walker"
+version = "0.1.0"
+dependencies = [
+ "dashmap",
+ "globset",
+ "ignore",
+ "libc",
+ "parking_lot",
+ "rayon",
+ "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "reactor_uu_diff"
+version = "0.8.0"
+dependencies = [
+ "clap",
+ "parking_lot",
+ "reactor-uutils-ctx",
+ "similar 3.1.1",
+ "tempfile",
+]
+
+[[package]]
+name = "reactor_uu_grep"
+version = "0.8.0"
+dependencies = [
+ "clap",
+ "globset",
+ "grep-cli",
+ "grep-matcher",
+ "grep-pcre2",
+ "grep-printer",
+ "grep-regex",
+ "grep-searcher",
+ "ignore",
+ "parking_lot",
+ "reactor-uutils-ctx",
+ "reactor-walker",
+ "serde_json",
 ]
 
 [[package]]
@@ -4480,9 +4480,9 @@ dependencies = [
 
 [[package]]
 name = "tokio"
-version = "1.52.4"
+version = "1.53.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "317fafbbe3f02fc663dad00ea6186197de963cd4190e86a26d8d0fae095539af"
+checksum = "d988bcd52dbe076d3d46903332f58c912b87a2c49b1428419a5845154762ffee"
 dependencies = [
  "bytes",
  "libc",
@@ -4497,9 +4497,9 @@ dependencies = [
 
 [[package]]
 name = "tokio-macros"
-version = "2.7.0"
+version = "2.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "385a6cb71ab9ab790c5fe8d67f1645e6c450a7ce006a33de03daa956cf70a496"
+checksum = "6328af13490e73a9b4694030fafd93f8c8c6a9dede33e821c3fc63eddf8042ba"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -5522,8 +5522,8 @@ version = "0.8.0"
 dependencies = [
  "clap",
  "parking_lot",
- "reactor-uutils-ctx",
  "rand 0.10.2",
+ "reactor-uutils-ctx",
  "tempfile",
  "thiserror 2.0.18",
  "uucore 0.8.0",
@@ -5701,9 +5701,9 @@ dependencies = [
  "itertools",
  "memchr",
  "nix 0.31.3",
- "reactor-uutils-ctx",
  "rand 0.10.2",
  "rayon",
+ "reactor-uutils-ctx",
  "self_cell",
  "tempfile",
  "thiserror 2.0.18",
@@ -5810,8 +5810,8 @@ version = "0.8.0"
 dependencies = [
  "clap",
  "parking_lot",
- "reactor-uutils-ctx",
  "platform-info",
+ "reactor-uutils-ctx",
  "uucore 0.8.0",
 ]
 

@@ -8,10 +8,11 @@
 // pi-uutils: vendored from uutils/coreutils 0.8.0 and patched to run in-process
 // as a shell builtin. The temp-file parent directory (from `-p`/`--tmpdir` or a
 // relative TEMPLATE prefix) is resolved against the shell working directory via
-// `reactor_uutils_ctx::resolve` at the creation sites, so the printed path is the
-// path actually created. TMPDIR/POSIXLY_CORRECT are read from the scope
-// environment, all stdio goes through `reactor_uutils_ctx`, `translate!` strings are
-// literalized, and the entry point no longer calls `std::process::exit`.
+// `reactor_uutils_ctx::resolve` at the creation sites, so the printed path is
+// the path actually created. TMPDIR/POSIXLY_CORRECT are read from the scope
+// environment, all stdio goes through `reactor_uutils_ctx`, `translate!`
+// strings are literalized, and the entry point no longer calls
+// `std::process::exit`.
 
 #[cfg(unix)]
 use std::fs;
@@ -29,11 +30,11 @@ use clap::{
 	Arg, ArgAction, ArgMatches, Command,
 	builder::{TypedValueParser, ValueParserFactory},
 };
-use reactor_uutils_ctx::format_usage;
 use rand::{
 	RngExt as _, SeedableRng as _,
 	rngs::{self, SmallRng},
 };
+use reactor_uutils_ctx::format_usage;
 use tempfile::Builder;
 use thiserror::Error;
 use uucore::{

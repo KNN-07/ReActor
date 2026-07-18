@@ -16,8 +16,8 @@ use std::{
 };
 
 use clap::{Arg, ArgAction, ArgMatches, Command};
-use reactor_uutils_ctx::format_usage;
 use platform_info::{PlatformInfo, PlatformInfoAPI, UNameAPI};
+use reactor_uutils_ctx::format_usage;
 use uucore::error::{UResult, USimpleError};
 
 pub mod options {

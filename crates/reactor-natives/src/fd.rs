@@ -1,7 +1,8 @@
 //! Fuzzy file path discovery for autocomplete and @-mention resolution.
 //!
 //! Searches for files and directories whose paths match a query string via
-//! subsequence scoring. Uses `reactor-walker` for directory traversal and caching.
+//! subsequence scoring. Uses `reactor-walker` for directory traversal and
+//! caching.
 
 use std::path::Path;
 

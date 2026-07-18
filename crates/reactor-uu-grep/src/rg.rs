@@ -1431,8 +1431,12 @@ fn search_dir<M: Matcher, W: Write>(
 		|error| {
 			had_error.set(true);
 			if !opts.no_messages {
-				let _ =
-					writeln!(reactor_uutils_ctx::stderr(), "rg: {}: {}", error.path.display(), error.error);
+				let _ = writeln!(
+					reactor_uutils_ctx::stderr(),
+					"rg: {}: {}",
+					error.path.display(),
+					error.error
+				);
 			}
 			Ok(reactor_walker::WalkDecision::Include)
 		},
@@ -1529,7 +1533,8 @@ fn list_files<W: Write>(cli: &RgCli, paths: &[OsString], out: &mut W) -> SearchO
 			},
 			Ok(_) => {},
 			Err(err) => {
-				let _ = writeln!(reactor_uutils_ctx::stderr(), "rg: {}: {err}", operand.to_string_lossy());
+				let _ =
+					writeln!(reactor_uutils_ctx::stderr(), "rg: {}: {err}", operand.to_string_lossy());
 				had_error = true;
 			},
 		}
@@ -1688,8 +1693,11 @@ fn execute_search<M: Matcher, W: Write>(
 			Err(error) => {
 				had_error = true;
 				if !opts.no_messages {
-					let _ =
-						writeln!(reactor_uutils_ctx::stderr(), "rg: {}: {error}", operand.to_string_lossy());
+					let _ = writeln!(
+						reactor_uutils_ctx::stderr(),
+						"rg: {}: {error}",
+						operand.to_string_lossy()
+					);
 				}
 			},
 		}
@@ -1746,7 +1754,8 @@ pub fn run(argv: Vec<OsString>) -> i32 {
 			|| cli.only_matching
 			|| cli.vimgrep)
 	{
-		let _ = writeln!(reactor_uutils_ctx::stderr(), "rg: --json cannot be combined with summary modes");
+		let _ =
+			writeln!(reactor_uutils_ctx::stderr(), "rg: --json cannot be combined with summary modes");
 		return 2;
 	}
 	let mut out = if cli.line_buffered && !cli.no_line_buffered {

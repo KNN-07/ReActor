@@ -123,21 +123,34 @@ export function __getLegacyPiBundledModulesGlobal(): string {
 
 // Canonical scope for in-process pi packages. Plugins published against any of
 // the aliased scopes below (mariozechner's original publish, earendil-works'
-// fork, or the canonical @ReActor scope itself) are remapped to this scope and
+// fork, or the canonical @reactor scope itself) are remapped to this scope and
 // resolved against the bundled copy that ships inside the reactor binary. This
 // keeps plugins running against the exact runtime state of the host (single
 // module registry, single tool registry, etc.) regardless of which historical
 // scope name they happened to declare in their peerDependencies.
-const CANONICAL_REACTOR_SCOPE = "@ReActor";
+const CANONICAL_REACTOR_SCOPE = "@reactor";
 
 // Scopes that have historically been used to publish (or alias) the same set
-// of internal pi-* packages. `@ReActor` is intentionally included so direct
+// of internal pi-* packages. `@reactor` is intentionally included so direct
 // canonical imports still pass through the same host-bundled package resolution
 // path instead of pulling a duplicate copy from plugin node_modules.
-const REACTOR_SCOPE_ALIASES = ["ReActor", "mariozechner", "earendil-works"] as const;
+const REACTOR_SCOPE_ALIASES = ["reactor", "mariozechner", "earendil-works"] as const;
 
 // Internal pi-* package basenames bundled inside the reactor binary.
-const REACTOR_PACKAGE_NAMES = ["agent-core", "ai", "coding-agent", "reactor-natives", "tui", "utils"] as const;
+const REACTOR_PACKAGE_NAMES = [
+	"agent-core",
+	"ai",
+	"coding-agent",
+	"reactor-natives",
+	"tui",
+	"utils",
+	"pi-agent-core",
+	"pi-ai",
+	"pi-coding-agent",
+	"pi-natives",
+	"pi-tui",
+	"pi-utils",
+] as const;
 
 const REACTOR_SCOPE_ALTERNATION = REACTOR_SCOPE_ALIASES.join("|");
 const REACTOR_PACKAGE_ALTERNATION = REACTOR_PACKAGE_NAMES.join("|");
@@ -405,7 +418,8 @@ function remapLegacyPiSpecifier(specifier: string): string | null {
 		return null;
 	}
 	const rest = specifier.slice(slashIdx + 1);
-	const remappedSubpath = remapLegacyPiSubpath(rest);
+	const normalizedRest = rest.replace(/^pi-(agent-core|ai|coding-agent|natives|tui|utils)(?=\/|$)/, "$1");
+	const remappedSubpath = remapLegacyPiSubpath(normalizedRest);
 	return `${CANONICAL_REACTOR_SCOPE}/${remappedSubpath}`;
 }
 
@@ -421,7 +435,7 @@ function getResolvedSpecifier(specifier: string): string {
 }
 
 /**
- * Resolve a canonical `@ReActor/*` specifier to a filesystem path, preferring
+ * Resolve a canonical `@reactor/*` specifier to a filesystem path, preferring
  * a bundled compat shim when one is registered for the package root.
  *
  * Falls back to `getResolvedSpecifier` (which may throw under compiled binary
@@ -1619,7 +1633,7 @@ function resolveLegacyPiSpecifier(args: { path: string; importer: string }): { p
 		return undefined;
 	}
 
-	// Primary: resolve the canonical @ReActor/* specifier from the host binary
+	// Primary: resolve the canonical @reactor/* specifier from the host binary
 	// location. Works in dev mode and in source-link installs.
 	try {
 		return { path: resolveCanonicalPiSpecifier(remappedSpecifier) };
@@ -1627,7 +1641,7 @@ function resolveLegacyPiSpecifier(args: { path: string; importer: string }): { p
 		// Fallback for compiled binary mode: the bundled packages live inside
 		// /$bunfs/root and aren't reachable by filesystem resolution. Prefer the
 		// canonical specifier against the importing file's directory when the
-		// plugin installed @ReActor peer deps, then try the original legacy
+		// plugin installed @reactor peer deps, then try the original legacy
 		// specifier for plugins that still vendor only @mariozechner or
 		// @earendil-works peer deps.
 		const importerDir = path.dirname(args.importer);

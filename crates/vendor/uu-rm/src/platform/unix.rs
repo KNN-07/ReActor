@@ -98,7 +98,8 @@ fn prompt_dir_with_mode(path: &Path, mode: libc::mode_t, options: &Options) -> b
 
 /// Whether the given file or directory is readable.
 pub fn is_readable(path: &Path) -> bool {
-	fs::metadata(reactor_uutils_ctx::resolve(path)).is_ok_and(|metadata| is_readable_metadata(&metadata))
+	fs::metadata(reactor_uutils_ctx::resolve(path))
+		.is_ok_and(|metadata| is_readable_metadata(&metadata))
 }
 
 /// Remove a single file using safe traversal

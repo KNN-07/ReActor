@@ -3,7 +3,8 @@
 // For the full copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-// pi-uutils: modified for in-process embedding using reactor-uutils-ctx streams.
+// pi-uutils: modified for in-process embedding using reactor-uutils-ctx
+// streams.
 
 use std::{borrow::Cow, ffi::OsString, io::Write};
 

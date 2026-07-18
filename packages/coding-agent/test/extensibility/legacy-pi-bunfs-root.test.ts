@@ -15,9 +15,9 @@ import { __computeBundledSelfPackageRoot } from "@reactor/coding-agent/extensibi
 // pinned below.
 describe("legacy pi compat bundled-self package root computation", () => {
 	it("derives the npm prebuilt bundle package root from dist import.meta.dir", () => {
-		const winMetaDir = "C:\\Users\\me\\.bun\\install\\global\\node_modules\\@ReActor\\coding-agent\\dist";
+		const winMetaDir = "C:\\Users\\me\\.bun\\install\\global\\node_modules\\@reactor\\coding-agent\\dist";
 		expect(__computeBundledSelfPackageRoot(winMetaDir, path.win32)).toBe(
-			"C:\\Users\\me\\.bun\\install\\global\\node_modules\\@ReActor\\coding-agent",
+			"C:\\Users\\me\\.bun\\install\\global\\node_modules\\@reactor\\coding-agent",
 		);
 
 		const posixMetaDir = "/home/me/.bun/install/global/node_modules/@reactor/coding-agent/dist";

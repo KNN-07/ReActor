@@ -45,10 +45,10 @@ use custom_str_cmp::custom_str_cmp;
 use ext_sort::ext_sort;
 use foldhash::{HashMap, SharedSeed, fast::FoldHasher};
 use numeric_str_cmp::{NumInfo, NumInfoParseSettings, human_numeric_str_cmp, numeric_str_cmp};
-use reactor_uutils_ctx::{format_usage, rayon_global_pool_available};
 use rand::{RngExt as _, rng};
 #[cfg(not(target_os = "wasi"))]
 use rayon::slice::ParallelSliceMut;
+use reactor_uutils_ctx::{format_usage, rayon_global_pool_available};
 use thiserror::Error;
 #[cfg(feature = "i18n-collator")]
 use uucore::i18n::collator::{compute_sort_key_utf8, locale_cmp};
@@ -1958,8 +1958,8 @@ fn emit_debug_warnings(
 
 /// In-process builtin entry point. Mirrors uutils' `uumain`, but owns argument
 /// parsing (bypassing the localized, process-exiting clap handler) and routes
-/// all I/O through `reactor_uutils_ctx`, so it is safe inside the long-lived host
-/// shell process.
+/// all I/O through `reactor_uutils_ctx`, so it is safe inside the long-lived
+/// host shell process.
 pub fn run(args: Vec<OsString>) -> i32 {
 	let (processed_args, mut legacy_warnings) = preprocess_legacy_args(args);
 	if !legacy_warnings.is_empty() {

@@ -184,8 +184,11 @@ impl HardlinkGroupScanner {
 				&& options.verbose
 			{
 				// Only show warnings for verbose mode
-				let _ =
-					writeln!(reactor_uutils_ctx::stderr(), "warning: failed to scan {}: {e}", file.quote());
+				let _ = writeln!(
+					reactor_uutils_ctx::stderr(),
+					"warning: failed to scan {}: {e}",
+					file.quote()
+				);
 			}
 			// For non-verbose mode, silently continue for missing files
 			// This provides graceful degradation - we'll lose hardlink info for

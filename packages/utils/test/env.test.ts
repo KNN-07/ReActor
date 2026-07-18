@@ -41,7 +41,7 @@ describe("parseEnvFile", () => {
 		});
 	});
 
-	it("mirrors valid REACTOR_ variables to REACTOR_ variables", () => {
+	it("preserves valid REACTOR_ variables without manufacturing aliases", () => {
 		const filePath = writeTempEnv("REACTOR_FEATURE=enabled\nREACTOR_BAD=before\0after\n");
 
 		expect(parseEnvFile(filePath)).toEqual({

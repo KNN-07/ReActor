@@ -7,8 +7,8 @@
 // pi-uutils: vendored from uutils/coreutils 0.8.0 and patched to run in-process
 // as a shell builtin. Every filesystem syscall (stat/lstat/statfs/readlink)
 // resolves its path operand against the shell working directory via
-// `reactor_uutils_ctx::resolve` AT THE CALL SITE, while the original operands are
-// kept for display/error messages and `%n` output (GNU prints operands as
+// `reactor_uutils_ctx::resolve` AT THE CALL SITE, while the original operands
+// are kept for display/error messages and `%n` output (GNU prints operands as
 // typed). All process-global stdio is routed through `reactor_uutils_ctx`,
 // `translate!` strings are literalized from locales/en-US.ftl, QUOTING_STYLE is
 // read from the scope environment, SELinux support is dropped, and the entry
@@ -529,7 +529,8 @@ for details about the options it supports.";
 
 		let bytes = s.as_bytes();
 
-		if pad_and_print_bytes(reactor_uutils_ctx::stdout(), bytes, flags.left, width, precision).is_err()
+		if pad_and_print_bytes(reactor_uutils_ctx::stdout(), bytes, flags.left, width, precision)
+			.is_err()
 		{
 			// if an error occurred while trying to print bytes fall back to normal lossy
 			// string so it can be printed
@@ -937,7 +938,8 @@ for details about the options it supports.";
 			if *i >= bound {
 				// pi-uutils: `show_warning!` replaced with a context-stderr
 				// write; message literalized from locales/en-US.ftl.
-				let _ = writeln!(reactor_uutils_ctx::stderr(), "stat: warning: backslash at end of format");
+				let _ =
+					writeln!(reactor_uutils_ctx::stderr(), "stat: warning: backslash at end of format");
 				return Token::Char('\\');
 			}
 			match chars[*i] {
@@ -1286,8 +1288,11 @@ for details about the options it supports.";
 				if self.show_fs {
 					// pi-uutils: `show_error!` replaced with a context-stderr
 					// write.
-					let _ =
-						writeln!(reactor_uutils_ctx::stderr(), "stat: {}", StatError::StdinFilesystemMode);
+					let _ = writeln!(
+						reactor_uutils_ctx::stderr(),
+						"stat: {}",
+						StatError::StdinFilesystemMode
+					);
 					return 1;
 				}
 				if let Ok(p) = Path::new("/dev/stdin").canonicalize() {
@@ -1360,10 +1365,11 @@ for details about the options it supports.";
 					Err(e) => {
 						// pi-uutils: `show_error!` replaced with a
 						// context-stderr write.
-						let _ = writeln!(reactor_uutils_ctx::stderr(), "stat: {}", StatError::CannotStat {
-							file:  display_name.quote().to_string(),
-							error: e.to_string(),
-						});
+						let _ =
+							writeln!(reactor_uutils_ctx::stderr(), "stat: {}", StatError::CannotStat {
+								file:  display_name.quote().to_string(),
+								error: e.to_string(),
+							});
 						return 1;
 					},
 				}

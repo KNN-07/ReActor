@@ -1,7 +1,7 @@
 //! N-API bindings for cross-platform process tree management.
 //!
-//! The platform-specific implementation lives in [`reactor_shell::process`]; this
-//! module is a thin shim that exposes that crate's `Process` surface to
+//! The platform-specific implementation lives in [`reactor_shell::process`];
+//! this module is a thin shim that exposes that crate's `Process` surface to
 //! JavaScript and re-exports the termination primitives used by other native
 //! modules (e.g. [`crate::pty`]).
 
@@ -13,7 +13,9 @@ use napi::{
 };
 use napi_derive::napi;
 use reactor_shell::process::{self as core_process, ProcessStatus as CoreProcessStatus};
-pub use reactor_shell::process::{KILL_SIGNAL, TERM_SIGNAL, TerminationTargets, kill_process_group};
+pub use reactor_shell::process::{
+	KILL_SIGNAL, TERM_SIGNAL, TerminationTargets, kill_process_group,
+};
 
 use crate::task;
 

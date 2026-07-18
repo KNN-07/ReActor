@@ -263,7 +263,8 @@ pub fn list_workspace(options: ListWorkspaceOptions<'_>) -> task::Promise<ListWo
 		};
 		run_list_workspace(
 			WorkspaceConfig {
-				root: reactor_walker::resolve_search_path(&path).map_err(crate::iofs::map_walker_error)?,
+				root: reactor_walker::resolve_search_path(&path)
+					.map_err(crate::iofs::map_walker_error)?,
 				max_depth,
 				walk_max_depth,
 				include_hidden: hidden.unwrap_or(false),

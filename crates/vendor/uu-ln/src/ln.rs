@@ -7,13 +7,13 @@
 
 // pi-uutils: vendored from uutils/coreutils 0.8.0 and patched to run in-process
 // as a shell builtin. Every filesystem syscall resolves its path operand
-// against the shell working directory via `reactor_uutils_ctx::resolve` AT THE CALL
-// SITE, while the original operands are kept for display/error messages (GNU
-// prints operands as typed) — and, crucially, for the CONTENT of symbolic
+// against the shell working directory via `reactor_uutils_ctx::resolve` AT THE
+// CALL SITE, while the original operands are kept for display/error messages
+// (GNU prints operands as typed) — and, crucially, for the CONTENT of symbolic
 // links, which stays exactly as typed like GNU ln (only the location where the
 // link is created gets resolved). All process-global stdio and the `-i` prompt
-// are routed through `reactor_uutils_ctx`, `translate!` strings are literalized, and
-// the entry point no longer calls `std::process::exit`.
+// are routed through `reactor_uutils_ctx`, `translate!` strings are
+// literalized, and the entry point no longer calls `std::process::exit`.
 
 #[cfg(any(unix, target_os = "redox"))]
 use std::os::unix::fs::symlink;
@@ -480,13 +480,15 @@ fn relative_path<'a>(src: &'a Path, dst: &Path) -> Cow<'a, Path> {
 	// pi-uutils: canonicalize from the resolved operands so `-r` computes the
 	// link text against the shell working directory (uucore's canonicalize
 	// would otherwise fall back to the process cwd for relative paths).
-	if let Ok(src_abs) =
-		canonicalize(reactor_uutils_ctx::resolve(src), MissingHandling::Missing, ResolveMode::Physical)
-		&& let Ok(dst_abs) = canonicalize(
-			reactor_uutils_ctx::resolve(dst.parent().unwrap()),
-			MissingHandling::Missing,
-			ResolveMode::Physical,
-		) {
+	if let Ok(src_abs) = canonicalize(
+		reactor_uutils_ctx::resolve(src),
+		MissingHandling::Missing,
+		ResolveMode::Physical,
+	) && let Ok(dst_abs) = canonicalize(
+		reactor_uutils_ctx::resolve(dst.parent().unwrap()),
+		MissingHandling::Missing,
+		ResolveMode::Physical,
+	) {
 		return make_path_relative_to(src_abs, dst_abs).into();
 	}
 	src.into()

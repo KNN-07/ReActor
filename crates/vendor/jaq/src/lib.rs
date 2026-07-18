@@ -9,8 +9,9 @@
 //! upstream:
 //! - `main()` is restructured as [`run`], returning the exit code instead of
 //!   `ExitCode`/`Termination`; no `std::process::exit` anywhere.
-//! - stdio goes through the [`reactor_uutils_ctx`] streams; every file path operand
-//!   resolves through `reactor_uutils_ctx::resolve` against the shell's cwd.
+//! - stdio goes through the [`reactor_uutils_ctx`] streams; every file path
+//!   operand resolves through `reactor_uutils_ctx::resolve` against the shell's
+//!   cwd.
 //! - The ctx streams are never a tty, so `--color` auto mode always resolves to
 //!   plain output; `-C/--color-output` still forces ANSI. Color state is
 //!   thread-local (see `color` in this module) instead of yansi's global
@@ -40,9 +41,9 @@ use jaq_core::{Ctx, RcIter, load};
 use jaq_json::Val;
 use write::{print, with_stdout};
 
-/// In-process builtin entry point. The host installs a [`reactor_uutils_ctx`] scope
-/// (stdio + working directory + environment) on a dedicated blocking thread,
-/// then calls this with `argv[0]` = command name (`jq`).
+/// In-process builtin entry point. The host installs a [`reactor_uutils_ctx`]
+/// scope (stdio + working directory + environment) on a dedicated blocking
+/// thread, then calls this with `argv[0]` = command name (`jq`).
 pub fn run(argv: Vec<std::ffi::OsString>) -> i32 {
 	color::init();
 	color::set(false);

@@ -607,8 +607,9 @@ async fn create_session_for_run(
 	// In-process uutils-backed builtins (vendored + patched): consistent,
 	// cross-platform implementations that run without spawning a process and
 	// resolve paths against the shell working directory. The whole set can be
-	// disabled (falling back to system binaries) via REACTOR_DISABLE_UUTILS_BUILTINS;
-	// the destructive pair additionally honors REACTOR_DISABLE_UUTILS_DESTRUCTIVE.
+	// disabled (falling back to system binaries) via
+	// REACTOR_DISABLE_UUTILS_BUILTINS; the destructive pair additionally honors
+	// REACTOR_DISABLE_UUTILS_DESTRUCTIVE.
 	if !uutils_env_disabled(config, "REACTOR_DISABLE_UUTILS_BUILTINS") {
 		shell.register_builtin("mkdir", crate::coreutils::mkdir_builtin());
 		shell.register_builtin("head", crate::coreutils::head_builtin());
@@ -725,8 +726,8 @@ async fn create_session_for_run(
 	// NohupCommand) so a backgrounded server survives this embedded shell's
 	// kill-on-drop teardown. It therefore shadows any system `nohup` (which does
 	// NOT escape the process-group kill) — unless explicitly opted out via
-	// REACTOR_DISABLE_NOHUP_BUILTIN (session env or process env), in which case bare
-	// `nohup` resolves to the real coreutils binary.
+	// REACTOR_DISABLE_NOHUP_BUILTIN (session env or process env), in which case
+	// bare `nohup` resolves to the real coreutils binary.
 	let nohup_builtin_disabled = {
 		let raw = config
 			.session_env
@@ -2210,6 +2211,50 @@ mod tests {
 		let _ = std::fs::remove_dir_all(&tmp);
 	}
 
+	/// Regression test for issue #5819: `mkdir -p ~/proj/{a,b}` must create both
+	/// `a` and `b` under `$HOME/proj`. Brace expansion runs before tilde
+	/// expansion and previously left every element after the first with a
+	/// literal `~`, so `b` was created as `./~/proj/b` in the shell cwd instead.
+	#[tokio::test(flavor = "multi_thread")]
+	async fn uutils_mkdir_expands_tilde_for_every_brace_element() {
+		let base = std::env::temp_dir().join(format!("pi-mkdir-brace-{}", std::process::id()));
+		let home = base.join("home");
+		let cwd = base.join("cwd");
+		let _ = std::fs::remove_dir_all(&base);
+		std::fs::create_dir_all(&home).expect("home dir");
+		std::fs::create_dir_all(&cwd).expect("cwd dir");
+		let cwd_str = cwd.to_str().expect("utf8 cwd path");
+
+		let mut env = HashMap::new();
+		env.insert("HOME".to_string(), home.to_string_lossy().to_string());
+		let config =
+			ShellConfig { session_env: Some(env), snapshot_path: None, minimizer: None };
+		let mut session = create_session(&config).await.expect("create_session");
+		session.shell.set_working_dir(cwd_str).expect("set cwd");
+
+		let mut params = session.shell.default_exec_params();
+		params.set_fd(OpenFiles::STDIN_FD, null_file().expect("null"));
+		params.set_fd(OpenFiles::STDOUT_FD, null_file().expect("null"));
+		params.set_fd(OpenFiles::STDERR_FD, null_file().expect("null"));
+
+		let source_info = SourceInfo::from("pi-natives:test");
+		let exec = session
+			.shell
+			.run_string("mkdir -p ~/proj/{a,b}", &source_info, &params)
+			.await
+			.expect("run_string");
+		assert!(matches!(exec.exit_code, ExecutionExitCode::Success), "exit {}", exit_code(&exec));
+
+		// Both elements' tildes expanded: dirs land under $HOME/proj.
+		assert!(home.join("proj/a").is_dir(), "~/proj/a not created under HOME");
+		assert!(home.join("proj/b").is_dir(), "~/proj/b not created under HOME");
+		// The buggy path created a literal `~` tree in the shell cwd.
+		assert!(!cwd.join("~").exists(), "literal ~ tree leaked into cwd");
+		assert!(!cwd.join("a").exists(), "unexpanded element leaked into cwd");
+
+		let _ = std::fs::remove_dir_all(&base);
+	}
+
 	/// `mkdir --help` and an invalid flag must be handled in-process: rendered
 	/// to the command streams and returned as an exit code. The upstream
 	/// `uumain` parser calls `std::process::exit`, which would terminate the
@@ -3114,10 +3159,10 @@ mod tests {
 
 	/// Truth-table coverage for `brush_core::commands::child_session_action`.
 	///
-	/// Lives in `reactor-natives` because the brush-core crate is excluded from the
-	/// workspace (vendored upstream) and cannot be tested standalone — its tokio
-	/// dependency only resolves the `net` feature via feature-unification with
-	/// other workspace members.
+	/// Lives in `reactor-natives` because the brush-core crate is excluded from
+	/// the workspace (vendored upstream) and cannot be tested standalone — its
+	/// tokio dependency only resolves the `net` feature via feature-unification
+	/// with other workspace members.
 	mod child_session_action {
 		use brush_core::commands::{ChildSessionAction, child_session_action};
 
@@ -3449,11 +3494,12 @@ replace = [{ pattern = "^.+$", replacement = "PWD" }]
 
 	/// Regression: a `&&` / `;` chain whose later pipeline stage is a compound
 	/// command (`while … done`) must execute instead of failing with
-	/// "reactor-natives:command: syntax error at end of input". The segmented chain
-	/// runner rebuilt each segment via the brush AST `Display` impl, but only
-	/// validated the *first* pipeline stage — so a compound later stage was
-	/// reconstructed without its terminator and re-run as invalid shell. Such a
-	/// command now bails out of segmentation and runs whole via the single path.
+	/// "reactor-natives:command: syntax error at end of input". The segmented
+	/// chain runner rebuilt each segment via the brush AST `Display` impl, but
+	/// only validated the *first* pipeline stage — so a compound later stage
+	/// was reconstructed without its terminator and re-run as invalid shell.
+	/// Such a command now bails out of segmentation and runs whole via the
+	/// single path.
 	#[cfg(unix)]
 	#[tokio::test(flavor = "multi_thread")]
 	async fn compound_stage_in_chain_runs_via_single_path() {
@@ -3884,9 +3930,10 @@ replace = [{ pattern = "^.+$", replacement = "PWD" }]
 	/// Regression for the `suspended (tty input)` bug: an **interactive child
 	/// inside a pipeline** (`zsh -i ... | awk`) used to stay in the host
 	/// session, open `/dev/tty`, `tcsetpgrp` itself to the foreground, and
-	/// leave the embedded host (ReActor) stopped on its next tty read. The earlier
-	/// embedded-host fix carved pipelines out of `detach_session` because a
-	/// later stage that `setpgid`-joined a detached leader failed with EPERM.
+	/// leave the embedded host (ReActor) stopped on its next tty read. The
+	/// earlier embedded-host fix carved pipelines out of `detach_session`
+	/// because a later stage that `setpgid`-joined a detached leader failed
+	/// with EPERM.
 	///
 	/// This test boots a real embedded `BrushShell` and runs a two-stage
 	/// pipeline whose first stage prints its PID then sleeps (forwarded to us
@@ -4133,9 +4180,9 @@ replace = [{ pattern = "^.+$", replacement = "PWD" }]
 
 	/// Brush expands `$env:NAME` against the `env` shell variable by default,
 	/// collapsing PowerShell references like `Write-Host $env:REACTOR_CODE` to
-	/// `:REACTOR_CODE`. The session-level fallback below defines `env=$env` so the
-	/// expansion is the literal `$env:REACTOR_CODE`, preserving the PowerShell
-	/// token when the command is forwarded to a child shell.
+	/// `:REACTOR_CODE`. The session-level fallback below defines `env=$env` so
+	/// the expansion is the literal `$env:REACTOR_CODE`, preserving the
+	/// PowerShell token when the command is forwarded to a child shell.
 	#[cfg(unix)]
 	#[tokio::test(flavor = "multi_thread")]
 	async fn powershell_env_reference_survives_brush_expansion() {

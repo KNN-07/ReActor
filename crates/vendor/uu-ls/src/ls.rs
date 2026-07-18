@@ -117,11 +117,12 @@ pub(crate) fn show_ls_error(err: LsError) {
 	let _ = writeln!(reactor_uutils_ctx::stderr(), "ls: {err}");
 }
 
-/// In-process builtin entry point. The host installs a [`reactor_uutils_ctx`] scope
-/// (stdio + working directory + environment) on a dedicated blocking thread,
-/// then calls this. Unlike uutils' `#[uucore::main] uumain`, this never calls
-/// `std::process::exit` and renders clap help/usage/version to the context
-/// streams, so it is safe to run inside the long-lived host shell process.
+/// In-process builtin entry point. The host installs a [`reactor_uutils_ctx`]
+/// scope (stdio + working directory + environment) on a dedicated blocking
+/// thread, then calls this. Unlike uutils' `#[uucore::main] uumain`, this never
+/// calls `std::process::exit` and renders clap help/usage/version to the
+/// context streams, so it is safe to run inside the long-lived host shell
+/// process.
 pub fn run(args: Vec<OsString>) -> i32 {
 	// Detect a raw `--dired`/`-D` operand before clap parsing (it can be masked
 	// by `--hyperlink` via overrides_with); see `dired::is_dired_arg_present`.
@@ -1427,8 +1428,10 @@ fn depth_first_list(
 				state.out.flush()?;
 				show_ls_error(LsError::IOErrorContext(e.path().to_path_buf(), err, e.command_line));
 			} else {
-				let fi =
-					FileInformation::from_path(reactor_uutils_ctx::resolve(e.path()), e.must_dereference)?;
+				let fi = FileInformation::from_path(
+					reactor_uutils_ctx::resolve(e.path()),
+					e.must_dereference,
+				)?;
 				if state.listed_ancestors.insert(fi) {
 					// Push to stack, but with a less aggressive growth curve.
 					let (cap, len) = (state.stack.capacity(), state.stack.len());
@@ -1539,8 +1542,11 @@ fn get_security_context<'a>(
 
 	#[cfg(all(feature = "selinux", any(target_os = "linux", target_os = "android")))]
 	if config.selinux_supported {
-		match selinux::SecurityContext::of_path(reactor_uutils_ctx::resolve(path), must_dereference, false)
-		{
+		match selinux::SecurityContext::of_path(
+			reactor_uutils_ctx::resolve(path),
+			must_dereference,
+			false,
+		) {
 			Err(_r) => {
 				// TODO: show the actual reason why it failed
 				let _ = writeln!(

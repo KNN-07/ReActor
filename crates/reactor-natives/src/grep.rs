@@ -1670,7 +1670,9 @@ fn run_streaming_grep<M: Matcher + Sync>(
 			skip_node_modules,
 			ct,
 		),
-		Some(stop) if stop <= ORDERED_STREAMING_STOP_MAX_COUNT || reactor_walker::walk_workers() <= 1 => {
+		Some(stop)
+			if stop <= ORDERED_STREAMING_STOP_MAX_COUNT || reactor_walker::walk_workers() <= 1 =>
+		{
 			run_sequential_grep(
 				search_path,
 				matcher,

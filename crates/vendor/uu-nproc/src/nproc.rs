@@ -6,11 +6,12 @@
 // spell-checker:ignore (ToDO) NPROCESSORS nprocs numstr sysconf
 
 // pi-uutils: vendored from uutils/coreutils 0.8.0 and patched to run in-process
-// as a shell builtin. The REACTOR_NUM_THREADS and REACTOR_THREAD_LIMIT environment
-// variables are read from the scope environment via `reactor_uutils_ctx::var` (the
-// shell's exported variables), not the host process environment. All output is
-// routed through the context stdout, `translate!` strings are literalized, and
-// the entry point no longer calls `std::process::exit`.
+// as a shell builtin. The REACTOR_NUM_THREADS and REACTOR_THREAD_LIMIT
+// environment variables are read from the scope environment via
+// `reactor_uutils_ctx::var` (the shell's exported variables), not the host
+// process environment. All output is routed through the context stdout,
+// `translate!` strings are literalized, and the entry point no longer calls
+// `std::process::exit`.
 
 use std::{ffi::OsString, io::Write, thread};
 
@@ -128,9 +129,9 @@ pub fn uu_app() -> Command {
 	Command::new("nproc")
 		.version(uucore::crate_version!())
 		.about(
-			"Print the number of cores available to the current process.\nIf the REACTOR_NUM_THREADS or \
-			 REACTOR_THREAD_LIMIT environment variables are set, then\nthey will determine the minimum \
-			 and maximum returned value respectively.",
+			"Print the number of cores available to the current process.\nIf the REACTOR_NUM_THREADS \
+			 or REACTOR_THREAD_LIMIT environment variables are set, then\nthey will determine the \
+			 minimum and maximum returned value respectively.",
 		)
 		.override_usage(format_usage("nproc [OPTIONS]..."))
 		.infer_long_args(true)

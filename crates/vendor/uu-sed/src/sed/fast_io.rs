@@ -316,9 +316,10 @@ impl IOChunkContent<'_> {
 	}
 }
 
-// Patched for reactor-uutils-ctx embedding: upstream's FastCopy (raw-fd metadata
-// driving write(2)/copy_file_range(2) output fast paths) is removed, because
-// the output writer is a plain `Write` handle without a file descriptor.
+// Patched for reactor-uutils-ctx embedding: upstream's FastCopy (raw-fd
+// metadata driving write(2)/copy_file_range(2) output fast paths) is removed,
+// because the output writer is a plain `Write` handle without a file
+// descriptor.
 
 /// Unified reader that uses mmap when possible, falls back to buffered reading.
 pub enum LineReader<'a> {
@@ -424,9 +425,9 @@ impl<'a> LineReader<'a> {
 	}
 }
 
-// Patched for reactor-uutils-ctx embedding: output goes to plain `Write` handles
-// (the context stdout has no raw fd), so upstream's `Write + AsRawFd` bound
-// is reduced to `Write` on every platform.
+// Patched for reactor-uutils-ctx embedding: output goes to plain `Write`
+// handles (the context stdout has no raw fd), so upstream's `Write + AsRawFd`
+// bound is reduced to `Write` on every platform.
 pub trait OutputWrite: Write {}
 impl<T: Write> OutputWrite for T {}
 

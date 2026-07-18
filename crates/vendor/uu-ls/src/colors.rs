@@ -563,10 +563,11 @@ pub(crate) fn color_name(
 		return style_manager.apply_style_for_path(path, name, wrap);
 	}
 
-	let md_option: Option<Metadata> = path
-		.metadata()
-		.cloned()
-		.or_else(|| reactor_uutils_ctx::resolve(&path.p_buf).symlink_metadata().ok());
+	let md_option: Option<Metadata> = path.metadata().cloned().or_else(|| {
+		reactor_uutils_ctx::resolve(&path.p_buf)
+			.symlink_metadata()
+			.ok()
+	});
 
 	style_manager.apply_style_based_on_metadata(path, md_option.as_ref(), name, wrap)
 }

@@ -7,13 +7,13 @@
 
 // pi-uutils: vendored from uutils/coreutils 0.8.0 and patched to run in-process
 // as a shell builtin. FILE operands resolve against the shell working directory
-// via `reactor_uutils_ctx::resolve` at the open/mmap call site (the original operand
-// is kept for error messages), `-`/no-operand read the context stdin, output is
-// written through the context stdout, recoverable per-file errors go to the
-// context stderr with `reactor_uutils_ctx::set_exit_code` (upstream `show!`), the
-// `translate!` strings are literalized, and the process-global signal handling
-// plus the stdin mmap/tempfile buffering (which target the process stdin fd)
-// are removed.
+// via `reactor_uutils_ctx::resolve` at the open/mmap call site (the original
+// operand is kept for error messages), `-`/no-operand read the context stdin,
+// output is written through the context stdout, recoverable per-file errors go
+// to the context stderr with `reactor_uutils_ctx::set_exit_code` (upstream
+// `show!`), the `translate!` strings are literalized, and the process-global
+// signal handling plus the stdin mmap/tempfile buffering (which target the
+// process stdin fd) are removed.
 
 mod error;
 

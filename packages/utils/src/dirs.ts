@@ -107,7 +107,7 @@ function getProfileConfigRoot(profile: string | undefined): string {
 	return profile ? path.join(root, "profiles", profile) : root;
 }
 
-function readPiProfileFromEnvSafe(): string | undefined {
+function readProfileAgentDirSourceFromEnvSafe(): string | undefined {
 	try {
 		return normalizeProfileName(process.env.REACTOR_PROFILE);
 	} catch {
@@ -120,7 +120,21 @@ function getProfileAgentDir(profile: string): string {
 }
 
 function isProfileDerivedAgentDir(profile: string | undefined, agentDirEnv: string | undefined): boolean {
-	return profile !== undefined && agentDirEnv === getProfileAgentDir(profile);
+	if (!agentDirEnv) return false;
+	if (profile !== undefined) return agentDirEnv === getProfileAgentDir(profile);
+
+	// A parent can explicitly select the default profile while still passing the
+	// agent-dir value derived from its previously active named profile. With no
+	// legacy profile variable to recover that name from, recognize the canonical
+	// `<config>/profiles/<name>/agent` shape directly.
+	const relative = path.relative(path.join(getBaseConfigRoot(), "profiles"), agentDirEnv);
+	const segments = relative.split(path.sep);
+	if (segments.length !== 2 || segments[1] !== "agent") return false;
+	try {
+		return normalizeProfileName(segments[0]) !== undefined;
+	} catch {
+		return false;
+	}
 }
 // =============================================================================
 // Project directory
@@ -323,8 +337,8 @@ class DirResolver {
  * (propagated by a parent's `setProfile`), so it must NOT be snapshotted as the
  * default-mode baseline — otherwise default mode would resolve to the profile's
  * agent dir. The profile source can be the active profile or a lower-priority
- * `REACTOR_PROFILE` that was bypassed because `REACTOR_PROFILE` explicitly selected the
- * default profile. Returns `undefined` in those cases so reset falls back to the
+ * `REACTOR_PROFILE` value propagated by a parent process. Returns `undefined`
+ * in that case so reset falls back to the
  * standard `~/.reactor/agent`.
  */
 function resolvePreProfileAgentDir(
@@ -347,7 +361,11 @@ let activeProfile = readProfileFromEnvSafe();
 function resolveActiveAgentDirOverride(): string | undefined {
 	return activeProfile
 		? undefined
-		: resolvePreProfileAgentDir(undefined, process.env.REACTOR_CODING_AGENT_DIR, readPiProfileFromEnvSafe());
+		: resolvePreProfileAgentDir(
+				undefined,
+				process.env.REACTOR_CODING_AGENT_DIR,
+				readProfileAgentDirSourceFromEnvSafe(),
+			);
 }
 
 let dirs = new DirResolver({
@@ -368,7 +386,7 @@ let dirs = new DirResolver({
 let preProfileAgentDirEnv: string | undefined = resolvePreProfileAgentDir(
 	activeProfile,
 	process.env.REACTOR_CODING_AGENT_DIR,
-	activeProfile ?? readPiProfileFromEnvSafe(),
+	activeProfile ?? readProfileAgentDirSourceFromEnvSafe(),
 );
 // Anchor home for the resolver. Captured at module load to stay stable across
 // test mocks of `os.homedir()`. `getPluginsDir(home)` compares against this so
@@ -425,7 +443,7 @@ export function __resetProfileSnapshotForTests(): void {
 	preProfileAgentDirEnv = resolvePreProfileAgentDir(
 		activeProfile,
 		process.env.REACTOR_CODING_AGENT_DIR,
-		activeProfile ?? readPiProfileFromEnvSafe(),
+		activeProfile ?? readProfileAgentDirSourceFromEnvSafe(),
 	);
 }
 
@@ -453,13 +471,12 @@ export function setProfile(profile: string | undefined): void {
 		preProfileAgentDirEnv = resolvePreProfileAgentDir(
 			undefined,
 			process.env.REACTOR_CODING_AGENT_DIR,
-			readPiProfileFromEnvSafe(),
+			readProfileAgentDirSourceFromEnvSafe(),
 		);
 	}
 	activeProfile = next;
 	if (activeProfile) {
 		dirs = new DirResolver({ profile: activeProfile });
-		process.env.REACTOR_PROFILE = activeProfile;
 		process.env.REACTOR_PROFILE = activeProfile;
 		process.env.REACTOR_CODING_AGENT_DIR = dirs.agentDir;
 	} else {

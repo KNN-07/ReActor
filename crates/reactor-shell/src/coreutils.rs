@@ -1,7 +1,7 @@
 //! In-process shell builtins backed by vendored, patched uutils utilities.
 //!
-//! Each builtin installs a [`reactor_uutils_ctx`] scope — the command's stdio file
-//! descriptors, the shell working directory, and the shell's exported
+//! Each builtin installs a [`reactor_uutils_ctx`] scope — the command's stdio
+//! file descriptors, the shell working directory, and the shell's exported
 //! environment — on a dedicated blocking thread, then invokes the patched
 //! utility's `run` entry point. Running on a blocking thread keeps the
 //! thread-local context isolated across concurrent pipeline stages and avoids
@@ -322,7 +322,8 @@ mod tests {
 
 	fn run_in_scope(run: UutilRun, argv: Vec<OsString>) -> (i32, String) {
 		let (tx, rx) = flume::unbounded();
-		let code = reactor_uutils_ctx::scope(scope_io(Box::new(ChanWriter(tx))), || run_caught(run, argv));
+		let code =
+			reactor_uutils_ctx::scope(scope_io(Box::new(ChanWriter(tx))), || run_caught(run, argv));
 		let mut err = Vec::new();
 		while let Ok(chunk) = rx.try_recv() {
 			err.extend_from_slice(&chunk);

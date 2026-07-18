@@ -115,7 +115,8 @@ fn copy(mut input: impl Read, mut output: impl Write) -> Result<usize> {
 			},
 			Err(err) if err.kind() == ErrorKind::Interrupted => {},
 			Err(err) => {
-				let _ = writeln!(reactor_uutils_ctx::stderr(), "tee: error reading standard input: {err}");
+				let _ =
+					writeln!(reactor_uutils_ctx::stderr(), "tee: error reading standard input: {err}");
 				return Err(err);
 			},
 		}
@@ -167,8 +168,11 @@ impl MultiWriter {
 						matches!(mode.as_ref(), Some(OutputErrorMode::Warn | OutputErrorMode::Exit))
 							|| !is_pipe;
 					if report {
-						let _ =
-							writeln!(reactor_uutils_ctx::stderr(), "tee: {}: {err}", writer.name.maybe_quote());
+						let _ = writeln!(
+							reactor_uutils_ctx::stderr(),
+							"tee: {}: {err}",
+							writer.name.maybe_quote()
+						);
 						errors += 1;
 					}
 					let exit = matches!(mode.as_ref(), Some(OutputErrorMode::Exit))

@@ -98,8 +98,9 @@ fn run_matches(matches: &ArgMatches) -> UResult<()> {
 	}
 }
 
-/// In-process builtin entry point. The host installs a [`reactor_uutils_ctx`] scope
-/// (stdio + working directory) on a dedicated blocking thread, then calls this.
+/// In-process builtin entry point. The host installs a [`reactor_uutils_ctx`]
+/// scope (stdio + working directory) on a dedicated blocking thread, then calls
+/// this.
 ///
 /// Unlike uutils' `#[uucore::main] uumain`, this never mutates process-global
 /// signal handlers and never calls `std::process::exit` — clap help/usage/

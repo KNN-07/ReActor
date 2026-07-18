@@ -1,7 +1,7 @@
 {
 	"repository": "https://github.com/can1357/oh-my-pi.git",
-	"lastImportedSha": "0f9fceeea483caad531a32b050ac38558516cb5c",
-	"importDate": "2026-07-17",
-	"reactorCommit": "290ded31d4",
-	"validationStatus": "pending-v0.1-validation"
+	"lastImportedSha": "3fdd85ab6c6bab6c0cdee80abbbec0981740a5c0",
+	"importDate": "2026-07-18",
+	"reactorCommit": "7b1c0378aa3784636c09a239273e3b10e3ecf12c",
+	"validationStatus": "passed"
 }

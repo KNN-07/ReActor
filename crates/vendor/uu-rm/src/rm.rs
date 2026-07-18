@@ -33,10 +33,11 @@ use uucore::{
 };
 
 // pi-uutils: in-process replacements for uucore's process-global `show_error!`
-// and `prompt_yes!` macros — both route through the thread-local reactor-uutils-ctx
-// streams rather than the process-global ones, so prompts/diagnostics follow
-// the embedding shell's (possibly redirected) fds. Defined before `mod
-// platform;` so the platform submodule picks them up via textual macro scope.
+// and `prompt_yes!` macros — both route through the thread-local
+// reactor-uutils-ctx streams rather than the process-global ones, so
+// prompts/diagnostics follow the embedding shell's (possibly redirected) fds.
+// Defined before `mod platform;` so the platform submodule picks them up via
+// textual macro scope.
 macro_rules! show_error {
     ($($args:tt)+) => ({
         use std::io::Write as _;
@@ -114,8 +115,11 @@ impl UError for RmError {}
 /// Helper function to print verbose message for removed file
 fn verbose_removed_file(path: &Path, options: &Options) {
 	if options.verbose {
-		let _ =
-			writeln!(reactor_uutils_ctx::stdout(), "removed {}", uucore::fs::normalize_path(path).quote());
+		let _ = writeln!(
+			reactor_uutils_ctx::stdout(),
+			"removed {}",
+			uucore::fs::normalize_path(path).quote()
+		);
 	}
 }
 
@@ -356,8 +360,9 @@ fn run_matches(matches: &ArgMatches, args: &[OsString]) -> UResult<()> {
 	Ok(())
 }
 
-/// In-process builtin entry point. The host installs a [`reactor_uutils_ctx`] scope
-/// (stdio + working directory) on a dedicated blocking thread, then calls this.
+/// In-process builtin entry point. The host installs a [`reactor_uutils_ctx`]
+/// scope (stdio + working directory) on a dedicated blocking thread, then calls
+/// this.
 ///
 /// Unlike uutils' attribute-macro entry point, this never aborts the process
 /// — clap help/usage/version output is rendered to the context streams — so it

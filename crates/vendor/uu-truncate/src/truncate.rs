@@ -7,12 +7,13 @@
 
 // pi-uutils: vendored from uutils/coreutils 0.8.0 and patched to run in-process
 // as a shell builtin. Every filesystem syscall resolves its path operand
-// against the shell working directory via `reactor_uutils_ctx::resolve` AT THE CALL
-// SITE, while the original operands are kept for display/error messages (GNU
-// prints operands as typed). All process-global stdio is routed through
-// `reactor_uutils_ctx`, `translate!` strings are literalized, per-file errors are
-// reported through the context stderr with `set_exit_code` (continue-on-error
-// like GNU truncate), and the entry point no longer calls `std::process::exit`.
+// against the shell working directory via `reactor_uutils_ctx::resolve` AT THE
+// CALL SITE, while the original operands are kept for display/error messages
+// (GNU prints operands as typed). All process-global stdio is routed through
+// `reactor_uutils_ctx`, `translate!` strings are literalized, per-file errors
+// are reported through the context stderr with `set_exit_code`
+// (continue-on-error like GNU truncate), and the entry point no longer calls
+// `std::process::exit`.
 
 #[cfg(unix)]
 use std::os::unix::fs::FileTypeExt;
@@ -277,25 +278,24 @@ fn truncate(
 	size: Option<String>,
 	filenames: &[OsString],
 ) -> UResult<()> {
-	let reference_size = match reference {
-		Some(reference_path) => {
-			// pi-uutils: resolve the reference operand against the shell
-			// working directory; `reference_path` is kept for the message.
-			let reference_metadata =
-				metadata(reactor_uutils_ctx::resolve(&reference_path)).map_err(|error| {
-					match error.kind() {
+	let reference_size =
+		match reference {
+			Some(reference_path) => {
+				// pi-uutils: resolve the reference operand against the shell
+				// working directory; `reference_path` is kept for the message.
+				let reference_metadata = metadata(reactor_uutils_ctx::resolve(&reference_path))
+					.map_err(|error| match error.kind() {
 						ErrorKind::NotFound => USimpleError::new(
 							1,
 							format!("cannot stat {}: No such file or directory", reference_path.quote()),
 						),
 						_ => error.map_err_context(String::new),
-					}
-				})?;
+					})?;
 
-			Some(reference_metadata.len())
-		},
-		None => None,
-	};
+				Some(reference_metadata.len())
+			},
+			None => None,
+		};
 
 	let size_string = size.as_deref();
 

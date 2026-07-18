@@ -116,11 +116,11 @@ pub fn scope<R>(io: ScopeIo, f: impl FnOnce() -> R) -> R {
 ///
 /// The native crash hook consults this from inside a panic: a panic raised
 /// while a scope is active is, by construction, about to be caught at the
-/// uutils boundary (see `run_uutil` in reactor-shell's `coreutils`), so the hook
-/// treats it as recoverable and keeps it out of the user-facing crash report.
-/// Reads the borrow-free [`SCOPE_DEPTH`] counter rather than `CTX`, because the
-/// panicking code may already hold `CTX`'s borrow — a `RefCell` read there
-/// would panic inside the panic hook and abort the process.
+/// uutils boundary (see `run_uutil` in reactor-shell's `coreutils`), so the
+/// hook treats it as recoverable and keeps it out of the user-facing crash
+/// report. Reads the borrow-free [`SCOPE_DEPTH`] counter rather than `CTX`,
+/// because the panicking code may already hold `CTX`'s borrow — a `RefCell`
+/// read there would panic inside the panic hook and abort the process.
 #[must_use]
 pub fn is_active() -> bool {
 	SCOPE_DEPTH.with(|d| d.get() > 0)

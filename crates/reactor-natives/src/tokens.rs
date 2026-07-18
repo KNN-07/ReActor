@@ -17,8 +17,8 @@ use std::sync::LazyLock;
 
 use napi::bindgen_prelude::Either;
 use napi_derive::napi;
-use reactor_uutils_ctx::rayon_global_pool_available;
 use rayon::prelude::*;
+use reactor_uutils_ctx::rayon_global_pool_available;
 use tiktoken_rs::{CoreBPE, cl100k_base, o200k_base};
 
 /// Tokenizer encoding to use.

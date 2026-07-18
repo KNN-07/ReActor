@@ -1,4 +1,4 @@
-//! Native utilities exported via N-API for the ReActor toolchain.
+//! Native utilities exported via N-API for the `ReActor` toolchain.
 //!
 //! # Overview
 //! High-performance primitives for clipboard access, grep, file discovery,
@@ -255,8 +255,8 @@ pub const fn reactor_natives_version_sentinel() {}
 /// invoke a panicking or allocating native call. This runs during `.node`
 /// load, while the dynamic-loader lock is held, so it MUST NOT spawn threads —
 /// the Tokio runtime is installed afterwards on Windows by
-/// [`reactor_install_tokio_runtime`], which the JS loader calls once `dlopen` has
-/// returned.
+/// [`reactor_install_tokio_runtime`], which the JS loader calls once `dlopen`
+/// has returned.
 ///
 /// On Windows, the custom Tokio runtime is host-sized to prevent aborts under
 /// memory limits (see [`create_windows_napi_tokio_runtime`]). Non-Windows
@@ -268,8 +268,8 @@ fn install_native_crash_handler() {
 	crash_handler::install();
 }
 
-/// Guards [`reactor_install_tokio_runtime`] so the runtime is built at most once
-/// per process even if the loader invokes it more than once.
+/// Guards [`reactor_install_tokio_runtime`] so the runtime is built at most
+/// once per process even if the loader invokes it more than once.
 #[cfg(target_os = "windows")]
 static TOKIO_RUNTIME_INSTALLED: AtomicBool = AtomicBool::new(false);
 

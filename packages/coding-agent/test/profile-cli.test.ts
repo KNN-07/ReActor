@@ -43,7 +43,6 @@ describe("global --profile flag", () => {
 	let originalAgentDir = "";
 	let originalAgentDirEnv: string | undefined;
 	let originalReactorProfileEnv: string | undefined;
-	let originalPiProfileEnv: string | undefined;
 	let originalConfigDir: string | undefined;
 
 	beforeEach(() => {
@@ -51,7 +50,6 @@ describe("global --profile flag", () => {
 		originalAgentDir = getAgentDir();
 		originalAgentDirEnv = process.env.REACTOR_CODING_AGENT_DIR;
 		originalReactorProfileEnv = process.env.REACTOR_PROFILE;
-		originalPiProfileEnv = process.env.REACTOR_PROFILE;
 		originalConfigDir = process.env.REACTOR_CONFIG_DIR;
 		configDir = `.reactor-profile-cli-test-${Snowflake.next()}`;
 		process.env.REACTOR_CONFIG_DIR = configDir;
@@ -78,11 +76,6 @@ describe("global --profile flag", () => {
 		} else {
 			process.env.REACTOR_PROFILE = originalReactorProfileEnv;
 		}
-		if (originalPiProfileEnv === undefined) {
-			delete process.env.REACTOR_PROFILE;
-		} else {
-			process.env.REACTOR_PROFILE = originalPiProfileEnv;
-		}
 		if (originalAgentDirEnv === undefined) {
 			delete process.env.REACTOR_CODING_AGENT_DIR;
 		} else {
@@ -108,7 +101,6 @@ describe("global --profile flag", () => {
 		const writeSpy = vi.spyOn(process.stdout, "write").mockImplementation(() => true);
 		setProfile(undefined);
 		process.env.REACTOR_PROFILE = "work";
-		delete process.env.REACTOR_PROFILE;
 
 		await runCli(["--version"]);
 
@@ -247,8 +239,6 @@ describe("global --profile flag", () => {
 				REACTOR_NO_TITLE: "1",
 				NO_COLOR: "1",
 			};
-			delete childEnv.REACTOR_PROFILE;
-			delete childEnv.REACTOR_PROFILE;
 			delete childEnv.REACTOR_CODING_AGENT_DIR;
 			delete childEnv.REACTOR_PROFILE_BOOTSTRAP_SENTINEL;
 
@@ -298,7 +288,6 @@ describe("global --profile flag", () => {
 				REACTOR_PROFILE: "..",
 				NO_COLOR: "1",
 			};
-			delete childEnv.REACTOR_PROFILE;
 			delete childEnv.REACTOR_CODING_AGENT_DIR;
 
 			const proc = Bun.spawn([process.execPath, probePath], {

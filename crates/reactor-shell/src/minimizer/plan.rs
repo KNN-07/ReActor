@@ -306,10 +306,10 @@ fn simple_segment(pipeline: &Pipeline) -> Option<(String, String)> {
 /// (`while … done`) and quoted here-doc close tags re-emit in forms that fail
 /// to re-parse — so a divergent segment drops back to the unsegmented
 /// whole-command path instead of blowing up at execution with
-/// "reactor-natives:command: syntax error". The per-stage `simple_command_is_safe`
-/// whitelist already excludes constructs whose `Display` is value-lossy
-/// (substitutions, here-docs); words carry raw source text and round-trip
-/// verbatim.
+/// "reactor-natives:command: syntax error". The per-stage
+/// `simple_command_is_safe` whitelist already excludes constructs whose
+/// `Display` is value-lossy (substitutions, here-docs); words carry raw source
+/// text and round-trip verbatim.
 fn reconstruction_reparses_to_same_shape(reconstructed: &str, expected_stages: usize) -> bool {
 	let Some(program) = parse(reconstructed) else {
 		return false;

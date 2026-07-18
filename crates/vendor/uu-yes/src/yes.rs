@@ -7,12 +7,12 @@
 
 // pi-uutils: vendored from uutils/coreutils 0.8.0 and patched to run in-process
 // as a shell builtin. All process-global stdio is routed through
-// `reactor_uutils_ctx`, `translate!` strings are literalized, and the entry point no
-// longer calls `std::process::exit`. Because the utility runs inside the shell
-// process there is no SIGPIPE to terminate it when the consumer closes, so a
-// broken-pipe write error exits cleanly with code 0 (GNU behaviour) on every
-// platform, and the output loop polls the scope cancel flag so shell
-// abort/timeout stops it promptly.
+// `reactor_uutils_ctx`, `translate!` strings are literalized, and the entry
+// point no longer calls `std::process::exit`. Because the utility runs inside
+// the shell process there is no SIGPIPE to terminate it when the consumer
+// closes, so a broken-pipe write error exits cleanly with code 0 (GNU
+// behaviour) on every platform, and the output loop polls the scope cancel flag
+// so shell abort/timeout stops it promptly.
 
 use std::{
 	error::Error,
@@ -58,7 +58,8 @@ pub fn run(argv: Vec<OsString>) -> i32 {
 		// so the in-process builtin exits cleanly with 0 on every platform.
 		ExecStop::Io(err) if err.kind() == io::ErrorKind::BrokenPipe => 0,
 		ExecStop::Io(err) => {
-			let _ = writeln!(reactor_uutils_ctx::stderr(), "yes: standard output: {}", strip_errno(&err));
+			let _ =
+				writeln!(reactor_uutils_ctx::stderr(), "yes: standard output: {}", strip_errno(&err));
 			1
 		},
 		// pi-uutils: the shell asked the scope to cancel (abort/timeout);

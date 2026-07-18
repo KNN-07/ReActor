@@ -298,7 +298,7 @@ export async function runCli(argv: string[]): Promise<void> {
 		if (extracted.profile !== undefined) {
 			setProfile(extracted.profile);
 		} else {
-			// No explicit --profile: activate any REACTOR_PROFILE/REACTOR_PROFILE inherited
+			// No explicit --profile: activate any REACTOR_PROFILE inherited
 			// from the environment. Module-load resolution deliberately swallows an
 			// invalid value to avoid an uncaught throw before this try/catch is in
 			// scope (see `readProfileFromEnvSafe` in dirs.ts), and callers may set

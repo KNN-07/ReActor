@@ -72,10 +72,8 @@ describe("test directory state cleanup", () => {
 	it("restores the active profile from the current env after setAgentDir mutations", () => {
 		const originalPiCodingAgentDir = process.env.REACTOR_CODING_AGENT_DIR;
 		const originalReactorProfile = process.env.REACTOR_PROFILE;
-		const originalPiProfile = process.env.REACTOR_PROFILE;
 		const originalXdgCacheHome = process.env.XDG_CACHE_HOME;
 		try {
-			process.env.REACTOR_PROFILE = "cache-profile";
 			delete process.env.REACTOR_PROFILE;
 			delete process.env.REACTOR_CODING_AGENT_DIR;
 			delete process.env.XDG_CACHE_HOME;
@@ -85,7 +83,6 @@ describe("test directory state cleanup", () => {
 			expect(getActiveProfile()).toBeUndefined();
 
 			process.env.REACTOR_PROFILE = "cache-profile";
-			delete process.env.REACTOR_PROFILE;
 			delete process.env.REACTOR_CODING_AGENT_DIR;
 			__resetDirsFromEnvForTests();
 
@@ -96,7 +93,6 @@ describe("test directory state cleanup", () => {
 		} finally {
 			restoreEnv("REACTOR_CODING_AGENT_DIR", originalPiCodingAgentDir);
 			restoreEnv("REACTOR_PROFILE", originalReactorProfile);
-			restoreEnv("REACTOR_PROFILE", originalPiProfile);
 			restoreEnv("XDG_CACHE_HOME", originalXdgCacheHome);
 			__resetDirsFromEnvForTests();
 		}

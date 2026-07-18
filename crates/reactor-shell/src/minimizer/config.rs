@@ -87,8 +87,8 @@ pub struct MinimizerConfig {
 	/// Resolved kill-switch: when true, opted-in filters (Tier 1 grep/find,
 	/// Tier 2 pytest) return the pre-PR legacy behavior. Resolved at
 	/// `from_options()` time from caller-supplied
-	/// `MinimizerOptions.legacy_filters` or the `REACTOR_MINIMIZER_LEGACY_FILTERS`
-	/// env var; default `false`.
+	/// `MinimizerOptions.legacy_filters` or the
+	/// `REACTOR_MINIMIZER_LEGACY_FILTERS` env var; default `false`.
 	pub legacy_filters_active: bool,
 }
 
@@ -149,8 +149,8 @@ impl MinimizerConfig {
 					let actual_hex = format!("{actual:016x}");
 					if !actual_hex.eq_ignore_ascii_case(expected) {
 						eprintln!(
-							"[reactor-natives minimizer] settings_hash mismatch for {} (expected {}, got {}); \
-							 ignoring file",
+							"[reactor-natives minimizer] settings_hash mismatch for {} (expected {}, got \
+							 {}); ignoring file",
 							expanded.display(),
 							expected,
 							actual_hex
@@ -234,8 +234,8 @@ impl SettingsFile {
 			&& v != SUPPORTED_SCHEMA_VERSION
 		{
 			eprintln!(
-				"[reactor-natives minimizer] unsupported schema_version {v} in settings file (expected \
-				 {SUPPORTED_SCHEMA_VERSION})"
+				"[reactor-natives minimizer] unsupported schema_version {v} in settings file \
+				 (expected {SUPPORTED_SCHEMA_VERSION})"
 			);
 			return;
 		}

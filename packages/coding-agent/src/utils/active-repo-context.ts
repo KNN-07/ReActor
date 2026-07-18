@@ -132,12 +132,12 @@ function findSingleDirectChildRepoSync(cwd: string): ActiveRepoContext | null {
 
 export async function resolveActiveRepoContext(cwd: string): Promise<ActiveRepoContext | null> {
 	const resolvedCwd = path.resolve(cwd);
-	if (await resolveRepository(resolvedCwd)) return null;
+	if ((await resolveRepository(resolvedCwd))?.repoRoot === resolvedCwd) return null;
 	return findSingleDirectChildRepo(resolvedCwd);
 }
 
 export function resolveActiveRepoContextSync(cwd: string): ActiveRepoContext | null {
 	const resolvedCwd = path.resolve(cwd);
-	if (resolveRepositorySync(resolvedCwd)) return null;
+	if (resolveRepositorySync(resolvedCwd)?.repoRoot === resolvedCwd) return null;
 	return findSingleDirectChildRepoSync(resolvedCwd);
 }

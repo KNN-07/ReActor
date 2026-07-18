@@ -7,11 +7,11 @@
 
 // pi-uutils: vendored from uutils/coreutils 0.8.0 and patched to run in-process
 // as a shell builtin. Every filesystem syscall resolves its path operand
-// against the shell working directory via `reactor_uutils_ctx::resolve` AT THE CALL
-// SITE, while the original operands are kept for display/error messages (GNU
-// prints operands as typed). All process-global stdio is routed through
-// `reactor_uutils_ctx`, `translate!` strings are literalized, POSIXLY_CORRECT is
-// read from the scope environment, and the entry point no longer calls
+// against the shell working directory via `reactor_uutils_ctx::resolve` AT THE
+// CALL SITE, while the original operands are kept for display/error messages
+// (GNU prints operands as typed). All process-global stdio is routed through
+// `reactor_uutils_ctx`, `translate!` strings are literalized, POSIXLY_CORRECT
+// is read from the scope environment, and the entry point no longer calls
 // `std::process::exit`.
 
 use std::{
@@ -81,7 +81,8 @@ fn readlink_main(matches: &ArgMatches) -> UResult<()> {
 	let use_zero = matches.get_flag(OPT_ZERO);
 	// pi-uutils: POSIXLY_CORRECT comes from the scope environment (the shell's
 	// exported variables), not the host process environment.
-	let verbose = matches.get_flag(OPT_VERBOSE) || reactor_uutils_ctx::var("POSIXLY_CORRECT").is_some();
+	let verbose =
+		matches.get_flag(OPT_VERBOSE) || reactor_uutils_ctx::var("POSIXLY_CORRECT").is_some();
 
 	// GNU readlink -f/-e/-m follows symlinks first and then applies `..` (physical
 	// resolution). ResolveMode::Logical collapses `..` before following links,

@@ -9,9 +9,9 @@
 
 pub mod find;
 
-/// In-process builtin entry point. The host installs a [`reactor_uutils_ctx`] scope
-/// (stdio + working directory + environment) on a dedicated blocking thread,
-/// then calls this.
+/// In-process builtin entry point. The host installs a [`reactor_uutils_ctx`]
+/// scope (stdio + working directory + environment) on a dedicated blocking
+/// thread, then calls this.
 ///
 /// Unlike findutils' real `main` (which `std::process::exit`s on the result of
 /// `find_main`), this returns the exit code so it is safe to run inside the

@@ -7,13 +7,13 @@
 
 // pi-uutils: vendored from uutils/coreutils 0.8.0 and patched to run in-process
 // as a shell builtin. Every filesystem syscall resolves its path operand
-// against the shell working directory via `reactor_uutils_ctx::resolve` AT THE CALL
-// SITE (FILE operands and the --relative-to/--relative-base option paths),
+// against the shell working directory via `reactor_uutils_ctx::resolve` AT THE
+// CALL SITE (FILE operands and the --relative-to/--relative-base option paths),
 // while the original operands are kept for display/error messages (GNU prints
 // operands as typed). All process-global stdio is routed through
 // `reactor_uutils_ctx`, `translate!` strings are literalized, `show_if_err!` is
-// replaced by a context-stderr write plus `reactor_uutils_ctx::set_exit_code`, and
-// the entry point no longer calls `std::process::exit`.
+// replaced by a context-stderr write plus `reactor_uutils_ctx::set_exit_code`,
+// and the entry point no longer calls `std::process::exit`.
 
 use std::{
 	ffi::{OsStr, OsString},

@@ -1,7 +1,7 @@
 /**
  * Regression: plugin extensions must resolve `pi-*` imports across every scope
  * that has ever been used to publish or alias the internal packages —
- * `@mariozechner` (original), `@earendil-works` (fork), and `@ReActor`
+ * `@mariozechner` (original), `@earendil-works` (fork), and `@reactor`
  * (canonical). The shim in `legacy-pi-compat.ts` remaps all three to the same
  * in-process bundled copy so that plugins observe a single module registry
  * regardless of which scope name their peerDependencies happened to declare.
@@ -49,7 +49,7 @@ const CASES: readonly AliasCase[] = [
 		canonicalPath: canonicalTui,
 		symbol: "visibleWidth",
 	},
-	// @ReActor self-import — canonical scope must still flow through the shim
+	// @reactor self-import — canonical scope must still flow through the shim
 	// so a duplicate copy is never dragged in from a plugin's own node_modules.
 	{ id: "ohmyutils", aliasSpecifier: "@reactor/utils", canonicalPath: canonicalUtils, symbol: "logger" },
 	{

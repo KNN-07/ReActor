@@ -1,9 +1,9 @@
 //! Native crash diagnostics.
 //!
 //! Installs Rust-side panic and allocation-error hooks the first time the
-//! native module loads, so any crash inside `reactor-natives` writes an actionable
-//! record (thread, payload, backtrace) to disk and to stderr before the host
-//! process exits.
+//! native module loads, so any crash inside `reactor-natives` writes an
+//! actionable record (thread, payload, backtrace) to disk and to stderr before
+//! the host process exits.
 //!
 //! Without these hooks, Bun receives only the bare
 //! `memory allocation of N bytes failed` line and aborts with no stack —
@@ -20,10 +20,10 @@
 //! - Backtraces are captured via [`Backtrace::force_capture`], so they work
 //!   regardless of `RUST_BACKTRACE`.
 //! - The crash log path mirrors the JS side (`packages/utils/src/dirs.ts`):
-//!   `$XDG_STATE_HOME/reactor/logs/` on Linux / macOS when the user has migrated to
-//!   XDG (i.e. that directory already exists and `REACTOR_CODING_AGENT_DIR` isn't
-//!   pointed somewhere custom), otherwise `<home>/<REACTOR_CONFIG_DIR>/logs/`
-//!   (defaulting to `~/.reactor/logs/`).
+//!   `$XDG_STATE_HOME/reactor/logs/` on Linux / macOS when the user has
+//!   migrated to XDG (i.e. that directory already exists and
+//!   `REACTOR_CODING_AGENT_DIR` isn't pointed somewhere custom), otherwise
+//!   `<home>/<REACTOR_CONFIG_DIR>/logs/` (defaulting to `~/.reactor/logs/`).
 //! - Hook installation is idempotent across repeated module loads.
 
 use std::{
@@ -44,7 +44,7 @@ use std::{
 	time::{SystemTime, UNIX_EPOCH},
 };
 
-/// Default directory name for ReActor's per-user state (overridable via
+/// Default directory name for `ReActor`'s per-user state (overridable via
 /// `REACTOR_CONFIG_DIR`, matching `packages/utils/src/dirs.ts`).
 const DEFAULT_CONFIG_DIR: &str = ".reactor";
 
@@ -189,8 +189,8 @@ fn report_header(kind: CrashKind) -> String {
 	let thread_name = thread::current().name().unwrap_or("<unnamed>").to_owned();
 	let now_ms = unix_millis();
 	format!(
-		"reactor-natives {kind} crash\npid:       {pid}\nthread:    {thread_name}\ntimestamp: {now_ms} \
-		 (unix ms)\n",
+		"reactor-natives {kind} crash\npid:       {pid}\nthread:    {thread_name}\ntimestamp: \
+		 {now_ms} (unix ms)\n",
 		kind = kind.as_str(),
 		pid = process::id(),
 	)
@@ -249,8 +249,11 @@ fn persist(report: &str, kind: CrashKind, echo_stderr: bool) {
 		let _ = f.flush();
 		let _ = f.sync_data();
 		if echo_stderr {
-			let _ =
-				writeln!(std::io::stderr(), "reactor-natives crash report written to {}", path.display());
+			let _ = writeln!(
+				std::io::stderr(),
+				"reactor-natives crash report written to {}",
+				path.display()
+			);
 		}
 	}
 }
@@ -465,14 +468,18 @@ mod tests {
 	#[test]
 	fn resolve_logs_dir_reroots_absolute_pi_config_dir_under_home() {
 		// JS resolves the config root via `path.join(os.homedir(),
-		// getConfigDirName())`, which never honors an absolute REACTOR_CONFIG_DIR — it is
-		// always re-rooted under `$HOME` (and `..` components are normalized away).
+		// getConfigDirName())`, which never honors an absolute REACTOR_CONFIG_DIR — it
+		// is always re-rooted under `$HOME` (and `..` components are normalized
+		// away).
 		let dir = resolve_logs_dir(
 			Path::new("/tmp/reactor-natives-test-home"),
 			Some(OsStr::new("/var/tmp/reactor-natives-state")),
 			None,
 		);
-		assert_eq!(dir, PathBuf::from("/tmp/reactor-natives-test-home/var/tmp/reactor-natives-state/logs"));
+		assert_eq!(
+			dir,
+			PathBuf::from("/tmp/reactor-natives-test-home/var/tmp/reactor-natives-state/logs")
+		);
 	}
 
 	#[test]
@@ -551,8 +558,8 @@ mod tests {
 	#[cfg(any(target_os = "linux", target_os = "macos"))]
 	#[test]
 	fn xdg_state_logs_skipped_when_agent_dir_overridden() {
-		// `REACTOR_CODING_AGENT_DIR` pointing elsewhere mirrors the JS `isDefault === false`
-		// branch in `packages/utils/src/dirs.ts` and must disable XDG.
+		// `REACTOR_CODING_AGENT_DIR` pointing elsewhere mirrors the JS `isDefault ===
+		// false` branch in `packages/utils/src/dirs.ts` and must disable XDG.
 		let dir = xdg_state_logs(
 			Some(OsStr::new("/xdg/state")),
 			Some(OsStr::new("/some/custom/agent")),
@@ -584,8 +591,10 @@ mod tests {
 	#[cfg(any(target_os = "linux", target_os = "macos"))]
 	#[test]
 	fn default_agent_dir_respects_pi_config_dir() {
-		let dir =
-			default_agent_dir(Path::new("/tmp/reactor-natives-test-home"), Some(OsStr::new(".reactor-dev")));
+		let dir = default_agent_dir(
+			Path::new("/tmp/reactor-natives-test-home"),
+			Some(OsStr::new(".reactor-dev")),
+		);
 		assert_eq!(dir, PathBuf::from("/tmp/reactor-natives-test-home/.reactor-dev/agent"));
 	}
 
@@ -595,7 +604,9 @@ mod tests {
 		let panic_log = build_crash_log_path(dir, CrashKind::Panic, 4242, 1_700_000_000_000);
 		assert_eq!(
 			panic_log,
-			PathBuf::from("/tmp/reactor-natives-test-home/.reactor/logs/native-panic-4242-1700000000000.log")
+			PathBuf::from(
+				"/tmp/reactor-natives-test-home/.reactor/logs/native-panic-4242-1700000000000.log"
+			)
 		);
 		let alloc_log = build_crash_log_path(dir, CrashKind::Alloc, 99, 1);
 		assert_eq!(

@@ -11,6 +11,7 @@ import {
 	stringifyJson,
 	toError,
 } from "@reactor/utils";
+import type { StructuredSubagentSchemaMode } from "../task/types";
 import { ArtifactManager } from "./artifacts";
 import { type BlobPutOptions, type BlobPutResult, BlobStore } from "./blob-store";
 import {
@@ -1551,6 +1552,8 @@ export class SessionManager {
 		task: string;
 		tools: string[];
 		outputSchema?: unknown;
+		outputSchemaMode?: StructuredSubagentSchemaMode;
+		restrictToolNames?: boolean;
 		spawns?: string;
 		readSummarize?: boolean;
 	}): string {
@@ -1989,6 +1992,8 @@ export class SessionManager {
 			task: string;
 			tools: string[];
 			outputSchema?: unknown;
+			outputSchemaMode?: StructuredSubagentSchemaMode;
+			restrictToolNames?: boolean;
 			spawns?: string;
 			readSummarize?: boolean;
 		} | null;
@@ -2007,6 +2012,8 @@ export class SessionManager {
 			task: string;
 			tools: string[];
 			outputSchema?: unknown;
+			outputSchemaMode?: StructuredSubagentSchemaMode;
+			restrictToolNames?: boolean;
 			spawns?: string;
 			readSummarize?: boolean;
 		} | null = null;
@@ -2018,6 +2025,8 @@ export class SessionManager {
 					task: entry.task,
 					tools: entry.tools,
 					outputSchema: entry.outputSchema,
+					outputSchemaMode: entry.outputSchemaMode,
+					restrictToolNames: entry.restrictToolNames,
 					readSummarize: entry.readSummarize,
 					spawns: entry.spawns,
 				};

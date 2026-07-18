@@ -184,8 +184,11 @@ fn log_no_properly_formatted(filename: impl Display) {
 /// Print a "no file was verified" message in stderr
 #[inline]
 fn log_no_file_verified(filename: impl Display) {
-	let _ =
-		writeln!(reactor_uutils_ctx::stderr(), "{}: {filename}: no file was verified", command_name());
+	let _ = writeln!(
+		reactor_uutils_ctx::stderr(),
+		"{}: {filename}: no file was verified",
+		command_name()
+	);
 }
 
 /// Represents the different outcomes that can happen to a file

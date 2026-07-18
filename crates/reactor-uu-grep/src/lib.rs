@@ -1,9 +1,10 @@
 //! `grep` implemented as an in-process shell builtin on top of the ripgrep
 //! libraries (`grep-regex` for the matcher, `grep-searcher` for line scanning),
 //! with directory recursion via `reactor-walker` and `--include` filtering via
-//! `globset`. All I/O and path resolution is routed through `reactor-uutils-ctx` so
-//! the builtin writes to the command's redirected file descriptors and resolves
-//! relative paths against the shell's working directory.
+//! `globset`. All I/O and path resolution is routed through
+//! `reactor-uutils-ctx` so the builtin writes to the command's redirected file
+//! descriptors and resolves relative paths against the shell's working
+//! directory.
 //!
 //! Entry point: [`run`]. It never calls `std::process::exit`; clap
 //! help/usage/error output is rendered to the context streams and an exit code
@@ -480,7 +481,11 @@ fn resolve_directory_action(cli: &Cli, matches: &ArgMatches) -> DirectoryAction 
 
 fn resolve_follow_links(cli: &Cli, matches: &ArgMatches) -> reactor_walker::FollowLinks {
 	let mut selected = (0, reactor_walker::FollowLinks::Roots);
-	choose_latest(&mut selected, last_index(matches, "recursive"), reactor_walker::FollowLinks::Roots);
+	choose_latest(
+		&mut selected,
+		last_index(matches, "recursive"),
+		reactor_walker::FollowLinks::Roots,
+	);
 	choose_latest(
 		&mut selected,
 		last_index(matches, "dereference_recursive"),
@@ -498,8 +503,16 @@ fn resolve_follow_links(cli: &Cli, matches: &ArgMatches) -> reactor_walker::Foll
 		last_index(matches, "follow_command_line"),
 		reactor_walker::FollowLinks::Roots,
 	);
-	choose_latest(&mut selected, last_index(matches, "no_follow"), reactor_walker::FollowLinks::Never);
-	choose_latest(&mut selected, last_index(matches, "follow_all"), reactor_walker::FollowLinks::Always);
+	choose_latest(
+		&mut selected,
+		last_index(matches, "no_follow"),
+		reactor_walker::FollowLinks::Never,
+	);
+	choose_latest(
+		&mut selected,
+		last_index(matches, "follow_all"),
+		reactor_walker::FollowLinks::Always,
+	);
 	selected.1
 }
 
@@ -1012,7 +1025,10 @@ fn search_file_path<M: Matcher, W: Write>(
 	}
 }
 
-fn grep_walk_request(root: &Path, follow_links: reactor_walker::FollowLinks) -> reactor_walker::WalkRequest {
+fn grep_walk_request(
+	root: &Path,
+	follow_links: reactor_walker::FollowLinks,
+) -> reactor_walker::WalkRequest {
 	reactor_walker::WalkRequest::new(root)
 		.hidden(true)
 		.gitignore(false)
@@ -1137,7 +1153,8 @@ fn read_auxiliary_file(path: &OsStr) -> Result<Vec<u8>, String> {
 	let result = if path == OsStr::new("-") {
 		reactor_uutils_ctx::stdin().read_to_end(&mut bytes)
 	} else {
-		File::open(reactor_uutils_ctx::resolve(path)).and_then(|mut file| file.read_to_end(&mut bytes))
+		File::open(reactor_uutils_ctx::resolve(path))
+			.and_then(|mut file| file.read_to_end(&mut bytes))
 	};
 	result
 		.map(|_| bytes)
@@ -1363,8 +1380,11 @@ fn execute_search<M: Matcher>(
 			Err(error) => {
 				had_error = true;
 				if !opts.no_messages {
-					let _ =
-						writeln!(reactor_uutils_ctx::stderr(), "grep: {}: {error}", operand.to_string_lossy());
+					let _ = writeln!(
+						reactor_uutils_ctx::stderr(),
+						"grep: {}: {error}",
+						operand.to_string_lossy()
+					);
 				}
 			},
 		}

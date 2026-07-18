@@ -211,14 +211,14 @@ describe.skipIf(SKIP)("handleGitHubGist", () => {
 describe("parseGitHubUrl — Actions", () => {
 	it("classifies a workflow run URL", () => {
 		const gh = parseGitHubUrl("https://github.com/KNN-07/ReActor/actions/runs/27070071296");
-		expect(gh).toEqual({ type: "actions-run", owner: "can1357", repo: "ReActor", runId: 27070071296 });
+		expect(gh).toEqual({ type: "actions-run", owner: "KNN-07", repo: "ReActor", runId: 27070071296 });
 	});
 
 	it("classifies a job URL using the web-form singular `job` segment", () => {
 		const gh = parseGitHubUrl("https://github.com/KNN-07/ReActor/actions/runs/27070071296/job/79897931171");
 		expect(gh).toEqual({
 			type: "actions-job",
-			owner: "can1357",
+			owner: "KNN-07",
 			repo: "ReActor",
 			runId: 27070071296,
 			jobId: 79897931171,
@@ -250,7 +250,7 @@ describe("parseGitHubUrl — commit", () => {
 		const gh = parseGitHubUrl("https://github.com/KNN-07/ReActor/commit/c1a1cb6149e73b345919dd4cf629b0d9ac74fb57");
 		expect(gh).toEqual({
 			type: "commit",
-			owner: "can1357",
+			owner: "KNN-07",
 			repo: "ReActor",
 			ref: "c1a1cb6149e73b345919dd4cf629b0d9ac74fb57",
 		});
@@ -259,7 +259,7 @@ describe("parseGitHubUrl — commit", () => {
 	it("accepts an abbreviated SHA", () => {
 		expect(parseGitHubUrl("https://github.com/KNN-07/ReActor/commit/c1a1cb6")).toEqual({
 			type: "commit",
-			owner: "can1357",
+			owner: "KNN-07",
 			repo: "ReActor",
 			ref: "c1a1cb6",
 		});

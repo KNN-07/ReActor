@@ -43,7 +43,6 @@ describe("profile directories", () => {
 	let originalProfile: string | undefined;
 	let originalAgentDirEnv: string | undefined;
 	let originalReactorProfileEnv: string | undefined;
-	let originalPiProfileEnv: string | undefined;
 	let originalConfigDir: string | undefined;
 	let originalXdgDataHome: string | undefined;
 	let originalXdgStateHome: string | undefined;
@@ -54,7 +53,6 @@ describe("profile directories", () => {
 		originalProfile = getActiveProfile();
 		originalAgentDirEnv = process.env.REACTOR_CODING_AGENT_DIR;
 		originalReactorProfileEnv = process.env.REACTOR_PROFILE;
-		originalPiProfileEnv = process.env.REACTOR_PROFILE;
 		originalConfigDir = process.env.REACTOR_CONFIG_DIR;
 		originalXdgDataHome = process.env.XDG_DATA_HOME;
 		originalXdgStateHome = process.env.XDG_STATE_HOME;
@@ -107,11 +105,6 @@ describe("profile directories", () => {
 			delete process.env.REACTOR_PROFILE;
 		} else {
 			process.env.REACTOR_PROFILE = originalReactorProfileEnv;
-		}
-		if (originalPiProfileEnv === undefined) {
-			delete process.env.REACTOR_PROFILE;
-		} else {
-			process.env.REACTOR_PROFILE = originalPiProfileEnv;
 		}
 		await fs.rm(tempRoot, { recursive: true, force: true });
 		await fs.rm(path.join(os.homedir(), configDir), { recursive: true, force: true });
@@ -258,8 +251,7 @@ describe("profile env + name validation", () => {
 		expect(resolveProfileEnv("work")).toBe("work");
 		// An undefined REACTOR_PROFILE selects the default profile.
 		expect(resolveProfileEnv(undefined)).toBeUndefined();
-		// An explicitly-empty REACTOR_PROFILE selects the default profile; it must NOT
-		// fall through to the lower-precedence REACTOR_PROFILE.
+		// An explicitly-empty REACTOR_PROFILE selects the default profile.
 		expect(resolveProfileEnv("")).toBeUndefined();
 		expect(resolveProfileEnv("   ")).toBeUndefined();
 		expect(resolveProfileEnv("default")).toBeUndefined();
@@ -364,7 +356,7 @@ describe("dirs module import behavior", () => {
 		}
 	});
 
-	it("ignores inherited profile agent dir when REACTOR_PROFILE explicitly selects default", async () => {
+	it("ignores an inherited profile agent dir when REACTOR_PROFILE selects default", async () => {
 		const root = await fs.mkdtemp(path.join(os.tmpdir(), "utils-dirs-default-profile-"));
 		const probeConfigDir = `.reactor-default-profile-${Snowflake.next()}`;
 		try {
@@ -388,7 +380,7 @@ describe("dirs module import behavior", () => {
 				const childEnv: Record<string, string | undefined> = {
 					...process.env,
 					REACTOR_CONFIG_DIR: probeConfigDir,
-					REACTOR_PROFILE: "work",
+					REACTOR_PROFILE: reactorProfile,
 					REACTOR_CODING_AGENT_DIR: workAgentDir,
 				};
 				const proc = Bun.spawn([process.execPath, probePath], {

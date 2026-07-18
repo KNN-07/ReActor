@@ -744,7 +744,9 @@ fn search(
 			fd_walk_request(&search_path.resolved, &cli, use_gitignore, cli.one_file_system);
 		let outcome = match request.collect_with_heartbeat(cancel_heartbeat(cancelled)) {
 			Ok(outcome) => outcome,
-			Err(reactor_walker::WalkError::Interrupted(_)) if cancelled.load(Ordering::Relaxed) => break,
+			Err(reactor_walker::WalkError::Interrupted(_)) if cancelled.load(Ordering::Relaxed) => {
+				break;
+			},
 			Err(err) => return Err(walker_collect_error_to_io(err)),
 		};
 		let mut pruned_dirs = Vec::new();
@@ -849,7 +851,9 @@ fn try_search_fast(
 		state.had_error = had_error;
 		match status {
 			Ok(reactor_walker::WalkStatus::Complete | reactor_walker::WalkStatus::Stopped) => {},
-			Err(reactor_walker::WalkError::Interrupted(_)) if cancelled.load(Ordering::Relaxed) => break,
+			Err(reactor_walker::WalkError::Interrupted(_)) if cancelled.load(Ordering::Relaxed) => {
+				break;
+			},
 			Err(err) => return Err(walker_error_to_io(err)),
 		}
 	}

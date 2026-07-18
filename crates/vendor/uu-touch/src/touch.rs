@@ -9,11 +9,11 @@
 
 // pi-uutils: vendored from uutils/coreutils 0.8.0 and patched to run in-process
 // as a shell builtin. Every filesystem syscall resolves its path operand
-// against the shell working directory via `reactor_uutils_ctx::resolve` AT THE CALL
-// SITE, while the original operands are kept for display/error messages (GNU
-// prints operands as typed). All process-global stdio is routed through
-// `reactor_uutils_ctx`, `translate!` strings are literalized, `_POSIX2_VERSION` is
-// read from the scope environment, `show!` accumulation goes through
+// against the shell working directory via `reactor_uutils_ctx::resolve` AT THE
+// CALL SITE, while the original operands are kept for display/error messages
+// (GNU prints operands as typed). All process-global stdio is routed through
+// `reactor_uutils_ctx`, `translate!` strings are literalized, `_POSIX2_VERSION`
+// is read from the scope environment, `show!` accumulation goes through
 // `reactor_uutils_ctx::set_exit_code`, and the entry point no longer calls
 // `std::process::exit`. Upstream's `src/error.rs` is inlined below as
 // `pub mod error`. jiff's `TimeZone::system()` (and thus `TZ`) intentionally

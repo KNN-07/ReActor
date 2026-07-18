@@ -15,9 +15,9 @@
 // feature is not vendored, and the locale.rs default-format probe — which
 // calls the process-global setlocale(3) — is replaced by upstream's 24-hour
 // fallback format). File operands (`--file`, `--reference`) resolve against
-// the shell working directory via `reactor_uutils_ctx::resolve` AT THE CALL SITE
-// while the original operands are kept for display/error messages, stdio is
-// routed through `reactor_uutils_ctx`, and the entry point no longer calls
+// the shell working directory via `reactor_uutils_ctx::resolve` AT THE CALL
+// SITE while the original operands are kept for display/error messages, stdio
+// is routed through `reactor_uutils_ctx`, and the entry point no longer calls
 // `std::process::exit`. Time-zone handling stays process-global: jiff reads
 // the host TZ environment variable and tzdb (same behavior as upstream).
 

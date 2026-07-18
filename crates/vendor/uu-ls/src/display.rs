@@ -1148,7 +1148,8 @@ fn create_hyperlink(name: &OsStr, path: &PathData) -> OsString {
 	let osc_8_tail = OsStr::new("\x1b]8;;\x1b\\");
 	let esc_bl = OsStr::new("\x1b\\");
 
-	let absolute_path = fs::canonicalize(reactor_uutils_ctx::resolve(path.path())).unwrap_or_default();
+	let absolute_path =
+		fs::canonicalize(reactor_uutils_ctx::resolve(path.path())).unwrap_or_default();
 	let mut ret = OsString::with_capacity(
 		osc_8_head.len()
 			+ osc_8_tail.len()

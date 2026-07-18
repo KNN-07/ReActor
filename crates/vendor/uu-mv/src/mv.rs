@@ -8,11 +8,11 @@
 
 // pi-uutils: vendored from uutils/coreutils 0.8.0 and patched to run in-process
 // as a shell builtin. Every filesystem syscall resolves its path operand
-// against the shell working directory via `reactor_uutils_ctx::resolve` AT THE CALL
-// SITE, while the original operands are kept for display/error messages (GNU
-// prints operands as typed). All process-global stdio is routed through
-// `reactor_uutils_ctx`, `translate!` strings are literalized, and the entry point no
-// longer calls `std::process::exit`.
+// against the shell working directory via `reactor_uutils_ctx::resolve` AT THE
+// CALL SITE, while the original operands are kept for display/error messages
+// (GNU prints operands as typed). All process-global stdio is routed through
+// `reactor_uutils_ctx`, `translate!` strings are literalized, and the entry
+// point no longer calls `std::process::exit`.
 
 mod error;
 #[cfg(unix)]
@@ -232,8 +232,9 @@ fn run_matches(matches: &ArgMatches) -> UResult<()> {
 	mv(&files[..], &opts)
 }
 
-/// In-process builtin entry point. The host installs a [`reactor_uutils_ctx`] scope
-/// (stdio + working directory) on a dedicated blocking thread, then calls this.
+/// In-process builtin entry point. The host installs a [`reactor_uutils_ctx`]
+/// scope (stdio + working directory) on a dedicated blocking thread, then calls
+/// this.
 ///
 /// Unlike uutils' `#[uucore::main] uumain`, this never mutates process-global
 /// signal handlers and never calls `std::process::exit` — clap help/usage/
@@ -1223,7 +1224,10 @@ fn copy_dir_contents_recursive(
 			#[cfg(not(unix))]
 			{
 				// Symlinks are already handled above, so this is always a regular file
-				fs::copy(reactor_uutils_ctx::resolve(&from_path), reactor_uutils_ctx::resolve(&to_path))?;
+				fs::copy(
+					reactor_uutils_ctx::resolve(&from_path),
+					reactor_uutils_ctx::resolve(&to_path),
+				)?;
 			}
 
 			print_verbose(&from_path, &to_path);
@@ -1253,14 +1257,21 @@ fn copy_file_with_hardlinks_helper(
 	if let Some(existing_target) =
 		hardlink_tracker.check_hardlink(from, to, hardlink_scanner, &hardlink_options)
 	{
-		fs::hard_link(reactor_uutils_ctx::resolve(&existing_target), reactor_uutils_ctx::resolve(to))?;
+		fs::hard_link(
+			reactor_uutils_ctx::resolve(&existing_target),
+			reactor_uutils_ctx::resolve(to),
+		)?;
 		return Ok(());
 	}
 
 	if reactor_uutils_ctx::resolve(from).is_symlink() {
 		// Copy a symlink file (no-follow).
 		rename_symlink_fallback(from, to)?;
-	} else if is_fifo(reactor_uutils_ctx::resolve(from).symlink_metadata()?.file_type()) {
+	} else if is_fifo(
+		reactor_uutils_ctx::resolve(from)
+			.symlink_metadata()?
+			.file_type(),
+	) {
 		make_fifo(&reactor_uutils_ctx::resolve(to))?;
 	} else {
 		// Copy a regular file.
@@ -1342,7 +1353,8 @@ fn copy_xattrs_if_supported(from: &Path, to: &Path) -> io::Result<()> {
 }
 
 fn is_empty_dir(path: &Path) -> bool {
-	fs::read_dir(reactor_uutils_ctx::resolve(path)).is_ok_and(|mut contents| contents.next().is_none())
+	fs::read_dir(reactor_uutils_ctx::resolve(path))
+		.is_ok_and(|mut contents| contents.next().is_none())
 }
 
 /// Check if file is writable, returning the mode for potential reuse.

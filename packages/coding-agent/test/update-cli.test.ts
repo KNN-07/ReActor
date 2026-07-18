@@ -229,14 +229,14 @@ describe("update-cli bun cache pruning", () => {
 			path.join(dir, "react@19.2.6@@@1", "package.json"),
 			JSON.stringify({ name: "react", version: "19.2.6" }),
 		);
-		await Bun.write(path.join(dir, "@ReActor", "utils", "15.7.6@@@1"), "");
-		await Bun.write(path.join(dir, "@ReActor", "utils", "15.8.0@@@1"), "");
+		await Bun.write(path.join(dir, "@reactor", "utils", "15.7.6@@@1"), "");
+		await Bun.write(path.join(dir, "@reactor", "utils", "15.8.0@@@1"), "");
 		await Bun.write(
-			path.join(dir, "@ReActor", "utils@15.7.6@@@1", "package.json"),
+			path.join(dir, "@reactor", "utils@15.7.6@@@1", "package.json"),
 			JSON.stringify({ name: "@reactor/utils", version: "15.7.6" }),
 		);
 		await Bun.write(
-			path.join(dir, "@ReActor", "utils@15.8.0@@@1", "package.json"),
+			path.join(dir, "@reactor", "utils@15.8.0@@@1", "package.json"),
 			JSON.stringify({ name: "@reactor/utils", version: "15.8.0" }),
 		);
 		await Bun.write(path.join(dir, "chalk", "4.1.2@@@1"), "");
@@ -257,10 +257,10 @@ describe("update-cli bun cache pruning", () => {
 		expect(await Bun.file(path.join(dir, "react@18.3.1@@@1", "package.json")).exists()).toBe(false);
 		expect(await Bun.file(path.join(dir, "react", "19.2.6@@@1")).exists()).toBe(true);
 		expect(await Bun.file(path.join(dir, "react@19.2.6@@@1", "package.json")).exists()).toBe(true);
-		expect(await Bun.file(path.join(dir, "@ReActor", "utils", "15.7.6@@@1")).exists()).toBe(false);
-		expect(await Bun.file(path.join(dir, "@ReActor", "utils@15.7.6@@@1", "package.json")).exists()).toBe(false);
-		expect(await Bun.file(path.join(dir, "@ReActor", "utils", "15.8.0@@@1")).exists()).toBe(true);
-		expect(await Bun.file(path.join(dir, "@ReActor", "utils@15.8.0@@@1", "package.json")).exists()).toBe(true);
+		expect(await Bun.file(path.join(dir, "@reactor", "utils", "15.7.6@@@1")).exists()).toBe(false);
+		expect(await Bun.file(path.join(dir, "@reactor", "utils@15.7.6@@@1", "package.json")).exists()).toBe(false);
+		expect(await Bun.file(path.join(dir, "@reactor", "utils", "15.8.0@@@1")).exists()).toBe(true);
+		expect(await Bun.file(path.join(dir, "@reactor", "utils@15.8.0@@@1", "package.json")).exists()).toBe(true);
 		expect(await Bun.file(path.join(dir, "chalk", "4.1.2@@@1")).exists()).toBe(true);
 		expect(await Bun.file(path.join(dir, "chalk@4.1.2@@@1", "package.json")).exists()).toBe(true);
 	});

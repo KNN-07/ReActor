@@ -377,8 +377,9 @@ fn run_matches(matches: &ArgMatches) -> UResult<()> {
 	wc(&inputs, &settings)
 }
 
-/// In-process builtin entry point. The host installs a [`reactor_uutils_ctx`] scope
-/// (stdio + working directory) on a dedicated blocking thread, then calls this.
+/// In-process builtin entry point. The host installs a [`reactor_uutils_ctx`]
+/// scope (stdio + working directory) on a dedicated blocking thread, then calls
+/// this.
 ///
 /// Unlike uutils' macro-generated `uumain` entry point, this never calls
 /// `std::process::exit` — clap help/usage/version output is rendered to the
@@ -955,8 +956,10 @@ fn wc(inputs: &Inputs, settings: &Settings) -> UResult<()> {
 		let runtime_disabled = !features.disabled_runtime.is_empty();
 
 		if enabled_empty && !runtime_disabled {
-			let _ =
-				writeln!(reactor_uutils_ctx::stderr(), "debug: hardware support unavailable on this CPU");
+			let _ = writeln!(
+				reactor_uutils_ctx::stderr(),
+				"debug: hardware support unavailable on this CPU"
+			);
 		} else if runtime_disabled {
 			let _ = writeln!(
 				reactor_uutils_ctx::stderr(),

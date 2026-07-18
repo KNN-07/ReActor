@@ -53,7 +53,7 @@ describe("legacy-pi bundled virtual module synthesizer (issue #3423)", () => {
 
 	it("throws when asked to synthesize a key the bundled modules do not cover", () => {
 		expect(() => __synthesizeLegacyPiBundledSourceWithModules("@reactor/pi-not-bundled", modules)).toThrow(
-			/no bundled module registered for @ReActor\/pi-not-bundled/,
+			/no bundled module registered for @reactor\/pi-not-bundled/,
 		);
 	});
 

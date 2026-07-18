@@ -101,13 +101,6 @@ export function parseEnvFile(filePath: string): Record<string, string> {
 		// File doesn't exist or can't be read - return empty result
 	}
 
-	// REACTOR_ overrides REACTOR_
-	for (const k in result) {
-		if (k.startsWith("REACTOR_")) {
-			result[`REACTOR_${k.slice(4)}`] = result[k];
-		}
-	}
-
 	return result;
 }
 
