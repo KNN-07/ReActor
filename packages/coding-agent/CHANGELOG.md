@@ -13,6 +13,10 @@
 - Completed the ReActor rebrand across provider headers and internal runtime, extension, protocol, and evaluation-bridge identifiers.
 - Updated the native gateway configuration and documentation references to `/v1/reactor/stream`.
 
+### Fixed
+
+- Fixed desktop session creation on Windows by accepting native absolute workspace paths.
+
 ## [17.0.4] - 2026-07-18
 
 ### Fixed

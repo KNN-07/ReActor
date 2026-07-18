@@ -7,25 +7,35 @@ credentials, models, and persistence remain in the bundled `reactor
 
 ## Development
 
-From the repository root:
+Install the repository dependencies first. Native development also requires a
+working Rust toolchain and the platform prerequisites required by Tauri 2
+(WebView2 and the MSVC C++ build tools on Windows).
 
 ```sh
-bun --cwd apps/desktop run dev       # browser preview with a deterministic mock host
-bun --cwd apps/desktop run tauri:dev # native window plus the bundled ReActor sidecar
+bun install
+bun run desktop:web # browser preview with a deterministic mock host
+bun run desktop:dev # native window plus the bundled ReActor sidecar
 ```
 
-`tauri:dev` builds the compiled `reactor` sidecar for the host target before
+`desktop:dev` builds the compiled `reactor` sidecar for the host target before
 starting Tauri. The renderer uses the browser platform only when it is not
 running inside Tauri; native dialogs, notifications, path opening, and the
 NDJSON bridge are isolated in `src/platform.ts`.
 
+Run the desktop checks without opening a window with:
+
+```sh
+bun run desktop:check
+```
+
 ## Packaging
 
 ```sh
-bun --cwd apps/desktop run tauri:build
+bun run desktop:build
 ```
 
 The build embeds the target-suffixed ReActor executable via Tauri `externalBin`
-and produces the platform's installer artifacts. Linux packaging can be
-restricted to the tested Debian target with `bunx --cwd apps/desktop tauri build
---bundles deb`.
+and produces the platform's installer artifacts under
+`apps/desktop/src-tauri/target/release/bundle`. Linux packaging can be
+restricted to the tested Debian target from `apps/desktop` with
+`bunx tauri build --bundles deb`.

@@ -50,7 +50,7 @@ Use it interactively, run a bounded autonomous objective, invoke it once from a 
 | TUI | `reactor` | Interactive coding and approvals |
 | Print mode | `reactor -p "..."` | Scripts and one-shot tasks |
 | Autonomous run | `reactor run "..."` | Bounded, resumable objectives |
-| Desktop GUI | `bun --cwd apps/desktop run tauri:dev` | Native desktop workflows |
+| Desktop GUI | `bun run desktop:dev` | Native desktop workflows |
 | RPC | `reactor --mode rpc --no-session` | Process integrations over stdio |
 | ACP | `reactor acp` | Editor integrations |
 
@@ -198,8 +198,8 @@ The renderer has no arbitrary shell or filesystem access. A bundled `reactor --m
 Desktop is currently available from source:
 
 ```sh
-bun --cwd apps/desktop run dev        # browser preview with a mock host
-bun --cwd apps/desktop run tauri:dev  # native GUI with the ReActor sidecar
+bun run desktop:web # browser preview with a mock host
+bun run desktop:dev # native GUI with the ReActor sidecar
 ```
 
 See [ReActor Desktop](apps/desktop/README.md) for development and packaging, and [the desktop architecture](docs/desktop.md) for its security and recovery model.

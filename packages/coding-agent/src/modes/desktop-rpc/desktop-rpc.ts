@@ -166,7 +166,7 @@ export class ManagedAgentSessionHost {
 	}
 
 	async #create(cwd: string, sessionManager?: SessionManager): Promise<ManagedDesktopSession> {
-		if (!cwd.startsWith("/")) throw new Error("Desktop sessions require an absolute cwd");
+		if (!path.isAbsolute(cwd)) throw new Error("Desktop sessions require an absolute cwd");
 		const services = await this.#services();
 		const result = await createAgentSession({
 			cwd,

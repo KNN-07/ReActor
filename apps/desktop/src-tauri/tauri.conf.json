@@ -15,5 +15,10 @@
     },
     "windows": [{ "label": "main", "title": "ReActor Desktop", "width": 1440, "height": 900, "minWidth": 960, "minHeight": 640 }]
   },
-  "bundle": { "active": true, "targets": "all", "externalBin": ["binaries/reactor-sidecar"] }
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "externalBin": ["binaries/reactor-sidecar"],
+    "icon": ["icons/icon.png", "icons/icon.ico"]
+  }
 }

@@ -108,6 +108,10 @@
   "scripts": {
     "setup": "bun install && bun run build:native && bun --cwd=packages/coding-agent link && sh scripts/link-reactor.sh",
     "dev": "bun --cwd=packages/coding-agent src/cli.ts",
+    "desktop:dev": "bun --cwd=apps/desktop run tauri:dev",
+    "desktop:build": "bun --cwd=apps/desktop run tauri:build",
+    "desktop:web": "bun --cwd=apps/desktop run dev",
+    "desktop:check": "bun --cwd=apps/desktop run check",
     "dev:timing": "REACTOR_TIMING=x bun --cwd=packages/coding-agent --preload ../utils/src/module-timer.ts src/cli.ts",
     "stats": "bun --cwd=packages/coding-agent src/cli.ts stats",
     "collab:web:dev": "bun --cwd=packages/collab-web run dev",
