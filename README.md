@@ -169,8 +169,35 @@ The `@reactor/coding-agent` package exposes the runtime to TypeScript applicatio
 
 - [TypeScript SDK](docs/sdk.md)
 - [RPC protocol](docs/rpc.md)
-- [Desktop and editor integration](docs/desktop.md)
 - [Collaboration](docs/collab.md)
+
+## Desktop GUI
+
+ReActor Desktop is a native Tauri 2 interface around the same coding-agent runtime. It provides a three-pane task workspace, an accessible prompt composer, session and model controls, Git status/diff/stage/commit workflows, and controls for bounded autonomous goals. It shares normal ReActor credentials and session files, so terminal and desktop work stay on the same profile.
+
+The renderer has no arbitrary shell or filesystem access. A bundled `reactor --mode desktop-rpc` sidecar owns agent execution and communicates through a versioned NDJSON protocol.
+
+Desktop is currently available from source:
+
+```sh
+bun --cwd apps/desktop run dev        # browser preview with a mock host
+bun --cwd apps/desktop run tauri:dev  # native GUI with the ReActor sidecar
+```
+
+See [ReActor Desktop](apps/desktop/README.md) for development and packaging, and [the desktop architecture](docs/desktop.md) for its security and recovery model.
+
+## Research workflows
+
+Research is built into the interactive agent:
+
+- `/autoresearch` runs an iterative experiment loop.
+- `/survey [topic]` produces a verified literature survey with summary, LaTeX, and BibTeX artifacts.
+- `/peer-review [paper]` runs parallel methods, writing, impact, and meta reviews; `/review` remains dedicated to code and pull requests.
+- `/autopaper [topic]` composes survey, ideation, experiments, optional Lean verification, writing, and review into a resumable workflow.
+
+Workflow state is project-keyed SQLite under `~/.reactor/research/`; generated artifacts remain in `surveys/`, `papers/`, and `reviews/`. Autopaper uses an isolated Git workspace when available, requires a clean worktree, and records unavailable Lean or PDF compilers as skipped rather than verified.
+
+See [Research workflows](docs/research-workflows.md) for commands, checkpoints, branch safety, and optional dependencies.
 
 ## Development
 
