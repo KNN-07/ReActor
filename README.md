@@ -1,34 +1,43 @@
 <p align="center">
-  <img src="https://github.com/KNN-07/ReActor/blob/main/assets/hero.png?raw=true" alt="reactor">
+  <img src="https://github.com/KNN-07/ReActor/blob/main/assets/hero.png?raw=true" alt="ReActor">
 </p>
 
 <p align="center">
-  <strong>A coding agent with the IDE wired in.</strong>
-  <strong><a href="https://reactor.norman.id.vn">reactor.norman.id.vn</a></strong>
+  <strong>A terminal-first coding agent with the IDE wired in.</strong><br>
+  <a href="https://reactor.norman.id.vn">Website</a> ·
+  <a href="https://reactor.norman.id.vn/docs">Documentation</a> ·
+  <a href="https://github.com/KNN-07/ReActor/releases">Releases</a> ·
+  <a href="https://discord.gg/4NMW9cdXZa">Discord</a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/KNN-07/ReActor/releases"><img src="https://img.shields.io/github/v/release/KNN-07/ReActor?style=flat&colorA=222222&colorB=CB3837" alt="release"></a>
-  <a href="https://github.com/KNN-07/ReActor/blob/main/packages/coding-agent/CHANGELOG.md"><img src="https://img.shields.io/badge/changelog-keep-E05735?style=flat&colorA=222222" alt="Changelog"></a>
-  <a href="https://github.com/KNN-07/ReActor/actions"><img src="https://img.shields.io/github/actions/workflow/status/KNN-07/ReActor/ci.yml?style=flat&colorA=222222&colorB=3FB950" alt="CI"></a>
-  <a href="https://github.com/KNN-07/ReActor/blob/main/LICENSE"><img src="https://img.shields.io/github/license/KNN-07/ReActor?style=flat&colorA=222222&colorB=58A6FF" alt="License"></a>
-  <a href="https://www.typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat&colorA=222222&logo=typescript&logoColor=white" alt="TypeScript"></a>
-  <a href="https://www.rust-lang.org"><img src="https://img.shields.io/badge/Rust-DEA584?style=flat&colorA=222222&logo=rust&logoColor=white" alt="Rust"></a>
+  <a href="https://github.com/KNN-07/ReActor/releases"><img src="https://img.shields.io/github/v/release/KNN-07/ReActor?style=flat&colorA=222222&colorB=CB3837" alt="Latest release"></a>
+  <a href="https://github.com/KNN-07/ReActor/actions"><img src="https://img.shields.io/github/actions/workflow/status/KNN-07/ReActor/ci.yml?style=flat&colorA=222222&colorB=3FB950" alt="CI status"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/KNN-07/ReActor?style=flat&colorA=222222&colorB=58A6FF" alt="MIT license"></a>
   <a href="https://bun.sh"><img src="https://img.shields.io/badge/runtime-Bun-f472b6?style=flat&colorA=222222" alt="Bun"></a>
-  <a href="https://discord.gg/4NMW9cdXZa"><img src="https://img.shields.io/badge/Discord-5865F2?style=flat&colorA=222222&logo=discord&logoColor=white" alt="Discord"></a>
 </p>
 
-<p align="center">
-  Maintained by <a href="https://github.com/KNN-07">norman (KNN-07)</a>
-</p>
+ReActor is a batteries-included coding agent for macOS, Linux, and Windows. It combines a fast terminal UI with code intelligence, native search and editing, persistent execution kernels, browser and web access, debugging, memory, subagents, collaboration, and broad model-provider support.
 
-The most capable agent surface that ships. Continuously tuned by real-world use — complete out of the box, open all the way down.
+Use it interactively, run a bounded autonomous objective, invoke it once from a script, embed the TypeScript SDK, or connect an editor over ACP.
 
-**40+** providers · **32** built-in tools · **14** lsp ops · **28** dap ops · **~55k** lines of Rust core.
+## Highlights
+
+- **IDE-grade code intelligence** — LSP diagnostics, references, symbols, code actions, and workspace-aware renames are available to the agent.
+- **Reliable edits** — hashline patches reject stale anchors; structural AST edits are previewed before they are applied.
+- **Native tooling** — in-process search, globbing, text handling, syntax analysis, PTY support, and image utilities avoid platform-specific shell dependencies.
+- **Real execution environments** — persistent Python and JavaScript sessions can call ReActor tools; the debugger speaks DAP to LLDB, Delve, debugpy, and other adapters.
+- **Parallel work** — typed subagents can work in isolated worktrees, coordinate, and return structured results. `/review` uses dedicated reviewers with priorities and a verdict.
+- **Long-running goals, by choice** — `reactor run` and `/react start` enable bounded autonomy with verification requirements, pause conditions, and restart-safe lifecycle handling.
+- **Open model routing** — use direct APIs, subscription plans, gateways, or local OpenAI-compatible servers; assign separate models to default, fast, reasoning, planning, and commit roles.
+- **Extensible and collaborative** — load skills, rules, hooks, MCP servers, custom tools, and plugins; share encrypted live sessions in a terminal or browser.
+- **Multiple front ends** — the same runtime powers the TUI, print mode, RPC, the TypeScript SDK, and Agent Client Protocol integrations.
 
 ## Install
 
-**macOS · Linux**
+ReActor requires a supported macOS, Linux, or Windows machine. Source development requires Bun 1.3.14 or newer.
+
+**macOS and Linux**
 
 ```sh
 curl -fsSL https://reactor.norman.id.vn/install | sh
@@ -40,546 +49,175 @@ curl -fsSL https://reactor.norman.id.vn/install | sh
 brew install KNN-07/tap/reactor
 ```
 
-**GitHub Releases (recommended)**
-
-```sh
-gh release download v0.1.0 --repo KNN-07/ReActor --pattern '*reactor*'
-```
-
-**Windows (PowerShell)**
+**Windows PowerShell**
 
 ```powershell
 irm https://reactor.norman.id.vn/install.ps1 | iex
 ```
 
-**Pinned versions (mise)**
+**mise**
 
 ```sh
 mise use -g github:KNN-07/ReActor
 ```
 
-macOS · Linux · Windows · bun ≥ 1.3.14
+Prebuilt artifacts are also available on the [Releases page](https://github.com/KNN-07/ReActor/releases).
+
+## Quick start
+
+Start ReActor in a project directory. The interactive setup connects a provider and selects a model.
+
+```sh
+cd your-project
+reactor
+```
+
+Useful entry points:
+
+```sh
+reactor "Explain this repository"       # interactive session with an initial prompt
+reactor -p "Summarize the current diff" # print one response and exit
+reactor --continue                       # continue the previous session
+reactor --resume                         # choose a saved session
+reactor run "Fix the failing tests"     # bounded autonomous objective
+reactor acp                              # ACP server for an editor
+reactor --mode rpc --no-session          # NDJSON RPC over stdio
+```
+
+Attach files or images by prefixing their paths with `@`:
+
+```sh
+reactor @error.log @screenshot.png "Diagnose this failure"
+```
+
+Run `reactor --help` for all flags and `reactor <command> --help` for command-specific help.
 
 ### Shell completions
 
-`reactor` generates its own completion scripts for **bash**, **zsh**, and **fish** from the live command/flag metadata, so they never drift from the actual CLI. Subcommands, flags, and enum values complete statically; model names (`--model`, `--smol`, `--slow`, `--plan`) resolve against the bundled model catalog and `--resume` against your on-disk sessions.
+Completion data is generated from the live CLI metadata, including flags, enum values, models, and saved sessions.
 
 ```sh
-# zsh — add to ~/.zshrc (or write the output into a file on your $fpath)
+# zsh
 eval "$(reactor completions zsh)"
 
-# bash — add to ~/.bashrc
+# bash
 eval "$(reactor completions bash)"
 
 # fish
 reactor completions fish > ~/.config/fish/completions/reactor.fish
 ```
 
-## Every tool, _benchmaxxed_.
+## Tools
 
-Edits that land on the first attempt. Reads that summarize files instead of dumping their content. Searches that return instantly. Pick any model — reactor will get it right.
+ReActor gives the model one integrated tool surface:
 
-| model            | metric       | what                                                                  |
-| ---------------- | ------------ | --------------------------------------------------------------------- |
-| Grok Code Fast 1 | 6.7% → 68.3% | Tenfold lift the moment the edit format stops eating the model alive. |
-| Gemini 3 Flash   | +5 pp        | Over str_replace — beats Google's own best attempt at the format.     |
-| Grok 4 Fast      | −61% tokens  | Output collapses once the retry loop on bad diffs disappears.         |
-| MiniMax          | 2.1×         | Pass rate more than doubles. Same weights, same prompt.               |
+| Area | Capabilities |
+| --- | --- |
+| Files and search | Read files, directories, archives, databases, notebooks, PDFs, URLs, PRs, issues, and internal URIs; write, hashline-edit, AST-edit, grep, and glob |
+| Code intelligence | LSP diagnostics and navigation, semantic rename and code actions, AST queries, DAP debugging |
+| Execution | Persistent shell sessions, Python and JavaScript kernels, notebooks, SSH |
+| Coordination | Subagents, worktree isolation, task lists, user questions, agent messaging, process supervision |
+| Web and media | Multi-provider web search, structured page extraction, browser automation, image inspection/generation, text-to-speech |
+| State | Sessions, checkpoints, rewind, project memory, durable recall, and reflection |
 
-- `read` : summarized snippets · ideal defaults · selector hit rate
-- `search` : fastest in the west
-- `lsp` : everything your IDE knows, the agent knows
-- `prompts` : adjusted relentlessly for each model
+Tools can be restricted with `--tools`, disabled individually through settings, or extended with plugins and MCP servers. See the [tool reference](https://reactor.norman.id.vn/docs/tools).
 
-[Read the full post ↗](https://blog.can.ac/2026/02/12/the-harness-problem/)
+## Models and configuration
 
-## The Pi _you love_, with **batteries included**.
+ReActor supports dozens of providers across direct APIs, OAuth subscriptions, gateways, cloud platforms, and local servers such as Ollama, LM Studio, llama.cpp, vLLM, and LiteLLM.
 
-Originally built on [Mario Zechner](https://github.com/mariozechner)'s wonderful [Pi](https://github.com/badlogic/pi-mono), reactor adds everything you're missing.
-
-### 01 · Code execution w/ tool-calling
-
-Most harnesses give the agent a Python sandbox and call it done. Ours runs persistent Python and a Bun worker, and either kernel can call back into the agent's own tools — read, search, task — over a loopback bridge. The agent loads a CSV with tool.read from inside Python, charts it from JavaScript, and never leaves the cell.
-
-![reactor TUI: a single eval session with `[1/2] pandas describe` (Python) printing a real DataFrame.describe() table, followed by `[2/2] top scorer` (JavaScript) running a reduce. Footer: 'Both kernels ran in one session.'](https://reactor.norman.id.vn/captures/eval.webp)
-
-### 02 · LSP wired into every write
-
-Ask for a rename and you get a rename. The call goes through workspace/willRenameFiles, so re-exports, barrel files, and aliased imports update before the file moves. Everything your IDE knows, the agent knows.
-
-![reactor TUI: `LSP references` returns five hits across three files for the symbol `formatBytes`, then `LSP rename` applies the change with edits to format.ts/report.ts/cli.ts, then a `Search formatBytes 0 matches` confirmation. Final line: 'Rename complete. Five edits across three files…'.](https://reactor.norman.id.vn/captures/lsp.webp)
-
-### 03 · Drives a real debugger
-
-A C binary segfaults: the agent attaches lldb, steps to the bad pointer, reads the frame. A Go service hangs: it attaches dlv and walks the goroutines. A Python process is wedged: debugpy, pause, inspect, evaluate. Most agents are still sprinkling print statements.
-
-![reactor TUI: a live lldb-dap session against a native binary at /tmp/reactor-native/demo. Adapter=lldb-dap, Status=stopped, Frame=xorshift32, Instruction pointer 0x10000055C, Location demo.c:6:10. Debug scopes and Debug variables cards show locals (x = 57351) and the agent confirms the math: x went from 7 → 57351 (= 7 ^ (7<<13)).](https://reactor.norman.id.vn/clips/dap-poster.webp)
-
-_[Watch the capture ↗](https://reactor.norman.id.vn/clips/dap.mp4)_
-
-### 04 · Time-traveling stream rules
-
-Your rules sit dormant until the model goes off-script. A regex match aborts the stream mid-token, injects the rule as a system reminder, and retries from the same point. You get course-correction without paying context tax on every turn. Injections survive compaction, so the fix sticks.
-
-![reactor TUI: agent reading src.rs and about to write Box::leak when the request aborts (red `Error: Request was aborted`), an amber `⚠ Injecting rule: box-leak` card injects the rule body `Don't reach for Box::leak in production code paths`, and the agent then course-corrects by proposing `Arc<str>` and asking the user to confirm.](https://reactor.norman.id.vn/clips/ttsr-poster.webp)
-
-_[Watch the capture ↗](https://reactor.norman.id.vn/clips/ttsr.mp4)_
-
-### 05 · First-class subagents
-
-Split a job across workers and get typed results back. task fans out into isolated worktrees, each worker runs its own tool surface, and the final yield is a schema-validated object the parent reads directly. No prose to parse, no merge conflicts between siblings, no orphaned edits.
-
-![reactor TUI showing `task` spawning two subagents `ComponentsExports` and `RoutesExports`, the constraints block requiring an IRC DM between peers, the per-subagent status cards with cost and duration, and a final Findings section listing both exports plus an honest 'IRC coordination note' about a one-sided handshake.](https://reactor.norman.id.vn/clips/irc-poster.webp)
-
-_[Watch the capture ↗](https://reactor.norman.id.vn/clips/irc.mp4)_
-
-### 06 · A second model, watching every turn.
-
-Pair a reviewer model to the 'advisor' role and it reads every turn the main agent takes, injecting notes inline — a quiet aside, a concern, or a hard blocker. It runs on its own context and its own model, so it catches what the doer rushed past. The main agent sees the note and course-corrects, or tells you why it won't.
-
-![reactor TUI: /advisor status shows the advisor running on openai-codex/gpt-5.5; after the main agent scopes a catch to ENOENT instead of swallowing every error, an amber 'Advisor 1 note (concern)' card warns the fix no longer matches the user's literal acceptance criterion.](https://reactor.norman.id.vn/clips/advisor-poster.webp)
-
-_[Watch the capture ↗](https://reactor.norman.id.vn/clips/advisor.mp4)_
-
-### 07 · Hand someone the link, they're in.
-
-/collab puts your live session on a relay and hands back a link — and a QR. A teammate joins from another terminal with reactor join, or just opens it in a browser. Share read-write to pair on the same agent, or /collab view for a read-only link anyone can watch but no one can steer. Frames are sealed client-side; the relay never sees your keys.
-
-![reactor TUI: /collab view prints 'Collab session started!' with an reactor join command, a reactor.norman.id.vn browser link, the note 'Anyone with this link can watch the session but cannot prompt the agent', and a large scannable QR code.](https://reactor.norman.id.vn/clips/collab-poster.webp)
-
-_[Watch the capture ↗](https://reactor.norman.id.vn/clips/collab.mp4)_
-
-### 08 · Read a pdf on arxiv, why not?
-
-web_search chains eighteen ranked providers and hands whatever URLs it finds straight to read. Arxiv PDFs, GitHub pages, Stack Overflow threads come back as structured markdown with anchors intact — the same tool surface you use on local files. Cite, follow, quote, never lose where you came from.
-
-![reactor TUI: web_search returns 10 ranked Perplexity sources for inference-time compute scaling, the agent picks an arxiv paper, calls read https://arxiv.org/pdf/2604.10739v1, and summarizes the paper's headline result with real numbers.](https://reactor.norman.id.vn/clips/web-poster.webp)
-
-_[Watch the capture ↗](https://reactor.norman.id.vn/clips/web.mp4)_
-
-### 09 · Unapologetically native. Even on Windows.
-
-Other agents shell out to rg, grep, find, and bash. On many machines those binaries don't exist, and on the ones where they do, every call costs a fork-exec round-trip. reactor links the real implementations into the process. ripgrep, glob, find: in-process. brush is the bash, with sessions that survive across calls. The same reactor binary runs on macOS, Linux, and Windows — no WSL bridge.
-
-### 10 · Code review with priorities and a verdict
-
-Get a clear verdict on whether the change ships, with every issue ranked P0 through P3 and scored for confidence. /review spawns dedicated reviewer subagents that sweep branches, single commits, or uncommitted work in parallel. You tackle what blocks release first; nothing important hides in a wall of prose.
-
-### 11 · Hashline: edit by content hash
-
-Perfect edits, fewer tokens. The model points at anchors instead of retyping the lines it wants to change, so whitespace battles and string-not-found loops just stop happening. Edit a stale file and the anchors diverge — we reject the patch before it corrupts anything. Grok 4 Fast spends 61% fewer output tokens on the same work.
-
-### 12 · GitHub is just another filesystem
-
-Other harnesses bolt on gh_issue_view, gh_pr_view, gh_search — each with its own parameters the agent has to learn and you have to debug. We skipped that. read already handles paths; PRs are paths. One interface to teach the model, one surface to keep correct.
-
-### 13 · Hindsight: memory the agent curates
-
-The agent remembers your codebase between sessions. It writes facts mid-run with retain, pulls them back with recall, and compresses each session into a mental model that loads on the first turn of the next one. Project-scoped by default, so what it learns about this repo stays with this repo.
-
-### 14 · ACP: editor-drivable agent
-
-Run reactor inside Zed and you get the same agent you drive from the terminal — reading the buffer you're actually looking at, writing through the editor's save path, spawning shells in the editor's terminal. Destructive tools pause for a permission prompt you can answer once and forget. No bridge, no plugin, no second brain to keep in sync.
-
-### 15 · Inherits what your other tools already wrote
-
-Every other agent ships an importer and expects you to convert. reactor reads the eight formats already on disk in their native shape — Cursor MDC, Cline .clinerules, Codex AGENTS.md, Copilot applyTo, and the rest. No migration script, no YAML-to-TOML port, no "supported subset" footnotes. The config your team wrote last quarter still works tonight.
-
-### 16 · reactor commit: atomic splits, validated messages
-
-reactor reads the working tree through git_overview, git_file_diff, and git_hunk, then splits unrelated changes into atomic commits ordered by their dependencies. Cycles are rejected before anything is written. Source files score above tests, docs, and configs, so the headline commit is the one that matters. Lock files are excluded from analysis entirely.
-
-### 17 · Read PRs. _Walk skills._ Pull JSON out of subagents.
-
-Twelve internal schemes — `pr://`, `issue://`, `agent://`, `skill://`, `rule://`, and the rest — resolve transparently inside every FS-shaped tool the agent already calls. `read pr://1428` returns the same shape as `read src/foo.ts`. `search` walks a diff like a directory. `agent://<id>/findings.0.path` pulls a field out of a subagent's output by path.
-
-![reactor TUI reading pr://KNN-07/ReActor/1063 and then /diff/1, showing hunk headers, added lines, and a [MODIFIED] (+12 -0) summary.](https://reactor.norman.id.vn/captures/pr.webp)
-
-### 18 · Conflict resolution, made easy.
-
-Each merge conflict becomes one URL. The agent writes `@theirs`, `@ours`, or `@base` to `conflict://N` and the file resolves cleanly. Bulk form: `conflict://*`.
-
-![reactor TUI: ✓ Read src/session.ts (⚠ 1 conflict), then ✓ Write conflict://1 · 1 line with content @theirs, then a confirmation 'Resolved.'](https://reactor.norman.id.vn/clips/conflict-poster.webp)
-
-_[Watch the capture ↗](https://reactor.norman.id.vn/clips/conflict.mp4)_
-
-### 19 · Preview, then accept.
-
-`ast_edit` returns a _(proposed)_ card with the replacement count. The change is staged. The agent calls `resolve` with a reason; the TUI turns it into an **Accept** card and the disk move happens — atomic, all or nothing.
-
-![reactor TUI: ✓ AST Edit: console.log($X) (proposed) 3 replacements · 1 file, then ✓ Accept: 3 replacements in 1 file (AST Edit), followed by 'Applied 3 replacements in src/auth.ts.'](https://reactor.norman.id.vn/clips/codemod-poster.webp)
-
-_[Watch the capture ↗](https://reactor.norman.id.vn/clips/codemod.mp4)_
-
-### 20 · Drives a _real browser_. _Or your Slack?_
-
-Stealth's on by default, so pages see a normal user instead of a headless bot. The same API drives any Electron app in place — point it at Slack and the agent reads your DMs the way it reads the web.
-
-![reactor TUI driving the browser tool against DuckDuckGo](https://reactor.norman.id.vn/captures/browser.webp)
-
-## Whatever the task needs, _it's already in the box_.
-
-32 tools live in the same namespace as `read` and `bash`. Pin the active set with `--tools read,edit,bash,…`; rarely used discoverable tools stay behind `xd://` devices. `read xd://` lists them, and `write xd://<tool>` runs one when `tools.xdev` is enabled.
-
-**Files & search**
-
-- `read` — files, dirs, archives, SQLite, PDFs, notebooks, URLs, and internal `://` schemes through one path.
-- `write` — create or overwrite a file, archive entry, or SQLite row.
-- `edit` — hashline patches with content-hash anchors and stale-anchor recovery.
-- `ast_edit` — structural rewrites previewed before apply, via ast-grep.
-- `ast_grep` — structural code queries over 50+ tree-sitter grammars.
-- `search` — regex over files, globs, and internal URLs.
-- `find` — glob-based path lookup; reach for `search` when you need content matches.
-
-**Runtime**
-
-- `bash` — workspace shell, with optional PTY or background-job dispatch.
-- `eval` — persistent Python and JavaScript cells with shared prelude and tool re-entry.
-- `ssh` — one remote command against a configured host.
-
-**Code intelligence**
-
-- `lsp` — diagnostics, navigation, symbols, renames, code actions, raw requests.
-- `debug` — drive a DAP session — breakpoints, stepping, threads, stack, variables.
-
-**Coordination**
-
-- `task` — fan out subagents in parallel, optionally workspace-isolated.
-- `hub` — message live agents, wait on or cancel background jobs, and supervise long-running processes.
-- `todo` — ordered mutations over the session todo list with phase tracking.
-- `ask` — structured follow-up questions for interactive runs.
-
-**Outside the box**
-
-- `browser` — Puppeteer tabs over headless Chromium or CDP-attached apps.
-- `web_search` — one query across configured providers, returning answer plus citations.
-- `github` — GitHub CLI ops — repo, PR, issues, code search, Actions run-watch.
-- `generate_image` — generate or edit raster images via Gemini, GPT, or xAI Grok image models.
-- `inspect_image` — vision-model analysis of a local image file.
-- `tts` — text-to-speech via xAI Grok Voice — five built-in voices, WAV or MP3.
-
-**Memory & state**
-
-- `checkpoint` — mark conversation state for a later collapse-and-report.
-- `rewind` — prune exploratory context, keep a concise report.
-- `retain` — queue durable facts into the active Hindsight bank.
-- `recall` — search the Hindsight bank for raw memories.
-- `reflect` — ask Hindsight to synthesize an answer over the bank.
-
-**Misc**
-
-- `resolve` — apply or discard a queued preview action.
-
-Setting-gated, off by default: `github`, `inspect_image`, `tts`, `checkpoint`, `rewind`, `retain`, `recall`, `reflect`. Flip them on once, scoped per project.
-
-[Full reference →](https://reactor.norman.id.vn/docs/tools)
-
-### Prompt controls
-
-Three standalone, lowercase words opt a turn into specialized agent behavior:
-
-- `ultrathink` — request careful multi-step reasoning and the highest supported automatic thinking effort.
-- `orchestrate` — run substantial independent work through parallel subagents and verify each phase.
-- `workflowz` — build a deterministic multi-subagent workflow with the active `task` tool.
-
-They trigger only in prose, not inside code spans, fenced code blocks, XML/HTML sections, identifiers, or paths. See [Magic keywords](docs/magic-keywords.md) for exact matching rules and configuration.
-
-## Forty-plus providers, hundreds of models, _one /model away_.
-
-Roles route work by intent. `default` for normal turns. `smol` for cheap subagent fan-out. `slow` for deep reasoning. `plan` for plan mode. `commit` for changelogs. Override at launch with `--smol`, `--slow`, or `--plan`; cycle through the configured models for the active role with `Ctrl+P`. Swap the active model mid-session with the `/model` slash command.
-
-Auth tags below: `oauth` signs in with your provider account, `plan` routes through a coding-plan subscription, `local` runs against a local server with the key optional.
-
-### Frontier APIs
-
-Direct APIs and gateways. Mix providers per role.
-
-Anthropic `oauth` · OpenAI · OpenAI Codex `oauth` · Google Gemini · Google Antigravity `oauth` · xAI · Mistral · Groq · Cerebras · Fireworks · Together · Hugging Face · NVIDIA · OpenRouter · Synthetic · Vercel AI Gateway · Cloudflare AI Gateway · Wafer Serverless · Perplexity `oauth`
-
-### Coding plans
-
-Subscription-routed. `/login` attaches the session.
-
-Cursor `oauth` · GitHub Copilot `oauth` · GitLab Duo · Kimi Code `plan` · Moonshot · MiniMax Coding Plan `plan` · MiniMax Coding Plan CN `plan` · Alibaba Coding Plan `plan` · Qwen Portal · Z.AI / GLM Coding Plan `plan` · Xiaomi MiMo · Qianfan · NanoGPT · Novita · Venice · Kilo · ZenMux · OpenCode Go · OpenCode Zen
-
-### Run it yourself
-
-OpenAI-compatible `/v1/models`. Local instances skip the key.
-
-Ollama `local` · Ollama Cloud · LM Studio `local` · llama.cpp `local` · vLLM `local` · LiteLLM
-
-### Four knobs that make routing useful
-
-- **Custom providers** — Declare anything that speaks `openai-completions`, `openai-responses`, `openai-codex-responses`, `azure-openai-responses`, `anthropic-messages`, `google-generative-ai`, or `google-vertex` in `~/.reactor/agent/models.yml`.
-- **Fallback chains** — Per-role or per-model chains under `retry.fallbackChains`. When the primary throws 429s or hits a quota wall, the next entry takes the rest of the turn — restored on cooldown.
-- **Path-scoped models** — Scope `enabledModels` and `disabledProviders` entries to a `path:` prefix to pin a different model set on one repo without touching the global config. Scoped entries cover the path and everything under it.
-- **Round-robin credentials** — Stack API keys per provider and the runtime rotates with session affinity and per-credential backoff. Useful when one key would burn its quota by lunch.
-
-Full provider & routing reference at [reactor.norman.id.vn/docs/providers](https://reactor.norman.id.vn/docs/providers).
-
-## Twenty-five backends. _One tool the agent already knows_.
-
-`web_search` is built in, not bolted on. `auto` walks a twenty-five-provider chain; pin one by name if you already pay for it. Behind every hit, site-aware extraction turns GitHub, registries, arXiv, Stack Overflow, and docs into structured markdown — anchors and link targets survive.
-
-### Search providers
-
-Twenty-five backends. Pin one, or let `auto` walk the chain in order.
-
-| provider     | auth                   |
-| ------------ | ---------------------- |
-| `auto`       | chain                  |
-| `perplexity` | `PERPLEXITY_API_KEY`   |
-| `gemini`     | oauth                  |
-| `anthropic`  | oauth                  |
-| `codex`      | oauth                  |
-| `xai`        | `XAI_API_KEY`          |
-| `zai`        | `ZAI_API_KEY`          |
-| `exa`        | `EXA_API_KEY` (or mcp) |
-| `tinyfish`   | `TINYFISH_API_KEY`     |
-| `jina`       | `JINA_API_KEY`         |
-| `kagi`       | `KAGI_API_KEY`         |
-| `tavily`     | `TAVILY_API_KEY`       |
-| `firecrawl`  | `FIRECRAWL_API_KEY`    |
-| `brave`      | `BRAVE_API_KEY`        |
-| `kimi`       | `MOONSHOT_API_KEY`     |
-| `parallel`   | `PARALLEL_API_KEY`     |
-| `synthetic`  | `SYNTHETIC_API_KEY`    |
-| `searxng`    | self-hosted            |
-| `duckduckgo` | no key                 |
-| `bing`       | no key                 |
-| `yahoo`      | no key                 |
-| `startpage`  | no key                 |
-| `google`     | no key (browser)       |
-| `ecosia`     | no key (browser)       |
-| `mojeek`     | no key (browser)       |
-| `public`     | no key (all of the above, consolidated) |
-
-### Specialised handlers
-
-The agent gets structured content, not stripped HTML.
-
-- **Code hosts** — github, gitlab
-- **Package registries** — npm, PyPI, crates.io, Hex, Hackage, NuGet, Maven, RubyGems, Packagist, pub.dev, Go packages
-- **Research sources** — arxiv, semantic scholar
-- **Forums** — stack overflow, reddit, hn
-- **Docs** — mdn, readthedocs, docs.rs
-
-Pages convert to markdown with link structure intact. The agent can cite, follow, and quote without losing anchors.
-
-### Security databases
-
-Vuln lookups answer with vendor data, not blog summaries.
-
-- **NVD** — national vulnerability database
-- **OSV** — open source vuln feed
-- **CISA KEV** — known exploited vulns
-
-[`web_search` reference ↗](https://reactor.norman.id.vn/docs/tools#web_search)
-
-## Roughly **~55,000** lines of Rust, doing the work other harnesses shell out for.
-
-Four crates, one platform-tagged N-API addon. Search, shell, AST, highlight, PTY, image decode, BPE counting — all in-process on the libuv pool. No fork/exec on the hot path.
-
-- Crates: `reactor-natives`, `reactor-shell`, `reactor-ast`, `reactor-iso`
-- Platforms: `linux-x64`, `linux-arm64`, `darwin-x64`, `darwin-arm64`, `win32-x64`
-
-The table below is a per-module breakdown that intentionally omits glue and tests.
-
-| Module     | What it does                                                                         | Powered by                                |  ~LoC |
-| ---------- | ------------------------------------------------------------------------------------ | ----------------------------------------- | ----: |
-| shell      | Embedded bash · persistent sessions · timeout/abort · custom builtins                | brush-shell (vendored)                    | 3,700 |
-| grep       | Regex search · parallel/sequential · glob & type filters · fuzzy find                | grep-regex · grep-searcher                | 1,900 |
-| keys       | Kitty keyboard protocol with xterm fallback · PHF perfect-hash lookup                | phf                                       | 1,490 |
-| text       | ANSI-aware width · truncation · column slicing · SGR-preserving wrap                 | unicode-width · segmentation              | 1,450 |
-| summary    | Tree-sitter structural source summaries with elision controls                        | tree-sitter · ast-grep-core               | 1,040 |
-| ast        | ast-grep pattern matching and structural rewrites                                    | ast-grep-core                             | 1,000 |
-| fs_cache   | Mtime-keyed file cache shared by read · grep · lsp                                   | in-tree                                   |   840 |
-| highlight  | Syntax highlighting · 11 semantic categories · 30+ aliases                           | syntect                                   |   470 |
-| pty        | Native PTY allocation for sudo · ssh interactive prompts                             | portable-pty                              |   455 |
-| glob       | Discovery with glob · type filters · mtime sort · gitignore respect                  | ignore · globset                          |   410 |
-| workspace  | Workspace walker with gitignore + AGENTS.md discovery in one pass                    | ignore                                    |   385 |
-| appearance | Mode 2031 + native macOS dark/light via CoreFoundation FFI                           | core-foundation                           |   270 |
-| power      | macOS power-assertion API for idle/system/display-sleep prevention                   | IOKit FFI                                 |   270 |
-| task       | Blocking work on libuv thread pool · cancellation · timeout · profiling              | tokio · napi                              |   260 |
-| fd         | Filesystem walker for find-tool replacement                                          | ignore                                    |   250 |
-| iso        | Workspace isolation shim · apfs · btrfs · zfs · reflink · overlayfs · projfs · rcopy | reactor-iso (PAL)                              |   245 |
-| prof       | Circular buffer profiler with folded-stack and SVG flamegraph output                 | inferno                                   |   240 |
-| ps         | Cross-platform process-tree kill and descendant listing                              | libc · libproc · CreateToolhelp32Snapshot |   195 |
-| clipboard  | Text copy and image read from system clipboard · no xclip/pbcopy                     | arboard                                   |    80 |
-| tokens     | O200k / Cl100k BPE token counting · both tables embedded                             | tiktoken-rs                               |    65 |
-| sixel      | Terminal image rendering · decode PNG · JPEG · WebP · GIF · resize · SIXEL encode    | icy_sixel · image                         |    55 |
-| html       | HTML to Markdown with optional content cleaning                                      | html-to-markdown-rs                       |    50 |
-
-## Four entry points: _interactive_, _one-shot_, RPC, and ACP.
-
-Same engine, four wrappers. `reactor` runs the TUI. `reactor -p` answers a single prompt and exits. The Node SDK embeds the session in your process. `reactor --mode rpc` and `reactor acp` hand the wheel to another program over stdio.
-
-### Interactive — when in doubt, the agent asks
-
-The TUI is the default surface. Tool calls render as cards, edits preview before they land, and ambiguity routes through the `ask` tool — a structured option picker the agent can call mid-turn. The keyboard handles the rest.
-
-The same prompt cards surface over ACP, so editors get the picker without writing one.
-
-![reactor TUI: the ask tool renders an option picker with three choices, a (Recommended) badge on the first, and 'up/down navigate · enter select · esc cancel' footer.](https://reactor.norman.id.vn/captures/ask.webp)
-
-### SDK — embed in Node
-
-`@reactor/coding-agent`
-
-Node and TypeScript hosts pull the engine in directly. The package exposes `ModelRegistry`, `SessionManager`, `createAgentSession`, and `discoverAuthStorage`; the session emits typed events you subscribe to.
-
-```ts
-import {
-  ModelRegistry,
-  SessionManager,
-  createAgentSession,
-  discoverAuthStorage,
-} from "@reactor/coding-agent";
-
-const auth = await discoverAuthStorage();
-const models = new ModelRegistry(auth);
-await models.refresh();
-
-const { session } = await createAgentSession({
-  sessionManager: SessionManager.inMemory(),
-  authStorage: auth,
-  modelRegistry: models,
-});
-await session.prompt("list .ts files");
+```sh
+reactor models                         # browse available models
+reactor --model opus                   # fuzzy model selection
+reactor --smol <model> --slow <model>  # assign role-specific models
+reactor config                         # manage settings
 ```
 
-### RPC — drive over stdio
+Provider credentials can come from the interactive login flow, environment variables, or the auth broker. Model aliases, fallback chains, role routing, path-scoped model filters, and custom OpenAI-compatible providers are configurable.
 
-`reactor --mode rpc`
+User data lives under `~/.reactor`; project-local configuration uses `.reactor`. ReActor intentionally does not add legacy command aliases or legacy data-directory fallbacks.
 
-For non-Node embedders, or when you want process isolation. NDJSON commands in, response and event frames out. `--mode rpc-ui` adds tool cards, selectors, and dialogs as `extension_ui_request` frames the host must answer.
+- [Providers and authentication](docs/providers.md)
+- [Models and routing](docs/models.md)
+- [Settings](docs/settings.md)
+- [Environment variables](docs/environment-variables.md)
+- [Secrets](docs/secrets.md)
 
-```
-$ reactor --mode rpc --no-session
-> {"id":"r1","type":"prompt","message":"list .ts files"}
-< {"id":"r1","type":"response", ...}
-> {"id":"r2","type":"set_model","provider":"anthropic","modelId":"sonnet-4.5"}
-> {"id":"r3","type":"abort"}
-```
+## Sessions, rules, and extensions
 
-### ACP — speak to editors
+Sessions are saved automatically and can be resumed, forked, exported, compacted, or shared. Project instructions are discovered from common agent-rule formats, including `AGENTS.md`, Cursor rules, Cline rules, and Copilot instructions.
 
-`reactor acp`
+ReActor can also load:
 
-The [Agent Client Protocol](https://github.com/zed-industries/agent-client-protocol) over JSON-RPC. When the editor advertises capabilities, tool I/O routes through it and writes are gated by `session/request_permission`.
+- **skills** for reusable workflows and knowledge;
+- **rules** and Time-Traveling Stream Rules for targeted course correction;
+- **extensions and hooks** for runtime behavior and UI integration;
+- **MCP servers and custom tools** for external capabilities;
+- **plugins** that bundle these components for installation.
 
-| reactor tool                      | ACP route                           |
-| ----------------------------- | ----------------------------------- |
-| `bash`                        | `terminal/create + terminal/output` |
-| `read`                        | `fs/read_text_file`                 |
-| `write`                       | `fs/write_text_file`                |
-| `edit, bash`                  | `session/request_permission`        |
+Start with [sessions](docs/session.md), [context files](docs/context-files.md), [skills](docs/skills.md), [extensions](docs/extensions.md), and [MCP configuration](docs/mcp-config.md).
 
-Full reference: [reactor.norman.id.vn/docs/sdk](https://reactor.norman.id.vn/docs/sdk).
+## SDK, RPC, and editor integration
 
-## Research workflows
+The `@reactor/coding-agent` package exposes the runtime to TypeScript applications. Other hosts can use NDJSON RPC over stdio, while editors such as Zed can connect through ACP.
 
-Research is built in:
-
-- `/survey [topic]` — verified literature, LaTeX/BibTeX, and summary artifacts.
-- `/peer-review [paper]` — parallel methods, writing, impact, and meta review; `/review` remains code review.
-- `/autopaper [topic]` — resumable survey → ideation → autoresearch → verification → writing → review.
-
-State lives in project-keyed SQLite under `~/.reactor/research/`; artifacts stay in `surveys/`, `papers/`, and `reviews/`. See [docs/research-workflows.md](docs/research-workflows.md) for phases, branch safety, and optional Lean/PDF dependencies.
-
-## Philosophy
-
-ReActor is a batteries-included coding workflow maintained as a public project by [KNN-07](https://github.com/KNN-07).
-
-Key ideas:
-
-- Keep interactive terminal-first UX for real coding work
-- Include practical built-ins (tools, sessions, branching, subagents, extensibility)
-- Make advanced behavior configurable rather than hidden
-
----
+- [TypeScript SDK](docs/sdk.md)
+- [RPC protocol](docs/rpc.md)
+- [Desktop and editor integration](docs/desktop.md)
+- [Collaboration](docs/collab.md)
 
 ## Development
 
-### Getting started from source
-
-Fresh clones need both workspace dependencies and the local Rust/N-API addon before the source CLI can start.
+Clone the repository, install all workspaces, build the native addon, and link the local CLI:
 
 ```sh
+git clone https://github.com/KNN-07/ReActor.git
+cd ReActor
 bun setup
 bun dev
 ```
 
-`bun setup` installs Bun workspaces and builds `@reactor/natives`. Re-run `bun run build:native` after changing Rust crates or `packages/natives`.
-
-For a non-interactive smoke check:
+Common checks:
 
 ```sh
-bun dev -- --version
+bun check               # TypeScript, formatting/brand, and Rust checks
+bun test                # local TypeScript test suite
+bun run test:rs         # Rust tests
+bun run test:py         # Python tests
+bun run ci:test:smoke   # CLI and worker smoke probes
 ```
 
-### Debug Command
+Run `bun run build:native` after changing Rust crates or `packages/natives`. The main implementation is in `packages/coding-agent`; architecture and package-specific guidance live in [its development guide](packages/coding-agent/DEVELOPMENT.md).
 
-`/debug` opens tools for debugging, reporting, and profiling.
+The monorepo is organized around these layers:
 
-For architecture and contribution guidelines, see [packages/coding-agent/DEVELOPMENT.md](packages/coding-agent/DEVELOPMENT.md).
+| Path | Purpose |
+| --- | --- |
+| `packages/coding-agent` | CLI, TUI application, SDK, tools, sessions, and integrations |
+| `packages/agent` | Agent runtime and tool-call state management |
+| `packages/ai` | Multi-provider streaming LLM client |
+| `packages/catalog` | Generated model catalog, provider descriptors, and model identity |
+| `packages/tui` | Differential terminal UI library |
+| `packages/natives` | N-API bindings for the Rust-native toolchain |
+| `packages/autonomy` | Opt-in autonomous goal lifecycle |
+| `packages/stats` | Local usage and observability dashboard |
+| `crates/` | Search, shell, AST, isolation, and native platform implementations |
+| `python/` | Python RPC and remote worker components |
 
----
-
-## Monorepo Packages
-
-| Package                                                   | Description                                                                |
-| --------------------------------------------------------- | -------------------------------------------------------------------------- |
-| **[@reactor/collab-web](packages/collab-web)**           | Browser guest client, mock host, and local relay for collab live sessions  |
-| **[@reactor/ai](packages/ai)**                        | Multi-provider LLM client with streaming and model/provider integration    |
-| **[@reactor/catalog](packages/catalog)**              | Model catalog: bundled model database, provider descriptors, and identity  |
-| **[@reactor/agent-core](packages/agent)**             | Agent runtime with tool calling and state management                       |
-| **[@reactor/coding-agent](packages/coding-agent)**    | Interactive coding agent CLI and SDK                                       |
-| **[@reactor/tui](packages/tui)**                      | Terminal UI library with differential rendering                            |
-| **[@reactor/natives](packages/natives)**              | N-API bindings for grep, shell, image, text, syntax highlighting, and more |
-| **[@reactor/stats](packages/stats)**                 | Local observability dashboard for AI usage statistics                      |
-| **[@reactor/utils](packages/utils)**                  | Shared utilities (logging, streams, dirs/env/process helpers)              |
-| **[@reactor/wire](packages/wire)**                    | Shared collab live-session protocol types and relay constants              |
-| **[@reactor/hashline](packages/hashline)**               | Line-anchored patch language and applier behind the `edit` tool            |
-| **[@reactor/mnemopi](packages/mnemopi)**              | Local SQLite memory engine for ReActor agents                             |
-| **[@reactor/snapcompact](packages/snapcompact)**         | Bitmap-frame context compression package and SQuAD eval suite              |
-| **[@reactor/swarm-extension](packages/swarm-extension)** | Swarm orchestration extension package                                      |
-
-### Rust Crates
-
-| Crate                                              | Description                                                                                         |
-| -------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| **[reactor-natives](crates/reactor-natives)**                | Core Rust native addon (N-API `cdylib`) used by `@reactor/natives`; aggregates the crates below |
-| **[reactor-shell](crates/reactor-shell)**                    | Embedded shell / PTY / process management split out of `reactor-natives` (wraps `brush-*`)               |
-| **[reactor-ast](crates/reactor-ast)**                        | tree-sitter-based code summarizer and AST utilities (50+ language grammars)                         |
-| **[reactor-iso](crates/reactor-iso)**                        | Task isolation backend resolver: APFS clones, btrfs/zfs reflinks, overlayfs, projfs, rcopy          |
-| **[brush-core](crates/vendor/brush-core)**         | Vendored fork of [brush-shell](https://github.com/reubeno/brush) for embedded bash execution        |
-| **[brush-builtins](crates/vendor/brush-builtins)** | Vendored bash builtins (cd, echo, test, printf, read, export, etc.)                                 |
+Additional packages provide collaboration, memory, hashline editing, wire protocols, UI sharing, benchmarks, and extensions.
 
 ## Contributing
 
-Issues are open to everyone. **Pull requests require a vouch** — PRs from
-unvouched or denounced authors are closed automatically. If you're not yet
-vouched, open a [Discussion](https://github.com/KNN-07/ReActor/discussions)
-and ask a maintainer to `!vouch` you rather than opening a PR (which would be
-closed on sight). See **[CONTRIBUTING.md](CONTRIBUTING.md)** and
-[`.github/VOUCHED.td`](.github/VOUCHED.td) for the full policy.
+Issues and discussions are open to everyone. Pull requests require a maintainer vouch and unvouched PRs are closed automatically. Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a PR.
 
----
+This public fork tracks a pinned upstream revision through a reviewable sync workflow. Do not merge a floating upstream branch; see the repository development rules and contribution guide for the supported process.
 
-## License
+## License and credits
 
-MIT. See [LICENSE](LICENSE).
+ReActor is available under the [MIT License](LICENSE).
 
-© 2025 Mario Zechner  
-© 2025-2026 Can Bölük
+Maintained by [norman (KNN-07)](https://github.com/KNN-07). ReActor builds on the work of Mario Zechner's [Pi](https://github.com/badlogic/pi-mono) and subsequent contributors.
+
+© 2025 Mario Zechner<br>
+© 2025–2026 Can Bölük<br>
 © 2026 norman (KNN-07)
-
-_made for terminals that stay open_
-
-- [reactor.norman.id.vn](https://reactor.norman.id.vn)
-- [GitHub](https://github.com/KNN-07/ReActor)
-- [Changelog](https://github.com/KNN-07/ReActor/blob/main/packages/coding-agent/CHANGELOG.md)
-- [GitHub Releases](https://github.com/KNN-07/ReActor/releases)
-- [Discord](https://discord.gg/4NMW9cdXZa)
-- [MIT](https://github.com/KNN-07/ReActor/blob/main/LICENSE)
