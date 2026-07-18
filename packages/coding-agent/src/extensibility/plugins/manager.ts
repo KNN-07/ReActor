@@ -975,7 +975,7 @@ export class PluginManager {
 				status: hasManifest ? "ok" : "warning",
 				message: hasManifest
 					? `v${pluginPkg.version}${pluginPkg.description ? ` - ${pluginPkg.description}` : ""}`
-					: `v${pluginPkg.version} - No reactor/pi manifest (not an reactor plugin)`,
+					: `v${pluginPkg.version} - No ReActor plugin manifest (not an reactor plugin)`,
 			});
 
 			// Check tools path exists if specified

@@ -11,7 +11,7 @@ import * as path from "node:path";
 import { isEnoent, logger } from "@reactor/utils";
 import type { SnapshotResponse } from "./types";
 
-const MAGIC = new Uint8Array([0x4f, 0x4d, 0x50, 0x53]); // "OMPS"
+const MAGIC = new Uint8Array([0x52, 0x45, 0x41, 0x53]); // "REAS" (ReActor encrypted auth snapshot)
 const VERSION = 1;
 const VERSION_OFFSET = MAGIC.byteLength;
 const IV_OFFSET = VERSION_OFFSET + 1;

@@ -17,7 +17,7 @@ import * as path from "node:path";
 import type { AgentToolResult, AgentToolUpdateCallback } from "@reactor/agent-core";
 import type { TSchema } from "@reactor/ai";
 import { Text } from "@reactor/tui";
-import { getAgentDir, getProjectDir, parseFrontmatter as parseOmpFrontmatter } from "@reactor/utils";
+import { getAgentDir, getProjectDir, parseFrontmatter as parseReactorFrontmatter } from "@reactor/utils";
 import type { PromptTemplate } from "../config/prompt-templates";
 import { type SettingPath, Settings } from "../config/settings";
 import { EditTool } from "../edit";
@@ -375,7 +375,7 @@ export interface ParsedFrontmatter<T extends Record<string, unknown> = Record<st
 export function parseFrontmatter<T extends Record<string, unknown> = Record<string, unknown>>(
 	content: string,
 ): ParsedFrontmatter<T> {
-	const { frontmatter, body } = parseOmpFrontmatter(content, { level: "fatal" });
+	const { frontmatter, body } = parseReactorFrontmatter(content, { level: "fatal" });
 	return { frontmatter: frontmatter as T, body };
 }
 

@@ -42,7 +42,7 @@ describe("profile directories", () => {
 	let originalAgentDir = "";
 	let originalProfile: string | undefined;
 	let originalAgentDirEnv: string | undefined;
-	let originalOmpProfileEnv: string | undefined;
+	let originalReactorProfileEnv: string | undefined;
 	let originalPiProfileEnv: string | undefined;
 	let originalConfigDir: string | undefined;
 	let originalXdgDataHome: string | undefined;
@@ -53,7 +53,7 @@ describe("profile directories", () => {
 		originalAgentDir = getAgentDir();
 		originalProfile = getActiveProfile();
 		originalAgentDirEnv = process.env.REACTOR_CODING_AGENT_DIR;
-		originalOmpProfileEnv = process.env.REACTOR_PROFILE;
+		originalReactorProfileEnv = process.env.REACTOR_PROFILE;
 		originalPiProfileEnv = process.env.REACTOR_PROFILE;
 		originalConfigDir = process.env.REACTOR_CONFIG_DIR;
 		originalXdgDataHome = process.env.XDG_DATA_HOME;
@@ -103,10 +103,10 @@ describe("profile directories", () => {
 		} else {
 			setProfile(undefined);
 		}
-		if (originalOmpProfileEnv === undefined) {
+		if (originalReactorProfileEnv === undefined) {
 			delete process.env.REACTOR_PROFILE;
 		} else {
-			process.env.REACTOR_PROFILE = originalOmpProfileEnv;
+			process.env.REACTOR_PROFILE = originalReactorProfileEnv;
 		}
 		if (originalPiProfileEnv === undefined) {
 			delete process.env.REACTOR_PROFILE;

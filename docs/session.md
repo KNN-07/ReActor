@@ -76,7 +76,7 @@ Session files are JSONL: one JSON object per line.
   "version": 3,
   "id": "1f9d2a6b9c0d1234",
   "timestamp": "2026-02-16T10:20:30.000Z",
-  "cwd": "/work/pi",
+  "cwd": "/work/reactor",
   "title": "optional session title",
   "titleSource": "auto",
   "parentSession": "optional lineage marker"

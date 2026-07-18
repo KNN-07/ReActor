@@ -112,9 +112,9 @@ reactor auth-gateway check   [--strict] [--json]
 | `POST` | `/v1/chat/completions`  | bearer | OpenAI Chat Completions wire format                          |
 | `POST` | `/v1/messages`          | bearer | Anthropic Messages wire format                               |
 | `POST` | `/v1/responses`         | bearer | OpenAI Responses wire format                                 |
-| `POST` | `/v1/pi/stream`         | bearer | Native `ai` stream wire format                            |
+| `POST` | `/v1/reactor/stream`         | bearer | Native `ai` stream wire format                            |
 
-The model id is read from the top-level `model` field for foreign wire formats and from the reactor-native request body for `/v1/pi/stream`. The gateway picks the first bundled `Model<Api>` matching that id, parses the inbound wire format into an reactor `Context`, resolves the provider credential from broker-backed `AuthStorage`, dispatches through `streamSimple()`, and re-encodes the result to the inbound format (SSE for streamed responses).
+The model id is read from the top-level `model` field for foreign wire formats and from the reactor-native request body for `/v1/reactor/stream`. The gateway picks the first bundled `Model<Api>` matching that id, parses the inbound wire format into an reactor `Context`, resolves the provider credential from broker-backed `AuthStorage`, dispatches through `streamSimple()`, and re-encodes the result to the inbound format (SSE for streamed responses).
 
 There is no raw provider passthrough path. All supported routes go through `ai` provider logic so credential-specific request shaping, OAuth refresh-on-auth-error, and provider quirks stay centralized.
 

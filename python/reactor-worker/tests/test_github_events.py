@@ -530,17 +530,17 @@ def test_extract_mention_returns_body_minus_mention() -> None:
     assert extract_mention("@reactor_worker-bot do X", "reactor_worker-bot") == "do X"
 
 
-@pytest.mark.parametrize("configured_login", ["@roboomp", "roboomp[bot]", "@roboomp[bot]"])
+@pytest.mark.parametrize("configured_login", ["@reactor-worker", "reactor-worker[bot]", "@reactor-worker[bot]"])
 def test_extract_mention_accepts_prefixed_or_app_bot_login(configured_login: str) -> None:
-    assert extract_mention("@roboomp go ahead", configured_login) == "go ahead"
+    assert extract_mention("@reactor-worker go ahead", configured_login) == "go ahead"
 
 
 def test_extract_mention_strips_literal_app_suffix_from_body() -> None:
-    assert extract_mention("@roboomp[bot] go ahead", "roboomp[bot]") == "go ahead"
+    assert extract_mention("@reactor-worker[bot] go ahead", "reactor-worker[bot]") == "go ahead"
 
 
 def test_extract_mention_rejects_extended_literal_app_suffix() -> None:
-    assert extract_mention("@roboomp[bot]-helper go ahead", "roboomp[bot]") is None
+    assert extract_mention("@reactor-worker[bot]-helper go ahead", "reactor-worker[bot]") is None
 
 
 def test_extract_mention_returns_none_without_mention() -> None:

@@ -533,7 +533,7 @@ describe("Cursor exec local-work tracking (issue #4593)", () => {
 							name: "mcp__fixture_report",
 							toolName: "mcp__fixture_report",
 							toolCallId: "call-mcp-1",
-							providerIdentifier: "pi-agent",
+							providerIdentifier: "reactor-agent",
 						}),
 					},
 				}),

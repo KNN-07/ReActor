@@ -1056,8 +1056,8 @@ describe("ModelRegistry runtime discovery", () => {
 				maxTokens: 4096,
 			}),
 		);
-		// streamPiNative appends `/v1/pi/stream`, so the gateway URL must stay bare
-		// rather than gaining a `/v1` that would double to `.../v1/v1/pi/stream`.
+		// streamReactorNative appends `/v1/reactor/stream`, so the gateway URL must stay bare
+		// rather than gaining a `/v1` that would double to `.../v1/v1/reactor/stream`.
 		expect(upgraded.baseUrl).toBe("http://gw:4000");
 		expect(upgraded.transport).toBe("reactor-native");
 		expect(upgraded.reasoning).toBe(true);

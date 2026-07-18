@@ -50,7 +50,7 @@ class _Pr:
 class _Comment:
     id: int = 1
     author: str = "can1357"
-    body: str = "@roboomp please fix"
+    body: str = "@reactor-worker please fix"
     created_at: str = "2026-05-14T20:00:00Z"
 
 
@@ -114,7 +114,7 @@ def test_directive_prompt_embeds_thread_and_directive_body() -> None:
 
 def test_followup_comment_prompt_embeds_thread_context() -> None:
     thread = (
-        ThreadMessage(kind="pr_body", author="roboomp", body="PR body", created_at=""),
+        ThreadMessage(kind="pr_body", author="reactor-worker", body="PR body", created_at=""),
         ThreadMessage(kind="comment", author="can1357", body="prior request", created_at="2026-05-01T10:00:00Z"),
     )
     out = persona.followup_comment(

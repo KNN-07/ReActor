@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+### Breaking Changes
+
+- Renamed the native auth-gateway endpoint from `/v1/pi/stream` to `/v1/reactor/stream`.
+- Renamed native gateway exports (`streamPiNative`, `handlePiNative`, `isPiNativeProgressEvent`, and `PiNativeParsedRequest`) to their `Reactor` equivalents.
+
+### Fixed
+
+- Removed remaining upstream branding from OAuth callbacks, provider request identity, and encrypted auth-snapshot headers.
+
+
 ## [17.0.2] - 2026-07-17
 
 ### Fixed

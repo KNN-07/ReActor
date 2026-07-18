@@ -1,4 +1,4 @@
-# roboomp
+# reactor-worker
 
 Self-hosted GitHub triage bot. Drives [`reactor --mode rpc`](https://github.com/KNN-07/ReActor)
 as a subprocess against a per-issue git worktree, then writes back to GitHub
@@ -47,9 +47,9 @@ into the `tool_calls` table with credential-redacted args and results.
 ## Setup
 
 Requires Docker Compose v2 and a LiteLLM-style proxy on the host that your
-`~/.reactor/agent/models.container.yml` points at (mounted into the container as `models.yml`; kept under a separate filename on the host so the host reactor doesn't route through the gateway). roboomp lives inside the ReActor
-monorepo at `python/reactor_worker/`; both the docker build context and the
-`/work/pi` bind mount default to the parent monorepo (`../..`). Override
+`~/.reactor/agent/models.container.yml` points at (mounted into the container as `models.yml`; kept under a separate filename on the host so the host reactor doesn't route through the gateway). reactor-worker lives inside the ReActor
+monorepo at `python/reactor-worker/`; both the docker build context and the
+`/work/reactor` bind mount default to the parent monorepo (`../..`). Override
 `REACTOR_ROOT` only if you want a different ReActor checkout backing the build
 and runtime.
 
@@ -63,8 +63,8 @@ $EDITOR .env
 openssl rand -hex 32              # REACTOR_WORKER_GH_PROXY_HMAC_KEY
 openssl rand -hex 32              # GITHUB_WEBHOOK_SECRET
 
-bun run pi:image                  # build ReActor/pi:dev (one-time / on pi change)
-bun run reactor_worker:build && bun run reactor_worker:up
+bun run reactor:image                  # build reactor/reactor:dev (one-time / on ReActor changes)
+bun run reactor-worker:build && bun run reactor-worker:up
 curl -fsS http://localhost:8080/healthz
 ```
 
@@ -74,13 +74,13 @@ comment out `REACTOR_WORKER_GH_PROXY_URL` / `REACTOR_WORKER_GH_PROXY_HMAC_KEY` a
 `GITHUB_TOKEN`. The two modes are mutually exclusive (`config.py`
 rejects a `.env` setting both).
 
-Build invalidation is bounded: editing roboomp Python touches only the
-runtime layer; editing pi source rebuilds `ReActor/pi:dev`, which
-roboomp's `Dockerfile.reactor_worker` extends via `FROM ${REACTOR_BASE}`.
+Build invalidation is bounded: editing reactor-worker Python touches only the
+runtime layer; editing ReActor source rebuilds `reactor/reactor:dev`, which
+reactor-worker's `Dockerfile.reactor-worker` extends via `FROM ${REACTOR_BASE}`.
 
 ### Public URL
 
-roboomp does not ship a tunnel. Cloudflare, smee, ngrok are all fine. The
+reactor-worker does not ship a tunnel. Cloudflare, smee, ngrok are all fine. The
 recommended ingress rule restricts the public hostname to
 `/webhook/github` exactly; `/healthz`, `/events`, `/issues`, `/replay`
 stay localhost-only.
@@ -111,9 +111,9 @@ docker compose exec reactor_worker reactor_worker status                   # dum
 docker compose exec reactor_worker reactor_worker cleanup owner/repo#123   # force workspace removal, state=abandoned
 ```
 
-`bun run reactor_worker:…` shortcuts in the root `package.json` cover the common
-lifecycle commands (`reactor_worker:dev`, `reactor_worker:build`, `reactor_worker:up`, `reactor_worker:down`,
-`reactor_worker:logs`, `reactor_worker:restart`, `reactor_worker:reset`).
+`bun run reactor-worker:…` shortcuts in the root `package.json` cover the common
+lifecycle commands (`reactor-worker:dev`, `reactor-worker:build`, `reactor-worker:up`, `reactor-worker:down`,
+`reactor-worker:logs`, `reactor-worker:restart`, `reactor-worker:reset`).
 
 ## Tests
 
@@ -184,12 +184,12 @@ The integration test spawns a real `reactor --mode rpc` against an
 | Symptom | Check |
 |---|---|
 | `401 invalid signature` | `GITHUB_WEBHOOK_SECRET` mismatch with the repo webhook config. |
-| Container exits with `REACTOR_ROOT … missing` | `/work/pi` mount empty inside the container; on the host either run `docker compose` from `python/reactor_worker/` so `REACTOR_ROOT` defaults to `../..`, or export `REACTOR_ROOT` to a valid ReActor checkout. |
-| `git push: Authentication required` | Bot PAT lacks push, or `REACTOR_WORKER_BOT_LOGIN` does not identify the PAT account's mention handle (production: `roboomp`, no `@`/`[bot]`). |
+| Container exits with `REACTOR_ROOT … missing` | `/work/reactor` mount empty inside the container; on the host either run `docker compose` from `python/reactor-worker/` so `REACTOR_ROOT` defaults to `../..`, or export `REACTOR_ROOT` to a valid ReActor checkout. |
+| `git push: Authentication required` | Bot PAT lacks push, or `REACTOR_WORKER_BOT_LOGIN` does not identify the PAT account's mention handle (production: `reactor-worker`, no `@`/`[bot]`). |
 | `refusing to push: commit author identity mismatch` | Some commit not authored as `REACTOR_WORKER_GIT_AUTHOR_*`. The error lists the offending shas; `git commit --amend --reset-author --no-edit`. |
 | `refusing to push: working tree is dirty` | Uncommitted agent edits. Or just call `gh_open_pr`, which auto-commits `bun run fix` output. |
 | `bun check failed before PR creation` | Fix the reported failure and retry `gh_open_pr`. |
-| `Failed to load reactor_natives` | Wrong arch / missing native. `bun run pi:image` then `bun run reactor_worker:build`. |
+| `Failed to load reactor_natives` | Wrong arch / missing native. `bun run reactor:image` then `bun run reactor-worker:build`. |
 | `No API key found for <provider>` | `~/.reactor/agent/models.container.yml` mount missing or provider id mismatch with `REACTOR_WORKER_MODEL`. |
 
 ## Layout

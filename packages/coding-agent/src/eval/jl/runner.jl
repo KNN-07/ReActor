@@ -498,9 +498,9 @@ function build_mime_bundle(value)
     return bundle
 end
 
-struct OmpDisplay <: AbstractDisplay end
+struct ReactorDisplay <: AbstractDisplay end
 
-function Base.display(d::OmpDisplay, value)
+function Base.display(d::ReactorDisplay, value)
     rid = current_rid
     if rid !== nothing
         bundle = build_mime_bundle(value)
@@ -509,7 +509,7 @@ function Base.display(d::OmpDisplay, value)
     return nothing
 end
 
-pushdisplay(OmpDisplay())
+pushdisplay(ReactorDisplay())
 
 function emit_error(rid, err, bt)
     io = IOBuffer()

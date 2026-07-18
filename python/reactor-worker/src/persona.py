@@ -175,7 +175,7 @@ def dirty_state_reminder(
     """Reminder injected when the worktree has uncommitted or unpushed work.
 
     Fired by `worker._drive_turn` after the model emits a terminal turn but
-    leaves changes behind that roboomp would otherwise discard. The summary
+    leaves changes behind that reactor-worker would otherwise discard. The summary
     embedded in the template comes from `git_ops.inspect_dirty_state` so the
     agent sees the exact paths / commits it forgot about.
     """

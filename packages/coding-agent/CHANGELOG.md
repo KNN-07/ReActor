@@ -8,6 +8,11 @@
 - Added desktop session rename/archive controls, persisted archive metadata, Git status/diff/stage/unstage/discard/commit operations, and autonomy pause/resume control through existing SDK services.
 - Added built-in `/survey`, `/peer-review`, and resumable `/autopaper` research workflows with SQLite checkpoints and verified artifact validation.
 
+### Changed
+
+- Completed the ReActor rebrand across provider headers and internal runtime, extension, protocol, and evaluation-bridge identifiers.
+- Updated the native gateway configuration and documentation references to `/v1/reactor/stream`.
+
 ## [17.0.2] - 2026-07-17
 
 ### Added

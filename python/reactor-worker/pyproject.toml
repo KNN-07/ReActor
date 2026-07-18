@@ -49,7 +49,7 @@ filterwarnings = [
 line-length = 120
 target-version = "py311"
 src = ["src", "tests"]
-extend-exclude = [".pi-context", "data"]
+extend-exclude = [".reactor-context", "data"]
 
 [tool.ruff.lint]
 select = [

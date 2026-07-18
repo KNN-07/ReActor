@@ -1,6 +1,6 @@
-"""gh-proxy: PAT-holding companion service for roboomp.
+"""gh-proxy: PAT-holding companion service for reactor-worker.
 
-roboomp container holds zero credentials; every GitHub side-effect (REST +
+reactor-worker container holds zero credentials; every GitHub side-effect (REST +
 git clone/fetch/push) flows through this service over an HMAC-authenticated
 internal channel. See `reactor_worker.proxy.server` for the request surface.
 """

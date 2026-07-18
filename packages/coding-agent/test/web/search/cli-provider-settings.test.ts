@@ -28,7 +28,7 @@ const WEB_SEARCH_ENV_KEYS = [
 ] as const;
 
 const originalAgentDir = process.env.REACTOR_CODING_AGENT_DIR;
-const originalOmpProfile = process.env.REACTOR_PROFILE;
+const originalReactorProfile = process.env.REACTOR_PROFILE;
 const originalPiProfile = process.env.REACTOR_PROFILE;
 
 let tempAgentDir: TempDir | undefined;
@@ -105,7 +105,7 @@ afterEach(async () => {
 		restoreEnv(key, originalEnv[key]);
 	}
 	restoreEnv("REACTOR_CODING_AGENT_DIR", originalAgentDir);
-	restoreEnv("REACTOR_PROFILE", originalOmpProfile);
+	restoreEnv("REACTOR_PROFILE", originalReactorProfile);
 	restoreEnv("REACTOR_PROFILE", originalPiProfile);
 	__resetDirsFromEnvForTests();
 	if (tempAgentDir) {

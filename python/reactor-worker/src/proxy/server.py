@@ -1,6 +1,6 @@
 """gh-proxy FastAPI app: HMAC-gated GitHub REST + git proxy.
 
-Robomp calls every endpoint with HMAC headers (see `reactor_worker.proxy_hmac`).
+ReActor Worker calls every endpoint with HMAC headers (see `reactor_worker.proxy_hmac`).
 Authenticated requests dispatch to a single `GitHubClient` instance holding
 the PAT, or to `reactor_worker.git_ops` for git transport. The PAT never leaves
 this process.

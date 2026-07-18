@@ -49,7 +49,7 @@ import {
 	preloadPluginRoots,
 	resolveActiveProjectRegistryPath,
 } from "./discovery/helpers";
-import { injectOmpExtensionCliRoots } from "./discovery/reactor-extension-roots";
+import { injectReactorExtensionCliRoots } from "./discovery/reactor-extension-roots";
 import { ExtensionRunner } from "./extensibility/extensions/runner";
 import type { ExtensionUIContext } from "./extensibility/extensions/types";
 import { scheduleMarketplaceAutoUpdate } from "./extensibility/plugins/marketplace-auto-update";
@@ -1133,7 +1133,7 @@ export async function runRootCommand(
 	if (!parsedArgs.noExtensions) {
 		const cliExtensions = [...(parsedArgs.extensions ?? []), ...(parsedArgs.hooks ?? [])];
 		if (cliExtensions.length > 0) {
-			injectOmpExtensionCliRoots(cliExtensions, home, getProjectDir());
+			injectReactorExtensionCliRoots(cliExtensions, home, getProjectDir());
 		}
 	}
 

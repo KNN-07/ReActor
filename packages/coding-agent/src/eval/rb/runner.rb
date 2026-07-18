@@ -275,7 +275,7 @@ end
 # User stdout/stderr proxies — emit typed frames for the current request.
 # ---------------------------------------------------------------------------
 
-class OmpStreamProxy
+class ReactorStreamProxy
   def initialize(kind, io, fileno)
     @kind = kind
     @io = io
@@ -550,8 +550,8 @@ end
 # ---------------------------------------------------------------------------
 
 def __reactor_main
-  $stdout = OmpStreamProxy.new("stdout", STDOUT, 1)
-  $stderr = OmpStreamProxy.new("stderr", STDERR, 2)
+  $stdout = ReactorStreamProxy.new("stdout", STDOUT, 1)
+  $stderr = ReactorStreamProxy.new("stderr", STDERR, 2)
   __reactor_install_idle_sigint
   __reactor_start_parent_watchdog
   __reactor_start_capture_drain($__reactor_stdout_capture_read, "stdout")

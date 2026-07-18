@@ -41,7 +41,6 @@ packages/ai/test/.temp-images/
 # Project specific
 !.reactor/
 .reactor/plugins/
-.pi_config/
 .opencode/
 .worktrees/
 .worktree/
@@ -53,7 +52,7 @@ __pycache__/
 syntax.jsonl
 out.jsonl
 out.html
-pi-*.html
+reactor-*.html
 
 # Generated files
 packages/coding-agent/src/export/html/tool-views.generated.js

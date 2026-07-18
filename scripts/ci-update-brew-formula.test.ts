@@ -11,6 +11,10 @@ const SUMS = {
 describe("renderFormula", () => {
 	const formula = renderFormula("15.12.1", SUMS);
 
+	it("uses the ReActor formula class", () => {
+		expect(formula).toStartWith("class Reactor < Formula");
+	});
+
 	// Regression: bare-binary URLs must opt out of Homebrew's UnpackStrategy.
 	// Without `using: :nounzip` the default CurlDownloadStrategy nests the file
 	// outside the staging CWD, `Dir["reactor-*"].first` returns `nil`, and

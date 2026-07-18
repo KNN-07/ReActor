@@ -106,7 +106,7 @@ providers:
 
 - `auth`: `apiKey` (default), `none`, or `oauth`; for `models.yml` custom models, `oauth` is accepted by schema but does not waive the `apiKey` requirement
 - `discovery.type`: `ollama`, `llama.cpp`, `lm-studio`, `openai-models-list`, `proxy`, or `litellm`
-- `transport`: `reactor-native` only. When set, every model under that provider is sent to an `reactor auth-gateway` compatible `baseUrl` via `POST /v1/pi/stream`; `apiKey` is the gateway bearer.
+- `transport`: `reactor-native` only. When set, every model under that provider is sent to an `reactor auth-gateway` compatible `baseUrl` via `POST /v1/reactor/stream`; `apiKey` is the gateway bearer.
 
 ## Validation rules (current)
 

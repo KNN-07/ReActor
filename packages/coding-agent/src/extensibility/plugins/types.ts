@@ -1,5 +1,5 @@
 // =============================================================================
-// Plugin Manifest Types (from package.json reactor/pi field)
+// Plugin Manifest Types (from package.json ReActor plugin field)
 // =============================================================================
 
 /**
@@ -106,7 +106,7 @@ export interface InstalledPlugin {
 	version: string;
 	/** Absolute path to package directory */
 	path: string;
-	/** Parsed reactor/pi manifest */
+	/** Parsed ReActor plugin manifest */
 	manifest: PluginManifest;
 	/**
 	 * Enabled features:

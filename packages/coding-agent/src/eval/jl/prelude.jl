@@ -473,13 +473,13 @@ function __reactor_call_bridge(name::String, args::Dict{String, Any})
     return get(parsed_resp, "value", nothing)
 end
 
-struct OmpToolProxy end
+struct ReactorToolProxy end
 
-struct OmpToolCallable
+struct ReactorToolCallable
     name::String
 end
 
-function (tc::OmpToolCallable)(args...; kwargs...)
+function (tc::ReactorToolCallable)(args...; kwargs...)
     args_dict = Dict{String, Any}()
     if length(args) == 1 && args[1] isa AbstractDict
         for (k, v) in args[1]
@@ -493,11 +493,11 @@ function (tc::OmpToolCallable)(args...; kwargs...)
     return __reactor_call_bridge("tool:" * tc.name, args_dict)
 end
 
-function Base.getproperty(::OmpToolProxy, sym::Symbol)
-    return OmpToolCallable(string(sym))
+function Base.getproperty(::ReactorToolProxy, sym::Symbol)
+    return ReactorToolCallable(string(sym))
 end
 
-const tool = OmpToolProxy()
+const tool = ReactorToolProxy()
 
 # -------------------------------------------------------------------------
 # Agent calls
@@ -684,7 +684,7 @@ end
 # Budget
 # -------------------------------------------------------------------------
 
-struct OmpBudgetProxy end
+struct ReactorBudgetProxy end
 
 function __reactor_budget_snapshot()
     try
@@ -710,7 +710,7 @@ function __reactor_budget_int(value, default::Int=0)
     return default
 end
 
-function Base.getproperty(::OmpBudgetProxy, sym::Symbol)
+function Base.getproperty(::ReactorBudgetProxy, sym::Symbol)
     if sym === :total
         snap = __reactor_budget_snapshot()
         return get(snap, "total", nothing)
@@ -732,4 +732,4 @@ function Base.getproperty(::OmpBudgetProxy, sym::Symbol)
     error("Unknown budget metric: $sym")
 end
 
-const budget = OmpBudgetProxy()
+const budget = ReactorBudgetProxy()

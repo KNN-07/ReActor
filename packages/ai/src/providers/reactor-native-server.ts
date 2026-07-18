@@ -19,7 +19,7 @@
  * actual cost.
  *
  * Endpoint contract:
- *   POST /v1/pi/stream
+ *   POST /v1/reactor/stream
  *   body:    { modelId, context, options?, stream? }   // `stream` defaults to true
  *   200 SSE: stream of `AssistantMessageEvent` (terminated by `data: [DONE]`)
  *   200 JSON (stream=false): { message: AssistantMessage }
@@ -30,7 +30,7 @@ import type { AuthGatewayStreamControl } from "../auth-gateway/types";
 import * as AIError from "../error";
 import type { AssistantMessageEventStream, Context, SimpleStreamOptions } from "../types";
 
-export interface PiNativeParsedRequest {
+export interface ReactorNativeParsedRequest {
 	modelId: string;
 	context: Context;
 	options: SimpleStreamOptions;
@@ -92,7 +92,7 @@ const ALLOWED_OPTION_KEYS: ReadonlySet<keyof SimpleStreamOptions> = new Set([
  * existing `streamProxy` client (which sends the full Model object) can target
  * the gateway with only a URL swap.
  */
-export function parseRequest(body: unknown, _headers?: Headers): PiNativeParsedRequest {
+export function parseRequest(body: unknown, _headers?: Headers): ReactorNativeParsedRequest {
 	if (typeof body !== "object" || body === null || Array.isArray(body)) {
 		throw new AIError.ValidationError("Request body must be a JSON object");
 	}

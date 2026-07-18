@@ -273,7 +273,7 @@ const ProviderConfigSchema = type({
 	/**
 	 * Streaming transport override. When set to `"reactor-native"`, reactor dispatches
 	 * every model under this provider via the auth-gateway's
-	 * `POST /v1/pi/stream` endpoint instead of the per-provider SDK. The
+	 * `POST /v1/reactor/stream` endpoint instead of the per-provider SDK. The
 	 * provider's `baseUrl` must point at a compatible `reactor auth-gateway`
 	 * and `apiKey` must carry the gateway bearer.
 	 */

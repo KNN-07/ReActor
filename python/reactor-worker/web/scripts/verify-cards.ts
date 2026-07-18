@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * Robomp Lifecycle Cards Verification Harness.
+ * ReActor Worker Lifecycle Cards Verification Harness.
  * Drives headless Chrome to assert layout, contrast, interactions, and edge cases.
  */
 import * as fs from "node:fs/promises";
@@ -988,7 +988,7 @@ async function main(): Promise<void> {
 
   // 8. Interactions (clicks).
   // Serve a replay-enabled index with a KNOWN token so every privileged
-  // request carries an auditable `X-Robreactor-Replay-Token: trigger-secret`
+  // request carries an auditable `X-Reactor-Worker-Replay-Token: trigger-secret`
   // header, independent of whatever token the live server was started with.
   const REPLAY_TOKEN = "trigger-secret";
   const replayResp = await fetch(BASE_URL);

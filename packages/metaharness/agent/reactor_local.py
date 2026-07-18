@@ -1,7 +1,7 @@
 """Harbor agent that runs the LOCAL ReActor (`reactor`) build inside task containers.
 
 Unlike Harbor's built-in `pi` agent (which `npm i -g @mariozechner/coding-agent`),
-this runs the working tree at `/work/pi`. Install modes (`REACTOR_BENCH_INSTALL`):
+this runs the working tree at `/work/reactor`. Install modes (`REACTOR_BENCH_INSTALL`):
 
   * `source` (default): the runner bind-mounts the repo read-only plus a
     prebuilt linux `node_modules` tree and a linux `bun` binary; reactor runs

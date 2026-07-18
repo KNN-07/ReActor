@@ -29,8 +29,8 @@ import type { LoadContext, Provider } from "@reactor/coding-agent/capability/typ
 // Register all discovery providers as a side effect.
 import "@reactor/coding-agent/discovery";
 import {
-	clearOmpExtensionCliRoots,
-	injectOmpExtensionCliRoots,
+	clearReactorExtensionCliRoots,
+	injectReactorExtensionCliRoots,
 } from "@reactor/coding-agent/discovery/reactor-extension-roots";
 import { getConfigRootDir, removeSyncWithRetries, setAgentDir } from "@reactor/utils";
 
@@ -87,7 +87,7 @@ function buildExtensionPackage(packageDir: string): void {
 
 beforeEach(() => {
 	clearCache();
-	clearOmpExtensionCliRoots();
+	clearReactorExtensionCliRoots();
 	tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "reactor-plugins-"));
 	home = path.join(tempDir, "home");
 	project = path.join(tempDir, "project");
@@ -101,7 +101,7 @@ beforeEach(() => {
 
 afterEach(() => {
 	clearCache();
-	clearOmpExtensionCliRoots();
+	clearReactorExtensionCliRoots();
 	if (originalAgentDirEnv) {
 		setAgentDir(originalAgentDirEnv);
 	} else {
@@ -147,7 +147,7 @@ test("user settings.json#extensions also feeds sub-discovery", async () => {
 
 test("`--extension` CLI injection is wired through the same provider", async () => {
 	// Empty settings on disk; rely purely on CLI injection.
-	injectOmpExtensionCliRoots([ext], home, project);
+	injectReactorExtensionCliRoots([ext], home, project);
 
 	const skills = await loadFromPlugin<{ name: string }>(skillCapability.id, ctx());
 	const tools = await loadFromPlugin<{ name: string }>(toolCapability.id, ctx());

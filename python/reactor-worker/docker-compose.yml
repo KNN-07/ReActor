@@ -1,6 +1,6 @@
 services:
   # ───────────────────────────────────────────────────────────────────────────
-  # roboomp orchestrator
+  # reactor-worker orchestrator
   #
   # NOTE: `env_file:` is INTENTIONALLY ABSENT. We never want the gh-proxy's
   # PAT (`GITHUB_TOKEN` in .env) to leak into this container's environment.
@@ -11,17 +11,17 @@ services:
   # ───────────────────────────────────────────────────────────────────────────
   reactor_worker:
     build:
-      # pi root: gives the web-builder stage access to the workspace
+      # repository root: gives the web-builder stage access to the workspace
       # bun.lock + catalog (web/package.json refs `catalog:` versions).
-      # python/reactor_worker/data and pi-root excludes are filtered via
-      # Dockerfile.reactor_worker.dockerignore at the context root.
+      # python/reactor-worker/data and repository-root excludes are filtered via
+      # Dockerfile.reactor-worker.dockerignore at the context root.
       context: ../..
-      dockerfile: Dockerfile.reactor_worker
+      dockerfile: Dockerfile.reactor-worker
       args:
-        # Tag of the pre-built pi-base image produced by `bun run pi:image`
-        # (sources: pi root /Dockerfile). Override per-environment as needed.
-        REACTOR_BASE: ReActor/pi:dev
-    image: reactor_worker:dev
+        # Tag of the pre-built reactor-base image produced by `bun run reactor:image`
+        # (sources: repository root /Dockerfile). Override per-environment as needed.
+        REACTOR_BASE: reactor/reactor:dev
+    image: reactor-worker:dev
     container_name: reactor_worker
     # Phase B (graceful shutdown): gives the orchestrator at least
     # REACTOR_WORKER_SHUTDOWN_DRAIN_TIMEOUT_SECONDS + REACTOR_WORKER_SHUTDOWN_KILL_TIMEOUT_SECONDS
@@ -80,7 +80,7 @@ services:
       REACTOR_WORKER_LOG_DIR: /data/logs
       REACTOR_WORKER_BIND_HOST: ${REACTOR_WORKER_BIND_HOST:-0.0.0.0}
       REACTOR_WORKER_BIND_PORT: ${REACTOR_WORKER_BIND_PORT:-8080}
-      REACTOR_ROOT: /work/pi
+      REACTOR_ROOT: /work/reactor
     depends_on:
       gh-proxy:
         condition: service_started
@@ -93,7 +93,7 @@ services:
       - default
       - reactor_worker_internal
     volumes:
-      - ${REACTOR_ROOT:-../..}:/work/pi:ro
+      - ${REACTOR_ROOT:-../..}:/work/reactor:ro
       - reactor_worker_data:/data
       # Host agent config is mounted read-only under /srv/agent-home-stage
       # with host-controlled permissions. The entrypoint copies it into
@@ -116,7 +116,7 @@ services:
   # allowlist below is the only place where any var lands in this container.
   # ───────────────────────────────────────────────────────────────────────────
   gh-proxy:
-    image: reactor_worker:dev
+    image: reactor-worker:dev
     container_name: gh-proxy
     restart: unless-stopped
     command: ["python", "-m", "reactor_worker.proxy", "serve"]

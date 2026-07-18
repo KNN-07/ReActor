@@ -111,7 +111,7 @@ def _resolve_pragma_overrides(
 
 _SCRUBBED_ENV_KEYS: tuple[str, ...] = (
     # Secrets that MUST NOT reach the agent subprocess; an agent with the
-    # `bash` tool could otherwise `printenv` them out of roboomp's env.
+    # `bash` tool could otherwise `printenv` them out of reactor-worker's env.
     "GITHUB_TOKEN",
     "GITHUB_WEBHOOK_SECRET",
     "REACTOR_WORKER_REPLAY_TOKEN",
@@ -388,9 +388,9 @@ def _drive_turn(
 
 
 def _has_prior_session(session_dir: Path) -> bool:
-    """Return True iff `session_dir` already contains an reactor JSONL transcript.
+    """Return True iff `session_dir` already contains a ReActor JSONL transcript.
 
-    pi's `coding-agent` writes one `*.jsonl` per session into `--session-dir`.
+    ReActor's `coding-agent` writes one `*.jsonl` per session into `--session-dir`.
     The presence of any such file is the signal that `--continue` will pick
     up the most recent transcript (`SessionManager.continueRecent`) rather
     than starting fresh.
@@ -521,7 +521,7 @@ def _run_rpc_blocking(
     rpc_env.update(_safe_directory_env(bindings.workspace.repo_dir))
     rpc_env.update(_git_identity_env(inputs.settings.resolved_author_name, inputs.settings.git_author_email))
     # Bare worktrees have no node_modules; install (idempotently) so the agent
-    # can resolve workspace packages (@reactor/pi-*) and actually run tests.
+    # can resolve workspace packages (@reactor/*) and actually run tests.
     host_tools.ensure_workspace_dependencies(bindings)
     resuming = _has_prior_session(bindings.workspace.session_dir)
     extra_args: tuple[str, ...] = ("--continue",) if resuming else ()

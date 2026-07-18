@@ -5,8 +5,8 @@ import * as path from "node:path";
 import { disableProvider, enableProvider } from "@reactor/coding-agent/capability";
 import { clearCache as clearFsCache } from "@reactor/coding-agent/capability/fs";
 import {
-	clearOmpExtensionCliRoots,
-	injectOmpExtensionCliRoots,
+	clearReactorExtensionCliRoots,
+	injectReactorExtensionCliRoots,
 } from "@reactor/coding-agent/discovery/reactor-extension-roots";
 import { discoverAgents } from "@reactor/coding-agent/task/discovery";
 import { removeWithRetries } from "@reactor/utils";
@@ -38,7 +38,7 @@ const CLAUDE_AGENT_MD = [
 	"You are a Claude Code custom subagent.",
 ].join("\n");
 
-async function writeOmpPluginAgent(home: string): Promise<void> {
+async function writeReactorPluginAgent(home: string): Promise<void> {
 	const userPluginsRoot = path.join(home, ".reactor", "plugins");
 	const pluginRoot = path.join(userPluginsRoot, "node_modules", "loom");
 	await fs.mkdir(path.join(pluginRoot, "agents"), { recursive: true });
@@ -69,7 +69,7 @@ describe("discoverAgents", () => {
 
 	afterEach(async () => {
 		enableProvider("reactor-plugins");
-		clearOmpExtensionCliRoots();
+		clearReactorExtensionCliRoots();
 		clearFsCache();
 		await removeWithRetries(tempHome);
 	});
@@ -92,7 +92,7 @@ describe("discoverAgents", () => {
 	});
 
 	test("loads agents from ReActor npm plugins under <home>/.reactor/plugins/node_modules", async () => {
-		await writeOmpPluginAgent(tempHome);
+		await writeReactorPluginAgent(tempHome);
 
 		const { agents } = await discoverAgents(projectDir, tempHome);
 		const names = agents.map(agent => agent.name);
@@ -101,7 +101,7 @@ describe("discoverAgents", () => {
 	});
 
 	test("excludes ReActor npm plugin agents when reactor-plugins is disabled", async () => {
-		await writeOmpPluginAgent(tempHome);
+		await writeReactorPluginAgent(tempHome);
 		disableProvider("reactor-plugins");
 
 		const { agents } = await discoverAgents(projectDir, tempHome);
@@ -111,7 +111,7 @@ describe("discoverAgents", () => {
 	});
 
 	test("CLI extension agents win over project `extensions:` settings on dedup", async () => {
-		// listOmpExtensionRoots returns roots in source-precedence order
+		// listReactorExtensionRoots returns roots in source-precedence order
 		// (CLI > project settings > user settings > installed plugins). Agents
 		// must honor that order so the `task` surface dedups identically to
 		// the skills/hooks/tools surface in discovery/reactor-plugins.ts.
@@ -133,7 +133,7 @@ describe("discoverAgents", () => {
 			path.join(projectDir, ".reactor", "settings.json"),
 			JSON.stringify({ extensions: [projectExt] }),
 		);
-		injectOmpExtensionCliRoots([cliExt], tempHome, projectDir);
+		injectReactorExtensionCliRoots([cliExt], tempHome, projectDir);
 
 		const { agents } = await discoverAgents(projectDir, tempHome);
 		const collide = agents.find(agent => agent.name === "collide");

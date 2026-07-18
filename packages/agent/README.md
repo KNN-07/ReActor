@@ -1,17 +1,17 @@
-# @reactor/pi-agent
+# @reactor/agent-core
 
 Stateful agent with tool execution and event streaming. Built on `@reactor/ai`.
 
 ## Installation
 
 ```bash
-npm install @reactor/pi-agent
+npm install @reactor/agent-core
 ```
 
 ## Quick Start
 
 ```typescript
-import { Agent } from "@reactor/pi-agent";
+import { Agent } from "@reactor/agent-core";
 import { getModel } from "@reactor/ai";
 
 const agent = new Agent({
@@ -255,7 +255,7 @@ steering until the current turn completes.
 Extend `AgentMessage` via declaration merging:
 
 ```typescript
-declare module "@reactor/pi-agent" {
+declare module "@reactor/agent-core" {
 	interface CustomAgentMessages {
 		notification: { role: "notification"; text: string; timestamp: number };
 	}
@@ -328,7 +328,7 @@ Thrown errors are caught by the agent and reported to the LLM as tool errors wit
 For browser apps that proxy through a backend:
 
 ```typescript
-import { Agent, streamProxy } from "@reactor/pi-agent";
+import { Agent, streamProxy } from "@reactor/agent-core";
 
 const agent = new Agent({
 	streamFn: (model, context, options) =>
@@ -345,7 +345,7 @@ const agent = new Agent({
 For direct control without the Agent class:
 
 ```typescript
-import { agentLoop, agentLoopContinue } from "@reactor/pi-agent";
+import { agentLoop, agentLoopContinue } from "@reactor/agent-core";
 
 const context: AgentContext = {
 	systemPrompt: ["You are helpful."],
@@ -445,7 +445,7 @@ fold N summaries with `aggregateAgentRunSummaries` / `aggregateAgentRunCoverage`
 import {
 	aggregateAgentRunSummaries,
 	aggregateAgentRunCoverage,
-} from "@reactor/pi-agent";
+} from "@reactor/agent-core";
 
 const summaries: AgentRunSummary[] = [];
 const coverages: AgentRunCoverage[] = [];
@@ -461,7 +461,7 @@ const runCoverage = aggregateAgentRunCoverage(coverages);
 
 ### Tool status reporting
 
-`execute_tool` spans carry `pi.gen_ai.tool.status` ∈
+`execute_tool` spans carry `reactor.gen_ai.tool.status` ∈
 `"ok" | "error" | "skipped" | "blocked" | "timeout" | "aborted"`.
 `beforeToolCall` blocks throw a distinguishable `ToolCallBlockedError`
 internally; the catch path reports `status: "blocked"` instead of conflating

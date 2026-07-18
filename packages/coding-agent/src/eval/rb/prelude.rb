@@ -277,7 +277,7 @@ unless defined?($__reactor_prelude_loaded) && $__reactor_prelude_loaded
   # Host tool bridge (loopback HTTP) — `tool.<name>(args)`, completion, agent.
   # -------------------------------------------------------------------------
 
-  module OmpBridge
+  module ReactorBridge
     INTENT_FIELD = "i"
 
     module_function
@@ -340,13 +340,13 @@ unless defined?($__reactor_prelude_loaded) && $__reactor_prelude_loaded
   end
 
   # `tool[:name]` form — a reusable one-tool callable.
-  class OmpToolCallable
+  class ReactorToolCallable
     def initialize(name)
       @name = name
     end
 
     def call(args = nil, **kwargs)
-      OmpBridge.tool_call(@name, args, kwargs)
+      ReactorBridge.tool_call(@name, args, kwargs)
     end
 
     def to_proc
@@ -360,13 +360,13 @@ unless defined?($__reactor_prelude_loaded) && $__reactor_prelude_loaded
 
   # `tool.<name>(args)` proxy. BasicObject so helper methods defined on Object
   # (read/write/…) never shadow a tool name — every call routes to the bridge.
-  class OmpToolProxy < BasicObject
+  class ReactorToolProxy < BasicObject
     def method_missing(name, args = nil, **kwargs)
-      ::OmpBridge.tool_call(name.to_s, args, kwargs)
+      ::ReactorBridge.tool_call(name.to_s, args, kwargs)
     end
 
     def [](name)
-      ::OmpToolCallable.new(name.to_s)
+      ::ReactorToolCallable.new(name.to_s)
     end
 
     def respond_to_missing?(_name, _include_private = false)
@@ -380,14 +380,14 @@ unless defined?($__reactor_prelude_loaded) && $__reactor_prelude_loaded
   end
 
   def tool
-    $__reactor_tool_proxy ||= OmpToolProxy.new
+    $__reactor_tool_proxy ||= ReactorToolProxy.new
   end
 
   def completion(prompt, model: "default", system: nil, schema: nil)
     args = { "prompt" => prompt, "model" => model }
     args["system"] = system unless system.nil?
     args["schema"] = schema unless schema.nil?
-    res = OmpBridge.call("__completion__", args)
+    res = ReactorBridge.call("__completion__", args)
     text = res.is_a?(Hash) ? res["text"] : res
     schema.nil? ? text : JSON.parse(text)
   end
@@ -405,7 +405,7 @@ unless defined?($__reactor_prelude_loaded) && $__reactor_prelude_loaded
     args["merge"] = !!merge unless merge.nil?
     # Tell the bridge a handle is wanted so it preserves the backing artifacts.
     args["handle"] = true if handle
-    res = OmpBridge.call("__agent__", args)
+    res = ReactorBridge.call("__agent__", args)
     text = res.is_a?(Hash) ? res["text"] : res
     parsed = schema.nil? ? text : JSON.parse(text)
     return parsed unless handle
@@ -439,7 +439,7 @@ unless defined?($__reactor_prelude_loaded) && $__reactor_prelude_loaded
   # -------------------------------------------------------------------------
 
   def __reactor_concurrency_limit
-    snap = (OmpBridge.call("__concurrency__", {}) rescue nil) || {}
+    snap = (ReactorBridge.call("__concurrency__", {}) rescue nil) || {}
     n = (snap["limit"] || 0).to_i
     n > 0 ? n : 0
   rescue StandardError
@@ -516,31 +516,31 @@ unless defined?($__reactor_prelude_loaded) && $__reactor_prelude_loaded
   end
 
   # Live view of the host Goal Mode token budget via the host bridge.
-  class OmpBudget
+  class ReactorBudget
     def total
-      snap = (OmpBridge.call("__budget__", {}) || {})
+      snap = (ReactorBridge.call("__budget__", {}) || {})
       snap["total"]
     end
 
     def hard
-      snap = (OmpBridge.call("__budget__", {}) || {})
+      snap = (ReactorBridge.call("__budget__", {}) || {})
       snap["hard"] ? true : false
     end
 
     def spent
-      snap = (OmpBridge.call("__budget__", {}) || {})
+      snap = (ReactorBridge.call("__budget__", {}) || {})
       (snap["spent"] || 0).to_i
     end
 
     def remaining
-      snap = (OmpBridge.call("__budget__", {}) || {})
+      snap = (ReactorBridge.call("__budget__", {}) || {})
       total = snap["total"]
       return Float::INFINITY if total.nil?
       [0, total - (snap["spent"] || 0).to_i].max
     end
 
     def inspect
-      snap = ((OmpBridge.call("__budget__", {}) rescue nil) || {})
+      snap = ((ReactorBridge.call("__budget__", {}) rescue nil) || {})
       "#<budget total=#{snap["total"].inspect} spent=#{snap["spent"].inspect}>"
     rescue StandardError
       "#<budget unavailable>"
@@ -548,6 +548,6 @@ unless defined?($__reactor_prelude_loaded) && $__reactor_prelude_loaded
   end
 
   def budget
-    $__reactor_budget ||= OmpBudget.new
+    $__reactor_budget ||= ReactorBudget.new
   end
 end

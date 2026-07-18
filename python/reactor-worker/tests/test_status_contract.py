@@ -266,7 +266,7 @@ def test_cancel_happy_path(env, monkeypatch: pytest.MonkeyPatch) -> None:
         resp = client.post(
             "/api/cancel",
             json={"delivery_id": "run-cancel-1"},
-            headers={"X-Robreactor-Replay-Token": token},
+            headers={"X-Reactor-Worker-Replay-Token": token},
         )
         assert resp.status_code == 202
         assert resp.json() == {
@@ -296,7 +296,7 @@ def test_cancel_errors_and_gating(env, monkeypatch: pytest.MonkeyPatch) -> None:
         resp = client.post(
             "/api/cancel",
             json={"delivery_id": "nope"},
-            headers={"X-Robreactor-Replay-Token": token},
+            headers={"X-Reactor-Worker-Replay-Token": token},
         )
         assert resp.status_code == 404
 
@@ -304,7 +304,7 @@ def test_cancel_errors_and_gating(env, monkeypatch: pytest.MonkeyPatch) -> None:
         resp = client.post(
             "/api/cancel",
             json={"delivery_id": "run-cancel-2"},
-            headers={"X-Robreactor-Replay-Token": token},
+            headers={"X-Reactor-Worker-Replay-Token": token},
         )
         assert resp.status_code == 409
         queued = db.get_event("run-cancel-2")
@@ -315,7 +315,7 @@ def test_cancel_errors_and_gating(env, monkeypatch: pytest.MonkeyPatch) -> None:
         resp = client.post(
             "/api/cancel",
             json={"delivery_id": "run-cancel-2"},
-            headers={"X-Robreactor-Replay-Token": "bad-token"},
+            headers={"X-Reactor-Worker-Replay-Token": "bad-token"},
         )
         assert resp.status_code == 401
 
@@ -336,7 +336,7 @@ def test_cancel_errors_and_gating(env, monkeypatch: pytest.MonkeyPatch) -> None:
         resp = client.post(
             "/api/cancel",
             json={"delivery_id": "run-cancel-2"},
-            headers={"X-Robreactor-Replay-Token": token},
+            headers={"X-Reactor-Worker-Replay-Token": token},
         )
         assert resp.status_code == 404
 
@@ -372,7 +372,7 @@ def test_retry_state_transition(env, monkeypatch: pytest.MonkeyPatch) -> None:
         resp = client.post(
             "/api/trigger",
             json={"mode": "retry", "delivery_id": "failed-retry-1"},
-            headers={"X-Robreactor-Replay-Token": token},
+            headers={"X-Reactor-Worker-Replay-Token": token},
         )
         assert resp.status_code == 202
         assert resp.json() == {

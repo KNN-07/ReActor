@@ -42,7 +42,7 @@ describe("global --profile flag", () => {
 	let originalProfile: string | undefined;
 	let originalAgentDir = "";
 	let originalAgentDirEnv: string | undefined;
-	let originalOmpProfileEnv: string | undefined;
+	let originalReactorProfileEnv: string | undefined;
 	let originalPiProfileEnv: string | undefined;
 	let originalConfigDir: string | undefined;
 
@@ -50,7 +50,7 @@ describe("global --profile flag", () => {
 		originalProfile = getActiveProfile();
 		originalAgentDir = getAgentDir();
 		originalAgentDirEnv = process.env.REACTOR_CODING_AGENT_DIR;
-		originalOmpProfileEnv = process.env.REACTOR_PROFILE;
+		originalReactorProfileEnv = process.env.REACTOR_PROFILE;
 		originalPiProfileEnv = process.env.REACTOR_PROFILE;
 		originalConfigDir = process.env.REACTOR_CONFIG_DIR;
 		configDir = `.reactor-profile-cli-test-${Snowflake.next()}`;
@@ -73,10 +73,10 @@ describe("global --profile flag", () => {
 		} else {
 			setProfile(undefined);
 		}
-		if (originalOmpProfileEnv === undefined) {
+		if (originalReactorProfileEnv === undefined) {
 			delete process.env.REACTOR_PROFILE;
 		} else {
-			process.env.REACTOR_PROFILE = originalOmpProfileEnv;
+			process.env.REACTOR_PROFILE = originalReactorProfileEnv;
 		}
 		if (originalPiProfileEnv === undefined) {
 			delete process.env.REACTOR_PROFILE;

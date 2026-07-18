@@ -113,7 +113,7 @@ async function parseProgram(code: string): Promise<{ program: { body: ReadonlyAr
 const DYNAMIC_IMPORT_CALLEE =
 	'(typeof __reactor_import__ === "function" ? __reactor_import__ : (s, o) => import(s, o))';
 
-function buildOmpImportCall(sourceLiteral: string, optionsLiteral: string | undefined): string {
+function buildReactorImportCall(sourceLiteral: string, optionsLiteral: string | undefined): string {
 	// Route every static import through the worker-injected `__reactor_import__` helper so the
 	// specifier resolves against the session cwd (and `with`-attribute imports keep working).
 	return optionsLiteral
@@ -158,7 +158,7 @@ function buildOptionsLiteral(node: BabelImportDeclaration): string | undefined {
 function rewriteImportNode(node: BabelImportDeclaration): string {
 	const sourceLiteral = JSON.stringify(node.source.value);
 	const optionsLiteral = buildOptionsLiteral(node);
-	const importCall = buildOmpImportCall(sourceLiteral, optionsLiteral);
+	const importCall = buildReactorImportCall(sourceLiteral, optionsLiteral);
 
 	let defaultName: string | undefined;
 	let namespaceName: string | undefined;

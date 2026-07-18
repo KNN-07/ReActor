@@ -483,7 +483,7 @@ describe("ModelRegistry", () => {
 			// `mergeDiscoveredModel` dropped `transport: reactor-native` (raw catalog
 			// rows carry no transport), so the next stream went out as plain
 			// openai-completions to `${baseUrl}/chat/completions` instead of the
-			// gateway's `/v1/pi/stream`.
+			// gateway's `/v1/reactor/stream`.
 			writeRawModelsJson({
 				openrouter: {
 					baseUrl: "http://localhost:4000",

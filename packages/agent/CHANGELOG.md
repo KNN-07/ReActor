@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Breaking Changes
+
+- Renamed the exported `PiGenAIAttr` and `PiGenAIAggregateAttr` telemetry enums to `ReactorGenAIAttr` and `ReactorGenAIAggregateAttr`; telemetry keys now use the `reactor.gen_ai.*` namespace.
+
+### Changed
+
+- Rebranded the GenAI telemetry attribute namespace and exported helper identifiers from `pi` to `reactor`.
+
 ## [17.0.2] - 2026-07-17
 
 ### Fixed

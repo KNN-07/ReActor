@@ -6,6 +6,10 @@
 
 - Added the private shared transcript and tool-card renderer package used by the ReActor desktop renderer.
 
+### Changed
+
+- Renamed the tool-view custom-element implementation to use ReActor-native branding.
+
 ## [17.0.1] - 2026-07-16
 
 ### Fixed

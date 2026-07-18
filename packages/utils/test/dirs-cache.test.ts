@@ -23,13 +23,13 @@ function restoreEnv(key: string, value: string | undefined): void {
 describe("document conversion cache directory", () => {
 	let tempRoot = "";
 	let originalPiCodingAgentDir: string | undefined;
-	let originalOmpProfile: string | undefined;
+	let originalReactorProfile: string | undefined;
 	let originalPiProfile: string | undefined;
 	let originalXdgCacheHome: string | undefined;
 
 	beforeEach(async () => {
 		originalPiCodingAgentDir = process.env.REACTOR_CODING_AGENT_DIR;
-		originalOmpProfile = process.env.REACTOR_PROFILE;
+		originalReactorProfile = process.env.REACTOR_PROFILE;
 		originalPiProfile = process.env.REACTOR_PROFILE;
 		originalXdgCacheHome = process.env.XDG_CACHE_HOME;
 		tempRoot = path.join(os.tmpdir(), "utils-document-cache", Snowflake.next());
@@ -38,7 +38,7 @@ describe("document conversion cache directory", () => {
 
 	afterEach(async () => {
 		restoreEnv("REACTOR_CODING_AGENT_DIR", originalPiCodingAgentDir);
-		restoreEnv("REACTOR_PROFILE", originalOmpProfile);
+		restoreEnv("REACTOR_PROFILE", originalReactorProfile);
 		restoreEnv("REACTOR_PROFILE", originalPiProfile);
 		restoreEnv("XDG_CACHE_HOME", originalXdgCacheHome);
 		__resetDirsFromEnvForTests();
@@ -71,7 +71,7 @@ describe("document conversion cache directory", () => {
 describe("test directory state cleanup", () => {
 	it("restores the active profile from the current env after setAgentDir mutations", () => {
 		const originalPiCodingAgentDir = process.env.REACTOR_CODING_AGENT_DIR;
-		const originalOmpProfile = process.env.REACTOR_PROFILE;
+		const originalReactorProfile = process.env.REACTOR_PROFILE;
 		const originalPiProfile = process.env.REACTOR_PROFILE;
 		const originalXdgCacheHome = process.env.XDG_CACHE_HOME;
 		try {
@@ -95,7 +95,7 @@ describe("test directory state cleanup", () => {
 			);
 		} finally {
 			restoreEnv("REACTOR_CODING_AGENT_DIR", originalPiCodingAgentDir);
-			restoreEnv("REACTOR_PROFILE", originalOmpProfile);
+			restoreEnv("REACTOR_PROFILE", originalReactorProfile);
 			restoreEnv("REACTOR_PROFILE", originalPiProfile);
 			restoreEnv("XDG_CACHE_HOME", originalXdgCacheHome);
 			__resetDirsFromEnvForTests();

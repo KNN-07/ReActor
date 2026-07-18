@@ -96,12 +96,12 @@ def test_blank_bot_login_rejected(monkeypatch: pytest.MonkeyPatch, env: dict[str
 @pytest.mark.parametrize(
     "raw_login",
     [
-        "roboomp",
-        " @roboomp ",
-        " @ROBOOMP ",
-        "roboomp[bot]",
-        "@roboomp[bot]",
-        " @ROBOOMP[BOT] ",
+        "reactor-worker",
+        " @reactor-worker ",
+        " @reactor-worker ",
+        "reactor-worker[bot]",
+        "@reactor-worker[bot]",
+        " @reactor-worker[BOT] ",
     ],
 )
 def test_bot_login_normalizes_mention_case_and_app_suffix(
@@ -110,25 +110,25 @@ def test_bot_login_normalizes_mention_case_and_app_suffix(
     monkeypatch.setenv("REACTOR_WORKER_BOT_LOGIN", raw_login)
     reset_settings_cache()
     cfg = Settings()  # type: ignore[call-arg]
-    assert cfg.bot_login == "roboomp"
+    assert cfg.bot_login == "reactor-worker"
 
 
 def test_maintainer_logins_normalize_csv_entries(monkeypatch: pytest.MonkeyPatch, env: dict[str, str]) -> None:
-    monkeypatch.setenv("REACTOR_WORKER_MAINTAINER_LOGINS", " can1357, @ROBOOMP , @Alice[bot] ,, ")
+    monkeypatch.setenv("REACTOR_WORKER_MAINTAINER_LOGINS", " can1357, @reactor-worker , @Alice[bot] ,, ")
     reset_settings_cache()
     cfg = Settings()  # type: ignore[call-arg]
-    assert cfg.maintainer_logins == frozenset({"can1357", "roboomp", "alice"})
+    assert cfg.maintainer_logins == frozenset({"can1357", "reactor-worker", "alice"})
 
 
 @pytest.mark.parametrize(
     ("raw_login", "expected"),
     [
-        ("roboomp", "roboomp"),
-        (" @roboomp ", "roboomp"),
-        (" @ROBOOMP ", "roboomp"),
-        ("roboomp[bot]", "roboomp"),
-        ("@roboomp[bot]", "roboomp"),
-        (" @ROBOOMP[BOT] ", "roboomp"),
+        ("reactor-worker", "reactor-worker"),
+        (" @reactor-worker ", "reactor-worker"),
+        (" @reactor-worker ", "reactor-worker"),
+        ("reactor-worker[bot]", "reactor-worker"),
+        ("@reactor-worker[bot]", "reactor-worker"),
+        (" @reactor-worker[BOT] ", "reactor-worker"),
     ],
 )
 def test_maintainer_logins_common_entry_forms(

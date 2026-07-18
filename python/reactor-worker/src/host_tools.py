@@ -296,12 +296,12 @@ def ensure_workspace_dependencies(bindings: ToolBindings) -> None:
     A per-issue worktree is a bare source checkout (``git worktree add`` off
     the shared clone pool): it has the repo's ``package.json``/``bun.lock`` but
     no ``node_modules``. With bun's ``hoisted`` linker the workspace links
-    (``@reactor/pi-*``) only exist after an install, so without one any
+    (``@reactor/*``) only exist after an install, so without one any
     ``bun test``/``bun check`` the agent runs fails instantly with "Cannot find
     package" — the agent then reports it could not verify. We install before
     the agent starts, mirroring how the natives cache pre-populates ``.node``
     artifacts. The links resolve into *this* worktree's ``packages/*`` (not the
-    orchestrator's read-only ``/work/pi``), so tests exercise the PR's edited
+    orchestrator's read-only ``/work/reactor``), so tests exercise the PR's edited
     source.
 
     ``--frozen-lockfile`` keeps the lockfile pristine (no spurious diff for the

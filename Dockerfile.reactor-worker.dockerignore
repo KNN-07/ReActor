@@ -1,5 +1,5 @@
 # Build context for `Dockerfile.reactor-worker` (reactor-worker:dev). Shadows .dockerignore
-# for this file only — the pi-root build uses Dockerfile.dockerignore instead.
+# for this file only — the repository-root build uses Dockerfile.dockerignore instead.
 #
 # Note: this duplicates most of the entries in Dockerfile.dockerignore. That's
 # the cost of per-Dockerfile shadows (no shared file to factor common rules
@@ -11,12 +11,11 @@ target/
 dist/
 runs/
 
-# Per-host scratch the pi codebase uses for parallel agents / worktrees.
+# Per-host scratch the ReActor codebase uses for parallel agents / worktrees.
 .fallow/
 .worktrees/
 .wt/
 .opencode/
-.pi_config/
 .reactor/plugins/
 
 # VCS, editors, IDEs.
@@ -64,12 +63,12 @@ python/reactor-worker/web/dist/
 syntax.jsonl
 out.jsonl
 out.html
-pi-*.html
+reactor-*.html
 
 # Secrets. Should never be in the image regardless.
 .env
 
-# Robreactor-only excludes. Natives + wheel + python + bun + rustup all come
+# Reactor-Worker-only excludes. Natives + wheel + python + bun + rustup all come
 # from REACTOR_BASE; the web-builder stage only needs root manifests + the
 # python/reactor-worker/web tree; the runtime stage only COPYs python/reactor-worker/
 # pyproject + src + entrypoint. Everything below is dead weight in the

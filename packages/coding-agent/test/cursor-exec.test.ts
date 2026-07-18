@@ -155,7 +155,7 @@ describe("CursorExecHandlers mounted tool bridge", () => {
 
 		const result = await handlers.mcp({
 			name: mountedTool.name,
-			providerIdentifier: "pi-agent",
+			providerIdentifier: "reactor-agent",
 			toolName: mountedTool.name,
 			toolCallId: "call-mounted",
 			args: {},
@@ -191,7 +191,7 @@ describe("CursorExecHandlers mounted tool bridge", () => {
 
 		const result = await handlers.mcp({
 			name: device.name,
-			providerIdentifier: "pi-agent",
+			providerIdentifier: "reactor-agent",
 			toolName: device.name,
 			toolCallId: "call-denied",
 			args: {},
@@ -273,7 +273,7 @@ describe("CursorExecHandlers advise routing (issue #5680)", () => {
 							name: "advise",
 							toolName: "advise",
 							toolCallId: "call-advise-1",
-							providerIdentifier: "pi-agent",
+							providerIdentifier: "reactor-agent",
 							args: { note: new TextEncoder().encode(JSON.stringify(note)) },
 						}),
 					},

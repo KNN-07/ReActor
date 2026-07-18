@@ -533,7 +533,7 @@ function isBonsaiQwenGguf(id: string): boolean {
  * `<think>` blocks survive (`qwenPreserveThinking`). The runtime base URL gets a
  * `/v1` suffix because the chat-completions request would otherwise POST to the
  * native root, which does not serve it. A model with a custom transport (e.g.
- * `reactor-native`, whose client appends `/v1/pi/stream`) keeps its base URL so the
+ * `reactor-native`, whose client appends `/v1/reactor/stream`) keeps its base URL so the
  * suffix is not doubled. Non-Qwen models pass through unchanged. Applied on both
  * fresh discovery and cache load, so an upgraded cache is corrected without
  * waiting for re-discovery.

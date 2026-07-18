@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, type Mock, mock, spyOn } from "bun:test";
-import { streamPiNative } from "@reactor/ai/providers/reactor-native-client";
+import { streamReactorNative } from "@reactor/ai/providers/reactor-native-client";
 import type { AssistantMessage, AssistantMessageEvent, Context, FetchImpl, Model, ModelSpec } from "@reactor/ai/types";
 import { buildModel } from "@reactor/catalog/build";
 
@@ -139,8 +139,8 @@ afterEach(() => {
 	mock.restore();
 });
 
-describe("streamPiNative request shape", () => {
-	it("POSTs `{modelId, context, options, stream:true}` to `<baseUrl>/v1/pi/stream`", async () => {
+describe("streamReactorNative request shape", () => {
+	it("POSTs `{modelId, context, options, stream:true}` to `<baseUrl>/v1/reactor/stream`", async () => {
 		const final = baseAssistant();
 		const captured: { url?: string; init?: RequestInit } = {};
 		const fetchImpl: FetchImpl = (async (input, init) => {
@@ -149,14 +149,14 @@ describe("streamPiNative request shape", () => {
 			return fakeResponse([{ type: "done", reason: "stop", message: final }]);
 		}) as FetchImpl;
 
-		const stream = streamPiNative(fakeModel(), baseContext, {
+		const stream = streamReactorNative(fakeModel(), baseContext, {
 			apiKey: "gw-bearer",
 			fetch: fetchImpl,
 			temperature: 0.7,
 		});
 		await stream.result();
 
-		expect(captured.url).toBe("http://llm-gateway.internal:4000/v1/pi/stream");
+		expect(captured.url).toBe("http://llm-gateway.internal:4000/v1/reactor/stream");
 		expect(captured.init?.method).toBe("POST");
 		const headers = captured.init?.headers as Record<string, string>;
 		expect(headers["Content-Type"]).toBe("application/json");
@@ -183,7 +183,7 @@ describe("streamPiNative request shape", () => {
 		}) as FetchImpl;
 
 		const controller = new AbortController();
-		const stream = streamPiNative(fakeModel(), baseContext, {
+		const stream = streamReactorNative(fakeModel(), baseContext, {
 			apiKey: "gw-bearer",
 			fetch: fetchImpl,
 			signal: controller.signal,
@@ -214,11 +214,11 @@ describe("streamPiNative request shape", () => {
 			return fakeResponse([{ type: "done", reason: "stop", message: baseAssistant() }]);
 		}) as FetchImpl;
 
-		await streamPiNative(fakeModel({ baseUrl: "http://llm-gateway.internal:4000///" }), baseContext, {
+		await streamReactorNative(fakeModel({ baseUrl: "http://llm-gateway.internal:4000///" }), baseContext, {
 			apiKey: "k",
 			fetch: fetchImpl,
 		}).result();
-		expect(captured.url).toBe("http://llm-gateway.internal:4000/v1/pi/stream");
+		expect(captured.url).toBe("http://llm-gateway.internal:4000/v1/reactor/stream");
 	});
 
 	it("forwards `model.headers` and lets a caller-supplied Authorization win", async () => {
@@ -228,7 +228,7 @@ describe("streamPiNative request shape", () => {
 			return fakeResponse([{ type: "done", reason: "stop", message: baseAssistant() }]);
 		}) as FetchImpl;
 
-		await streamPiNative(
+		await streamReactorNative(
 			fakeModel({ headers: { "x-reactor-slot": "reactor-worker-1", Authorization: "Bearer model-wins" } }),
 			baseContext,
 			{ apiKey: "options-loses", fetch: fetchImpl },
@@ -242,12 +242,12 @@ describe("streamPiNative request shape", () => {
 	it("throws synchronously when `baseUrl` is missing", async () => {
 		const broken = fakeModel({ baseUrl: "" as unknown as string });
 		// The promise the iterator awaits surfaces the error via `.result()`.
-		const stream = streamPiNative(broken, baseContext, { apiKey: "k" });
+		const stream = streamReactorNative(broken, baseContext, { apiKey: "k" });
 		await expect(stream.result()).rejects.toThrow(/baseUrl/);
 	});
 });
 
-describe("streamPiNative event flow", () => {
+describe("streamReactorNative event flow", () => {
 	it("pushes parsed events verbatim and resolves `.result()` on terminal `done`", async () => {
 		const final = baseAssistant({
 			content: [{ type: "text", text: "hi" }],
@@ -268,7 +268,7 @@ describe("streamPiNative event flow", () => {
 		];
 		const fetchImpl: FetchImpl = (async () => fakeResponse(events)) as FetchImpl;
 
-		const stream = streamPiNative(fakeModel(), baseContext, { apiKey: "k", fetch: fetchImpl });
+		const stream = streamReactorNative(fakeModel(), baseContext, { apiKey: "k", fetch: fetchImpl });
 		const seen = await collectEvents(stream);
 		const result = await stream.result();
 
@@ -283,13 +283,13 @@ describe("streamPiNative event flow", () => {
 				headers: { "Content-Type": "application/json" },
 			})) as FetchImpl;
 
-		const stream = streamPiNative(fakeModel(), baseContext, { apiKey: "k", fetch: fetchImpl });
+		const stream = streamReactorNative(fakeModel(), baseContext, { apiKey: "k", fetch: fetchImpl });
 		await expect(stream.result()).rejects.toThrow(/no credential/);
 	});
 
 	it("falls back to plain text on a non-JSON error body", async () => {
 		const fetchImpl: FetchImpl = (async () => new Response("bad gateway", { status: 502 })) as FetchImpl;
-		const stream = streamPiNative(fakeModel(), baseContext, { apiKey: "k", fetch: fetchImpl });
+		const stream = streamReactorNative(fakeModel(), baseContext, { apiKey: "k", fetch: fetchImpl });
 		await expect(stream.result()).rejects.toThrow(/502/);
 	});
 
@@ -297,7 +297,7 @@ describe("streamPiNative event flow", () => {
 		const fetchImpl: FetchImpl = (async () =>
 			new Response(stalledBody(), { status: 200, headers: { "Content-Type": "text/event-stream" } })) as FetchImpl;
 
-		const stream = streamPiNative(fakeModel(), baseContext, {
+		const stream = streamReactorNative(fakeModel(), baseContext, {
 			apiKey: "k",
 			fetch: fetchImpl,
 			streamFirstEventTimeoutMs: 20,
@@ -317,7 +317,7 @@ describe("streamPiNative event flow", () => {
 					headers: { "Content-Type": "text/event-stream" },
 				})) as FetchImpl;
 
-			const stream = streamPiNative(fakeModel(), baseContext, { apiKey: "k", fetch: fetchImpl });
+			const stream = streamReactorNative(fakeModel(), baseContext, { apiKey: "k", fetch: fetchImpl });
 
 			await expect(stream.result()).rejects.toThrow(/first event/);
 		} finally {
@@ -341,7 +341,7 @@ describe("streamPiNative event flow", () => {
 				headers: { "Content-Type": "text/event-stream" },
 			})) as FetchImpl;
 
-		const stream = streamPiNative(fakeModel(), baseContext, {
+		const stream = streamReactorNative(fakeModel(), baseContext, {
 			apiKey: "k",
 			fetch: fetchImpl,
 			streamFirstEventTimeoutMs: 1_000,
@@ -365,7 +365,7 @@ describe("streamPiNative event flow", () => {
 				headers: { "Content-Type": "text/event-stream" },
 			})) as FetchImpl;
 
-		const stream = streamPiNative(fakeModel(), baseContext, {
+		const stream = streamReactorNative(fakeModel(), baseContext, {
 			apiKey: "k",
 			fetch: fetchImpl,
 			streamFirstEventTimeoutMs: 1000,
@@ -391,7 +391,7 @@ describe("streamPiNative event flow", () => {
 		const fetchImpl: FetchImpl = (async () =>
 			new Response(body, { status: 200, headers: { "Content-Type": "text/event-stream" } })) as FetchImpl;
 
-		const stream = streamPiNative(fakeModel(), baseContext, { apiKey: "k", fetch: fetchImpl });
+		const stream = streamReactorNative(fakeModel(), baseContext, { apiKey: "k", fetch: fetchImpl });
 		const seen = await collectEvents(stream);
 		expect(seen.length).toBeGreaterThanOrEqual(2);
 		expect(seen[seen.length - 1].type).toBe("done");
@@ -406,7 +406,7 @@ describe("streamPiNative event flow", () => {
 		const controller = new AbortController();
 		controller.abort(new Error("pre-aborted"));
 
-		const stream = streamPiNative(fakeModel(), baseContext, {
+		const stream = streamReactorNative(fakeModel(), baseContext, {
 			apiKey: "k",
 			fetch: fetchImpl,
 			signal: controller.signal,
@@ -424,7 +424,7 @@ describe("streamPiNative event flow", () => {
 			return new Response(stalledBody(), { status: 200, headers: { "Content-Type": "text/event-stream" } });
 		}) as FetchImpl;
 		const controller = new AbortController();
-		const stream = streamPiNative(fakeModel(), baseContext, {
+		const stream = streamReactorNative(fakeModel(), baseContext, {
 			apiKey: "k",
 			fetch: fetchImpl,
 			signal: controller.signal,

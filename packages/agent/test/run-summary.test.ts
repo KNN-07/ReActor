@@ -24,7 +24,7 @@ import {
 	emptyAgentRunCoverage,
 	emptyAgentRunSummary,
 } from "@reactor/agent-core/run-collector";
-import { EXECUTE_TOOL_STATUS_ATTR, GenAIAttr, PiGenAIAggregateAttr } from "@reactor/agent-core/telemetry";
+import { EXECUTE_TOOL_STATUS_ATTR, GenAIAttr, ReactorGenAIAggregateAttr } from "@reactor/agent-core/telemetry";
 import type { AgentEvent, AgentLoopConfig, AgentMessage, AgentTool } from "@reactor/agent-core/types";
 import type { AssistantMessage, Message } from "@reactor/ai";
 import { z } from "@reactor/ai";
@@ -321,7 +321,7 @@ describe("AgentRunSummary aggregation", () => {
 		expect(blockedSpan?.attributes[GenAIAttr.ErrorType]).toBe("tool_blocked");
 	});
 
-	it("populates aggregate pi.gen_ai.agent.* attributes on the invoke_agent span", async () => {
+	it("populates aggregate reactor.gen_ai.agent.* attributes on the invoke_agent span", async () => {
 		const tracer = new RecordingTracer();
 		const tool = buildTool({ name: "alpha", behavior: "ok" });
 		const mock = createMockModel({
@@ -346,12 +346,12 @@ describe("AgentRunSummary aggregation", () => {
 		await detailed.detailed();
 		const invokeSpan = tracer.findSpan("invoke_agent");
 		expect(invokeSpan).toBeDefined();
-		expect(invokeSpan?.attributes[PiGenAIAggregateAttr.ChatsCount]).toBe(2);
-		expect(invokeSpan?.attributes[PiGenAIAggregateAttr.ToolsCount]).toBe(1);
-		expect(invokeSpan?.attributes[PiGenAIAggregateAttr.ToolsOkCount]).toBe(1);
-		expect(invokeSpan?.attributes[PiGenAIAggregateAttr.UsageInputTokensTotal]).toBe(6);
-		expect(invokeSpan?.attributes[PiGenAIAggregateAttr.UsageTotalTokensTotal]).toBe(13);
-		expect(invokeSpan?.attributes[PiGenAIAggregateAttr.ToolsInvoked]).toEqual(["alpha"]);
+		expect(invokeSpan?.attributes[ReactorGenAIAggregateAttr.ChatsCount]).toBe(2);
+		expect(invokeSpan?.attributes[ReactorGenAIAggregateAttr.ToolsCount]).toBe(1);
+		expect(invokeSpan?.attributes[ReactorGenAIAggregateAttr.ToolsOkCount]).toBe(1);
+		expect(invokeSpan?.attributes[ReactorGenAIAggregateAttr.UsageInputTokensTotal]).toBe(6);
+		expect(invokeSpan?.attributes[ReactorGenAIAggregateAttr.UsageTotalTokensTotal]).toBe(13);
+		expect(invokeSpan?.attributes[ReactorGenAIAggregateAttr.ToolsInvoked]).toEqual(["alpha"]);
 	});
 });
 

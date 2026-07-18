@@ -65,7 +65,7 @@ export function renderFormula(version: string, sums: Record<string, string>): st
 	// the writable staging dir so `generate_completions_from_executable` does
 	// not touch the real `/Users/<user>/.reactor` (denied by Homebrew's sandbox
 	// profile, which would otherwise fail the popen).
-	return `class Omp < Formula
+	return `class Reactor < Formula
   desc "${DESC}"
   homepage "${HOMEPAGE}"
   version "${version}"

@@ -5,7 +5,7 @@
  *   - ~/.reactor/agent/agents/*.md (user-level)
  *   - .reactor/agents/*.md (project-level)
  *   - <ext>/agents/*.md for every ReActor extension package wired through
- *     `listOmpExtensionRoots` (CLI `--extension` roots, `extensions:` in
+ *     `listReactorExtensionRoots` (CLI `--extension` roots, `extensions:` in
  *     settings, and enabled npm/link plugins under `<plugins>/node_modules/`).
  *     Mirrors the same sub-discovery convention applied to `skills/`,
  *     `hooks/`, `tools/`, etc. by `discovery/reactor-plugins.ts`.
@@ -24,7 +24,7 @@ import { logger } from "@reactor/utils";
 import { isProviderEnabled } from "../capability";
 import { findAllNearestProjectConfigDirs, getConfigDirs } from "../config";
 import { listClaudePluginRoots } from "../discovery/helpers";
-import { listOmpExtensionRoots } from "../discovery/reactor-extension-roots";
+import { listReactorExtensionRoots } from "../discovery/reactor-extension-roots";
 import { loadBundledAgents, parseAgent } from "./agents";
 import type { AgentDefinition, AgentSource } from "./types";
 
@@ -61,7 +61,7 @@ async function loadAgentsFromDir(dir: string, source: AgentSource): Promise<Agen
 /**
  * Discover agents from filesystem and merge with bundled agents.
  * Precedence (highest wins): project `.reactor/agents`, user `.reactor/agents`,
- * ReActor extension-package agents in `listOmpExtensionRoots` source order
+ * ReActor extension-package agents in `listReactorExtensionRoots` source order
  * (CLI roots > project `extensions:` settings > user `extensions:` settings >
  * installed npm/link plugins), Claude marketplace plugin agents (project
  * scope before user), then bundled.
@@ -90,7 +90,7 @@ export async function discoverAgents(cwd: string, home: string = os.homedir()): 
 	const user = userDirs[0];
 	if (user) orderedDirs.push({ dir: user.path, source: "user" });
 
-	// ReActor extension-package agents/ dirs. `listOmpExtensionRoots` returns roots in
+	// ReActor extension-package agents/ dirs. `listReactorExtensionRoots` returns roots in
 	// source-precedence order (CLI > project `extensions:` settings > user
 	// `extensions:` settings > installed npm/link plugins, with marketplace
 	// installs already excluded by realpath) — consume that order verbatim so the
@@ -98,7 +98,7 @@ export async function discoverAgents(cwd: string, home: string = os.homedir()): 
 	// surface in `discovery/reactor-plugins.ts`. Gate on `reactor-plugins` so
 	// disabledProviders suppresses the whole extension-package surface.
 	const extensionRoots = isProviderEnabled("reactor-plugins")
-		? await listOmpExtensionRoots({ cwd: resolvedCwd, home, repoRoot: null })
+		? await listReactorExtensionRoots({ cwd: resolvedCwd, home, repoRoot: null })
 		: [];
 	for (const root of extensionRoots) {
 		orderedDirs.push({ dir: path.join(root.path, "agents"), source: root.level });

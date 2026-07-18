@@ -523,9 +523,9 @@ async function handleFormatEndpoint(
 }
 
 /**
- * Pi-native fast path: `POST /v1/pi/stream`. Accepts the canonical ai
+ * Pi-native fast path: `POST /v1/reactor/stream`. Accepts the canonical ai
  * `Context` directly (no wire-format round-trip) and emits a bandwidth-shrunk
- * event stream matching `pi-agent`'s `streamProxy`. Skips the OpenAI /
+ * event stream matching `reactor-agent`'s `streamProxy`. Skips the OpenAI /
  * Anthropic / Responses translation layers — those exist to bridge foreign
  * SDKs (llm-git, anthropic-sdk, openai-sdk), and bridging back to reactor-native
  * just to bridge forward again is wasted work.
@@ -536,7 +536,7 @@ async function handleFormatEndpoint(
  * `parseRequest`/`encodeResponse`/`encodeStream` differ from the format-endpoint
  * path.
  */
-async function handlePiNative(bootOpts: AuthGatewayBootOptions, req: Request, peer: string): Promise<Response> {
+async function handleReactorNative(bootOpts: AuthGatewayBootOptions, req: Request, peer: string): Promise<Response> {
 	const startedAt = performance.now();
 	const requestId = crypto.randomUUID();
 	const controller = mirrorRequestAbort(req);
@@ -552,7 +552,7 @@ async function handlePiNative(bootOpts: AuthGatewayBootOptions, req: Request, pe
 	}
 	if (controller.signal.aborted) return aborted();
 
-	let parsed: piNative.PiNativeParsedRequest;
+	let parsed: piNative.ReactorNativeParsedRequest;
 	try {
 		parsed = piNative.parseRequest(body, req.headers);
 	} catch (error) {
@@ -789,8 +789,8 @@ export function startAuthGateway(opts: AuthGatewayBootOptions): AuthGatewayServe
 
 				// Pi-native fast path. Same auth + provider plumbing as the
 				// foreign-wire routes, just without the wire-format translation.
-				if (req.method === "POST" && pathname === "/v1/pi/stream") {
-					return withCors(await handlePiNative(opts, req, peer), req);
+				if (req.method === "POST" && pathname === "/v1/reactor/stream") {
+					return withCors(await handleReactorNative(opts, req, peer), req);
 				}
 
 				// Model catalog.

@@ -2392,7 +2392,7 @@ function buildMcpToolDefinitions(tools: Tool[] | undefined): McpToolDefinition[]
 		return create(McpToolDefinitionSchema, {
 			name: tool.name,
 			description: tool.description || "",
-			providerIdentifier: "pi-agent",
+			providerIdentifier: "reactor-agent",
 			toolName: tool.name,
 			inputSchema,
 		});

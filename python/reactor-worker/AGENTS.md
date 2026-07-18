@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-`roboomp` is a self-hosted GitHub triage-and-fix bot that drives [`reactor --mode rpc`](https://github.com/KNN-07/ReActor) as a subprocess. On every issue opened in an allowlisted repository it classifies the issue, applies labels, then branches into one of: reproduce → fix → PR (`bug` / `documentation`), single-comment answer (`question`), single thoughtful comment (`enhancement` / `proposal`), or brief comment (`invalid` / `duplicate`). Follow-up comments and PR review comments resume the same reactor session so the agent keeps its prior reasoning. If the orchestrator restarts mid-task, the dispatcher resumes the same session via `reactor --continue` from the per-issue `session_dir`, so an interrupted task re-enters its prior reasoning instead of restarting from scratch. The orchestrator runs as a single FastAPI process inside Docker with SQLite-backed durable event state.
+`reactor-worker` is a self-hosted GitHub triage-and-fix bot that drives [`reactor --mode rpc`](https://github.com/KNN-07/ReActor) as a subprocess. On every issue opened in an allowlisted repository it classifies the issue, applies labels, then branches into one of: reproduce → fix → PR (`bug` / `documentation`), single-comment answer (`question`), single thoughtful comment (`enhancement` / `proposal`), or brief comment (`invalid` / `duplicate`). Follow-up comments and PR review comments resume the same reactor session so the agent keeps its prior reasoning. If the orchestrator restarts mid-task, the dispatcher resumes the same session via `reactor --continue` from the per-issue `session_dir`, so an interrupted task re-enters its prior reasoning instead of restarting from scratch. The orchestrator runs as a single FastAPI process inside Docker with SQLite-backed durable event state.
 
 ## Architecture & Data Flow
 
@@ -23,50 +23,50 @@ Webhook → durable queue → async dispatcher → per-issue git worktree → re
 - `src/prompts/` — Mustache-style `{{var}}` templates loaded by `persona.py` via `@cache` and `importlib.resources`. Shipped as package data (`pyproject.toml` `package-data`).
 - `tests/` — pytest suite. `test_worker_smoke.py` is gated on `REACTOR_WORKER_INTEGRATION=1`.
 - `data/` — runtime state (sqlite + WAL, `workspaces/`, `logs/`). Never committed.
-- `/Dockerfile` (pi root) — produces `ReActor/pi:dev` (pi runtime image: python + bun + rustup + reactor-natives + reactor_rpc + `/usr/local/bin/reactor` shim + the full pi source under `/pi`). Stages: `natives-builder` → `wheel-builder` → `pi-base` → `pi-runtime` (default). Built via `bun run pi:image`. Robomp's image extends `pi-base` via `FROM ${REACTOR_BASE}` in `/Dockerfile.reactor_worker`.
+- `/Dockerfile` (repository root) — produces `reactor/reactor:dev` (ReActor runtime image: python + bun + rustup + reactor-natives + reactor_rpc + `/usr/local/bin/reactor` shim + the full ReActor source under `/reactor`). Stages: `natives-builder` → `wheel-builder` → `reactor-base` → `reactor-runtime` (default). Built via `bun run reactor:image`. ReActor Worker's image extends `reactor-base` via `FROM ${REACTOR_BASE}` in `/Dockerfile.reactor-worker`.
 
 ## Development Commands
 
-Task runner is `bun` against the **monorepo root** `package.json`. roboomp itself no longer ships a `package.json`; every recipe lives at the root under the `reactor_worker:*` namespace. Local venv (no docker): `bun run reactor_worker:install` runs `pip install -e 'python/reactor_worker[dev]'`. From there:
+Task runner is `bun` against the **monorepo root** `package.json`. reactor-worker itself no longer ships a `package.json`; every recipe lives at the root under the `reactor-worker:*` namespace. Local venv (no docker): `bun run reactor-worker:install` runs `pip install -e 'python/reactor-worker[dev]'`. From there:
 
 ```
-bun run test:py                   # pytest -x python/reactor-rpc/tests python/reactor_worker/tests
-bun run reactor_worker:test:integration   # REACTOR_WORKER_INTEGRATION=1, requires reactor on PATH
-bun run reactor_worker:serve              # python -m reactor_worker serve on the host
+bun run test:py                   # pytest -x python/reactor-rpc/tests python/reactor-worker/tests
+bun run reactor-worker:test:integration   # REACTOR_WORKER_INTEGRATION=1, requires reactor on PATH
+bun run reactor-worker:serve              # python -m reactor_worker serve on the host
 ```
 
 Docker inner loop:
 
 ```
-bun run pi:image                  # build ReActor/pi:dev (one-time / on pi change)
-bun run pi:run                    # docker run -it ReActor/pi:dev (smoke-test the shim)
-bun run reactor_worker:build              # pi:image (if pi changed) + docker compose build
-bun run reactor_worker:dev                # build + up -d + follow logs
-bun run reactor_worker:up / reactor_worker:down / reactor_worker:restart / reactor_worker:logs
-bun run reactor_worker:rebuild            # docker compose build --no-cache
-bun run reactor_worker:reset              # `down -v` + drop the pi image
+bun run reactor:image                  # build reactor/reactor:dev (one-time / on ReActor changes)
+bun run reactor:run                    # docker run -it reactor/reactor:dev (smoke-test the shim)
+bun run reactor-worker:build              # reactor:image (if ReActor changed) + docker compose build
+bun run reactor-worker:dev                # build + up -d + follow logs
+bun run reactor-worker:up / reactor-worker:down / reactor-worker:restart / reactor-worker:logs
+bun run reactor-worker:rebuild            # docker compose build --no-cache
+bun run reactor-worker:reset              # `down -v` + drop the ReActor image
 ```
 
 Frontend (Vite + SolidJS, in `web/` — still a bun workspace):
 
 ```
-bun run reactor_worker:web:dev            # vite dev server with proxy to :8080
-bun run reactor_worker:web:build          # produce src/static/ bundle
-bun --cwd=python/reactor_worker/web run typecheck   # tsc --noEmit
+bun run reactor-worker:web:dev            # vite dev server with proxy to :8080
+bun run reactor-worker:web:build          # produce src/static/ bundle
+bun --cwd=python/reactor-worker/web run typecheck   # tsc --noEmit
 ```
 
 In-container CLI (`reactor_worker` console script → `reactor_worker.cli:main`): no root aliases — invoke directly:
 
 ```
-docker compose --project-directory python/reactor_worker exec reactor_worker reactor_worker triage owner/repo#N
-docker compose --project-directory python/reactor_worker exec reactor_worker reactor_worker replay <delivery_id>
-docker compose --project-directory python/reactor_worker exec reactor_worker reactor_worker status
-docker compose --project-directory python/reactor_worker exec reactor_worker reactor_worker cleanup owner/repo#N
+docker compose --project-directory python/reactor-worker exec reactor_worker reactor_worker triage owner/repo#N
+docker compose --project-directory python/reactor-worker exec reactor_worker reactor_worker replay <delivery_id>
+docker compose --project-directory python/reactor-worker exec reactor_worker reactor_worker status
+docker compose --project-directory python/reactor-worker exec reactor_worker reactor_worker cleanup owner/repo#N
 ```
 
-HTTP / sqlite / webhook inspection is unaliased — use `curl http://localhost:${REACTOR_WORKER_BIND_PORT:-8080}/{healthz,readyz,events,issues}` and `docker compose --project-directory python/reactor_worker exec reactor_worker sqlite3 /data/reactor_worker.sqlite` directly.
+HTTP / sqlite / webhook inspection is unaliased — use `curl http://localhost:${REACTOR_WORKER_BIND_PORT:-8080}/{healthz,readyz,events,issues}` and `docker compose --project-directory python/reactor-worker exec reactor_worker sqlite3 /data/reactor_worker.sqlite` directly.
 
-Lint + format: TypeScript via Biome (config in `biome.json`), Python via Ruff (config in `pyproject.toml`). Root recipes cover both languages — `bun run lint` / `bun run fix` apply to the whole monorepo including roboomp. `bun run lint:py` / `bun run fix:py` scope to Python only.
+Lint + format: TypeScript via Biome (config in `biome.json`), Python via Ruff (config in `pyproject.toml`). Root recipes cover both languages — `bun run lint` / `bun run fix` apply to the whole monorepo including reactor-worker. `bun run lint:py` / `bun run fix:py` scope to Python only.
 
 ## Code Conventions & Common Patterns
 
@@ -97,8 +97,8 @@ Lint + format: TypeScript via Biome (config in `biome.json`), Python via Ruff (c
 - `src/cli.py` — Click CLI (`serve`, `triage`, `replay`, `status`, `cleanup`).
 - `src/dashboard.py` — single-page HTML dashboard served from `/`.
 - `pyproject.toml` — packaging + pytest config (`asyncio_mode = "auto"`, `testpaths = ["tests"]`).
-- `/Dockerfile.reactor_worker` (pi root) — reactor_worker's image. `FROM ${REACTOR_BASE}` (default `ReActor/pi:dev`), adds the SolidJS dashboard bundle, the reactor_worker Python package, and the `reactor_worker-entrypoint` shim. Tini entrypoint, exposes `8080`, `VOLUME /data`. The toolchain (python + bun + rustup + reactor-natives + reactor_rpc + `reactor` shim) comes from `pi-base` — no duplication in this file.
-- `docker-compose.yml` — `build.args.REACTOR_BASE`, mounts `$REACTOR_ROOT:/work/pi:ro`, `./data:/data`, `~/.reactor/agent/models.container.yml:ro` (mapped to `models.yml` inside the container — kept separate from the host's `~/.reactor/agent/models.yml` so the host reactor doesn't pick up gateway routing intended only for the container), `extra_hosts: llm-gateway.internal:host-gateway`.
+- `/Dockerfile.reactor-worker` (repository root) — reactor-worker's image. `FROM ${REACTOR_BASE}` (default `reactor/reactor:dev`), adds the SolidJS dashboard bundle, the reactor_worker Python package, and the `reactor_worker-entrypoint` shim. Tini entrypoint, exposes `8080`, `VOLUME /data`. The toolchain (python + bun + rustup + reactor-natives + reactor_rpc + `reactor` shim) comes from `reactor-base` — no duplication in this file.
+- `docker-compose.yml` — `build.args.REACTOR_BASE`, mounts `$REACTOR_ROOT:/work/reactor:ro`, `./data:/data`, `~/.reactor/agent/models.container.yml:ro` (mapped to `models.yml` inside the container — kept separate from the host's `~/.reactor/agent/models.yml` so the host reactor doesn't pick up gateway routing intended only for the container), `extra_hosts: llm-gateway.internal:host-gateway`.
 - `entrypoint.sh` — validates `REACTOR_ROOT`, creates `/data/{workspaces,logs}` + build caches.
 - `.env.example` — authoritative list of required runtime env vars.
 - `README.md` — full architecture + operational reference. Authoritative for end-to-end flow, host-tool spec, security posture, and configuration reference.
@@ -109,8 +109,8 @@ Lint + format: TypeScript via Biome (config in `biome.json`), Python via Ruff (c
 - **Package manager**: `pip` only. No poetry / uv / pdm files; don't introduce one.
 - **Task runner**: `bun` (root `package.json` `scripts`). Always reach for an existing `bun run` recipe before invoking `docker compose` or `pytest` directly.
 - **Container runtime**: Docker Compose v2. The image embeds Bun 1.3.14 + a rustup launcher and exposes `reactor` via a `/usr/local/bin/reactor` shim; `REACTOR_WORKER_REACTOR_COMMAND=reactor` should not need changing.
-- **Required env** (set in `.env`, see `.env.example`): `GITHUB_WEBHOOK_SECRET`, `REACTOR_WORKER_BOT_LOGIN`, `REACTOR_WORKER_GIT_AUTHOR_NAME`, `REACTOR_WORKER_GIT_AUTHOR_EMAIL`, `REACTOR_WORKER_REPO_ALLOWLIST`, plus model knobs (`REACTOR_WORKER_MODEL`, `REACTOR_WORKER_THINKING`, optional `REACTOR_WORKER_PROVIDER`) and rate-limit / concurrency / timeout overrides. Set `REACTOR_WORKER_BOT_LOGIN` to the lowercase mention handle (`roboomp` in production, no leading `@` or `[bot]`; config normalizes common variants). `REACTOR_WORKER_MAINTAINER_LOGINS` is optional comma-separated bare logins (`@`/`[bot]` optional, case-insensitive) for non-owner implementation authorizers. **GitHub auth is mode-exclusive**: either set `REACTOR_WORKER_GH_PROXY_URL` + `REACTOR_WORKER_GH_PROXY_HMAC_KEY` (gh-proxy mode; PAT lives only in the sidecar container — the bundled compose default), or set `GITHUB_TOKEN` directly (single-process PAT mode). `Settings._validate_proxy_or_pat` rejects a `.env` that sets both.
-- **REACTOR_ROOT resolution**: roboomp lives inside the ReActor monorepo at `python/reactor_worker/`. `bun run pi:image` builds the parent monorepo (`../..`) as its docker build context to produce `ReActor/pi:dev`; `docker-compose.yml` extends that image via `REACTOR_BASE` and mounts the same parent path read-only at `/work/pi` for the orchestrator to see live source. Override `REACTOR_ROOT` only when pointing the build/mount at a different ReActor checkout. Inside the container the path is always `/work/pi`. Build invalidation stays bounded: Python-only edits in roboomp never trigger a natives recompile.
+- **Required env** (set in `.env`, see `.env.example`): `GITHUB_WEBHOOK_SECRET`, `REACTOR_WORKER_BOT_LOGIN`, `REACTOR_WORKER_GIT_AUTHOR_NAME`, `REACTOR_WORKER_GIT_AUTHOR_EMAIL`, `REACTOR_WORKER_REPO_ALLOWLIST`, plus model knobs (`REACTOR_WORKER_MODEL`, `REACTOR_WORKER_THINKING`, optional `REACTOR_WORKER_PROVIDER`) and rate-limit / concurrency / timeout overrides. Set `REACTOR_WORKER_BOT_LOGIN` to the lowercase mention handle (`reactor-worker` in production, no leading `@` or `[bot]`; config normalizes common variants). `REACTOR_WORKER_MAINTAINER_LOGINS` is optional comma-separated bare logins (`@`/`[bot]` optional, case-insensitive) for non-owner implementation authorizers. **GitHub auth is mode-exclusive**: either set `REACTOR_WORKER_GH_PROXY_URL` + `REACTOR_WORKER_GH_PROXY_HMAC_KEY` (gh-proxy mode; PAT lives only in the sidecar container — the bundled compose default), or set `GITHUB_TOKEN` directly (single-process PAT mode). `Settings._validate_proxy_or_pat` rejects a `.env` that sets both.
+- **REACTOR_ROOT resolution**: reactor-worker lives inside the ReActor monorepo at `python/reactor-worker/`. `bun run reactor:image` builds the parent monorepo (`../..`) as its docker build context to produce `reactor/reactor:dev`; `docker-compose.yml` extends that image via `REACTOR_BASE` and mounts the same parent path read-only at `/work/reactor` for the orchestrator to see live source. Override `REACTOR_ROOT` only when pointing the build/mount at a different ReActor checkout. Inside the container the path is always `/work/reactor`. Build invalidation stays bounded: Python-only edits in reactor-worker never trigger a natives recompile.
 - **Forbidden**: no docker-in-docker, no extra service containers, no new background workers outside `WorkerPool`. The container itself is the isolation boundary; per-issue isolation is the git worktree.
 
 ## Testing & QA

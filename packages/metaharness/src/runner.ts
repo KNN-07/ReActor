@@ -7,7 +7,7 @@ import * as path from "node:path";
  *
  * Orchestrates Harbor (`harbor run`) against any Harbor dataset (default
  * terminal-bench-2) using a custom agent (`agent/reactor_local.py`) that installs
- * the working tree at /work/pi and routes all model auth through the host pm2
+ * the working tree at /work/reactor and routes all model auth through the host pm2
  * auth-gateway (no provider keys ever enter the task containers).
  *
  * It owns the terminal: Harbor's own output is redirected to a log file and this
@@ -139,7 +139,7 @@ Model / agent:
   -m, --model <provider/model>   Model (repeatable). Default anthropic/claude-sonnet-4-6
       --agent <name>             reactor (default) | oracle | nop | any harbor agent
       --install <source|local|published> reactor install mode (default: source).
-                                 source = mount /work/pi read-only + prebuilt linux deps tree; TS changes
+                                 source = mount /work/reactor read-only + prebuilt linux deps tree; TS changes
                                  apply per-trial with no rebuild. local = pack a tarball. published = npm.
       --version <v>              reactor version for published install (default: latest)
       --thinking <level>         off|minimal|low|medium|high|xhigh|max
@@ -924,7 +924,7 @@ function writeReport(st: RenderState, benchDir: string, exitCode: number): strin
 	const tot = aggregate(trials, readJobResult(st.jobDir), st.expected);
 	const successPct = tot.done > 0 ? (tot.pass / tot.done) * 100 : 0;
 	const lines: string[] = [];
-	const isOmp = st.cfg.agent === "reactor";
+	const isReactor = st.cfg.agent === "reactor";
 	const argsLabel = agentArgsLabel(st.cfg);
 	const baseModelLine = st.cfg.models.join(", ");
 	const modelLine = argsLabel ? `${baseModelLine} (${argsLabel})` : baseModelLine;
@@ -932,7 +932,7 @@ function writeReport(st: RenderState, benchDir: string, exitCode: number): strin
 	lines.push("");
 	lines.push(`- dataset: \`${st.cfg.dataset}\``);
 	lines.push(`- tasks: ${st.cfg.tasks} · attempts: ${st.cfg.attempts} · concurrency: ${st.cfg.concurrency}`);
-	if (isOmp) {
+	if (isReactor) {
 		lines.push(
 			`- install: ${st.cfg.install} · auth: ${st.cfg.gateway ? "host gateway (no keys in container)" : "direct provider keys"}`,
 		);

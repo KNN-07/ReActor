@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# roboomp container entrypoint. No per-boot pip installs — everything is baked
+# reactor-worker container entrypoint. No per-boot pip installs — everything is baked
 # into the image; we only sanity-check the runtime mount and create state dirs.
 #
 # Used by both the orchestrator (CMD: `python -m reactor_worker serve`) and the
 # sibling gh-proxy (compose command: `python -m reactor_worker.proxy serve`). The
-# proxy role does NOT need a $REACTOR_ROOT pi checkout — it never runs reactor.
+# proxy role does NOT need a $REACTOR_ROOT ReActor checkout — it never runs reactor.
 set -euo pipefail
 
 # Shared git metadata under /data/workspaces/_pool is intentionally group
@@ -37,9 +37,9 @@ if [ "$is_proxy_role" -eq 1 ]; then
     exec "$@"
 fi
 
-: "${REACTOR_ROOT:=/work/pi}"
+: "${REACTOR_ROOT:=/work/reactor}"
 if [ ! -d "$REACTOR_ROOT/packages/coding-agent" ]; then
-    echo "roboomp: REACTOR_ROOT=$REACTOR_ROOT does not look like a pi checkout (no packages/coding-agent/)" >&2
+    echo "reactor-worker: REACTOR_ROOT=$REACTOR_ROOT does not look like a ReActor checkout (no packages/coding-agent/)" >&2
     exit 1
 fi
 

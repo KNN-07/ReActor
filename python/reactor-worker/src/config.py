@@ -1,4 +1,4 @@
-"""Env-driven configuration for roboomp."""
+"""Env-driven configuration for reactor-worker."""
 
 from __future__ import annotations
 
@@ -181,7 +181,7 @@ class Settings(BaseSettings):
     def _blank_replay_disables(cls, value: object) -> object:
         # Treat empty/whitespace strings as 'disabled'. Without this, an empty
         # REACTOR_WORKER_REPLAY_TOKEN becomes SecretStr("") which the server would
-        # happily compare against an empty X-Robreactor-Replay-Token header.
+        # happily compare against an empty X-Reactor-Worker-Replay-Token header.
         if isinstance(value, str) and not value.strip():
             return None
         if hasattr(value, "get_secret_value"):

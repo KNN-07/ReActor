@@ -747,7 +747,7 @@ function buildGitLabDuoWorkflowActionToolCall(action: GitLabDuoWorkflowActionDes
 		action.args && typeof action.args === "object" && !Array.isArray(action.args)
 			? (action.args as Record<string, unknown>)
 			: {};
-	const mapped = mapGitLabDuoWorkflowActionToOmpTool(action.name, args);
+	const mapped = mapGitLabDuoWorkflowActionToReactorTool(action.name, args);
 	return {
 		type: "toolCall",
 		id: action.requestID,
@@ -756,7 +756,7 @@ function buildGitLabDuoWorkflowActionToolCall(action: GitLabDuoWorkflowActionDes
 	};
 }
 
-function mapGitLabDuoWorkflowActionToOmpTool(
+function mapGitLabDuoWorkflowActionToReactorTool(
 	actionName: string,
 	args: Record<string, unknown>,
 ): { name: string; arguments: Record<string, unknown> } {

@@ -17,7 +17,7 @@ import { ToolView, type ToolViewProps } from "./ToolView";
 
 type PayloadStore = { get(key: string): ToolViewProps | undefined };
 
-export class OmpToolViewElement extends HTMLElement {
+export class ReactorToolViewElement extends HTMLElement {
 	#root: Root | null = null;
 	#data: ToolViewProps | null = null;
 
@@ -67,5 +67,5 @@ export class OmpToolViewElement extends HTMLElement {
 }
 
 export function defineToolViewElement(tag = "reactor-tool-view"): void {
-	if (!customElements.get(tag)) customElements.define(tag, OmpToolViewElement);
+	if (!customElements.get(tag)) customElements.define(tag, ReactorToolViewElement);
 }

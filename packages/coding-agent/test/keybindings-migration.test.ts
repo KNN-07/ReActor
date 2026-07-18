@@ -239,14 +239,14 @@ describe("KeybindingsManager.create", () => {
 	it("merges default user keybindings when create uses the active profile with no arguments (#4867)", async () => {
 		const originalConfigDir = process.env.REACTOR_CONFIG_DIR;
 		const originalAgentDirEnv = process.env.REACTOR_CODING_AGENT_DIR;
-		const originalOmpProfile = process.env.REACTOR_PROFILE;
+		const originalReactorProfile = process.env.REACTOR_PROFILE;
 		const originalPiProfile = process.env.REACTOR_PROFILE;
 		const configRootDir = await fs.mkdtemp(path.join(os.tmpdir(), "pi-keybindings-active-profile-"));
 
 		try {
 			process.env.REACTOR_CONFIG_DIR = path.relative(os.homedir(), configRootDir);
 			restoreEnvValue("REACTOR_CODING_AGENT_DIR", originalAgentDirEnv);
-			restoreEnvValue("REACTOR_PROFILE", originalOmpProfile);
+			restoreEnvValue("REACTOR_PROFILE", originalReactorProfile);
 			restoreEnvValue("REACTOR_PROFILE", originalPiProfile);
 			__resetDirsFromEnvForTests();
 
@@ -272,7 +272,7 @@ describe("KeybindingsManager.create", () => {
 		} finally {
 			restoreEnvValue("REACTOR_CONFIG_DIR", originalConfigDir);
 			restoreEnvValue("REACTOR_CODING_AGENT_DIR", originalAgentDirEnv);
-			restoreEnvValue("REACTOR_PROFILE", originalOmpProfile);
+			restoreEnvValue("REACTOR_PROFILE", originalReactorProfile);
 			restoreEnvValue("REACTOR_PROFILE", originalPiProfile);
 			__resetDirsFromEnvForTests();
 			await removeWithRetries(configRootDir);

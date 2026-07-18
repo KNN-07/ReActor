@@ -1968,11 +1968,11 @@ mod tests {
 		// unrecognized, so it was counted as visible width and `break_long_word`
 		// spun forever on the ESC. The APC must measure zero width: a line whose
 		// visible content fits the target stays on a single row.
-		let data = to_u16("\x1b_pi:c\x07root-overflowx1界🙂한");
+		let data = to_u16("\x1b_reactor:c\x07root-overflowx1界🙂한");
 		let lines = wrap_text_with_ansi_impl(&data, 24, DEFAULT_TAB_WIDTH);
 		assert_eq!(lines.len(), 1);
 		let only = String::from_utf16_lossy(&lines[0]);
-		assert!(only.contains("\x1b_pi:c\x07"));
+		assert!(only.contains("\x1b_reactor:c\x07"));
 		assert!(only.contains("root-overflowx1界🙂한"));
 	}
 
@@ -1981,11 +1981,11 @@ mod tests {
 		// Same BEL-APC embedded in content that overflows, forcing break_long_word:
 		// it must terminate (keeping the zero-width marker) and every wrapped row
 		// must stay within the target width.
-		let data = to_u16("\x1b_pi:c\x07abcdefghijklmnopqrstuvwxyz0123456789");
+		let data = to_u16("\x1b_reactor:c\x07abcdefghijklmnopqrstuvwxyz0123456789");
 		let lines = wrap_text_with_ansi_impl(&data, 10, DEFAULT_TAB_WIDTH);
 		assert!(lines.len() > 1);
 		let joined: String = lines.iter().map(|l| String::from_utf16_lossy(l)).collect();
-		assert!(joined.contains("\x1b_pi:c\x07"));
+		assert!(joined.contains("\x1b_reactor:c\x07"));
 		for line in &lines {
 			assert!(visible_width_u16(line, DEFAULT_TAB_WIDTH) <= 10);
 		}

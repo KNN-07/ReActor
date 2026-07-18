@@ -26,7 +26,7 @@ from reactor_worker.github_client import (
 
 
 class GitHubBackend(Protocol):
-    """Methods every caller in roboomp uses against GitHub."""
+    """Methods every caller in reactor-worker uses against GitHub."""
 
     # ---- reads ----
     async def get_repo(self, repo: str) -> RepoInfo: ...

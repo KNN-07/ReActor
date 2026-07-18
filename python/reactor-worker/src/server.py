@@ -482,7 +482,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.post("/replay")
     async def replay(
         request: Request,
-        x_reactor_worker_token: str | None = Header(None, alias="X-Robreactor-Replay-Token"),
+        x_reactor_worker_token: str | None = Header(None, alias="X-Reactor-Worker-Replay-Token"),
         delivery_id: str = "",
     ) -> JSONResponse:
         bag = request.app.state.bag
@@ -512,7 +512,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         state: str = "open",
         limit: int = 30,
         refresh: bool = False,
-        x_reactor_worker_token: str | None = Header(None, alias="X-Robreactor-Replay-Token"),
+        x_reactor_worker_token: str | None = Header(None, alias="X-Reactor-Worker-Replay-Token"),
     ) -> dict[str, Any]:
         """Browse issues across `REACTOR_WORKER_REPO_ALLOWLIST` for the trigger picker.
 
@@ -569,7 +569,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def api_trigger(
         request: Request,
         payload: dict[str, Any] = Body(...),
-        x_reactor_worker_token: str | None = Header(None, alias="X-Robreactor-Replay-Token"),
+        x_reactor_worker_token: str | None = Header(None, alias="X-Reactor-Worker-Replay-Token"),
     ) -> JSONResponse:
         """Manually queue an issue. Modes:
 
@@ -653,7 +653,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def api_cancel(
         request: Request,
         payload: dict[str, Any] = Body(...),
-        x_reactor_worker_token: str | None = Header(None, alias="X-Robreactor-Replay-Token"),
+        x_reactor_worker_token: str | None = Header(None, alias="X-Reactor-Worker-Replay-Token"),
     ) -> JSONResponse:
         """Stop a running event. The reactor subprocess is killed; the row lands in
         `failed` with `cancelled by operator` as the error.

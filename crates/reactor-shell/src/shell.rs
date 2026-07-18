@@ -4132,9 +4132,9 @@ replace = [{ pattern = "^.+$", replacement = "PWD" }]
 	}
 
 	/// Brush expands `$env:NAME` against the `env` shell variable by default,
-	/// collapsing PowerShell references like `Write-Host $env:OMPCODE` to
-	/// `:OMPCODE`. The session-level fallback below defines `env=$env` so the
-	/// expansion is the literal `$env:OMPCODE`, preserving the PowerShell
+	/// collapsing PowerShell references like `Write-Host $env:REACTOR_CODE` to
+	/// `:REACTOR_CODE`. The session-level fallback below defines `env=$env` so the
+	/// expansion is the literal `$env:REACTOR_CODE`, preserving the PowerShell
 	/// token when the command is forwarded to a child shell.
 	#[cfg(unix)]
 	#[tokio::test(flavor = "multi_thread")]

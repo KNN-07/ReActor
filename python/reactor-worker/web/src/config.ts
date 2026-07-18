@@ -32,7 +32,7 @@ function readConfig(): AppConfig {
 export const CONFIG: AppConfig = readConfig();
 
 export const AUTH_HEADERS: Readonly<Record<string, string>> = CONFIG.replayEnabled
-  ? Object.freeze({ "X-Robreactor-Replay-Token": CONFIG.replayToken })
+  ? Object.freeze({ "X-Reactor-Worker-Replay-Token": CONFIG.replayToken })
   : Object.freeze({});
 
 export const POLL_INTERVAL_MS = 3000;

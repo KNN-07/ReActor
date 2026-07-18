@@ -22,13 +22,13 @@ describe("disabledExtensions runtime filtering", () => {
 	let tempHomeDir = "";
 	let originalHome: string | undefined;
 	let originalAgentDirEnv: string | undefined;
-	let originalOmpProfileEnv: string | undefined;
+	let originalReactorProfileEnv: string | undefined;
 	let originalPiProfileEnv: string | undefined;
 
 	beforeEach(async () => {
 		resetSettingsForTest();
 		originalAgentDirEnv = process.env.REACTOR_CODING_AGENT_DIR;
-		originalOmpProfileEnv = process.env.REACTOR_PROFILE;
+		originalReactorProfileEnv = process.env.REACTOR_PROFILE;
 		originalPiProfileEnv = process.env.REACTOR_PROFILE;
 		originalHome = process.env.HOME;
 		tempHomeDir = await fs.mkdtemp(path.join(os.tmpdir(), "reactor-disabled-ext-home-"));
@@ -53,7 +53,7 @@ describe("disabledExtensions runtime filtering", () => {
 		resetSettingsForTest();
 		vi.restoreAllMocks();
 		restoreEnvValue("HOME", originalHome);
-		restoreEnvValue("REACTOR_PROFILE", originalOmpProfileEnv);
+		restoreEnvValue("REACTOR_PROFILE", originalReactorProfileEnv);
 		restoreEnvValue("REACTOR_PROFILE", originalPiProfileEnv);
 		restoreEnvValue("REACTOR_CODING_AGENT_DIR", originalAgentDirEnv);
 		__resetDirsFromEnvForTests();

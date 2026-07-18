@@ -7,7 +7,7 @@ Workspace state at end of your turn:
 
 {{dirty.summary}}
 
-Either of these counts being non-zero means roboomp will discard your work when this session ends. Read the summary above and act on it:
+Either of these counts being non-zero means reactor-worker will discard your work when this session ends. Read the summary above and act on it:
 
 - **Uncommitted changes** → stage and commit them (or `git restore` if they were unintentional). If the work is ready, run `bun run fix` before committing — formatter and lint gates reject pushes when `fix` exits non-zero.
 - **Unpushed commits** → call `gh_push_branch` once `bun run fix` succeeds. If the push still refuses for a different reason, fix that root cause; do not skip the gate.

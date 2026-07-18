@@ -25,7 +25,7 @@ import packageJson from "../../package.json" with { type: "json" };
 import { isAuthenticated, type ModelRegistry } from "../config/model-registry";
 import { settings } from "../config/settings";
 import type { CustomTool } from "../extensibility/custom-tools/types";
-import { ohMyPiXAIUserAgent, resolveXAIHttpCredentials } from "../lib/xai-http";
+import { reactorXAIUserAgent, resolveXAIHttpCredentials } from "../lib/xai-http";
 import imageGenDescription from "../prompts/tools/image-gen.md" with { type: "text" };
 import { resolveReadPath } from "./path-utils";
 
@@ -1397,7 +1397,7 @@ export const imageGenTool: CustomTool<typeof imageGenSchema, ImageGenToolDetails
 									headers: {
 										Authorization: `Bearer ${key}`,
 										"Content-Type": "application/json",
-										"User-Agent": ohMyPiXAIUserAgent(),
+										"User-Agent": reactorXAIUserAgent(),
 									},
 									body: JSON.stringify(xaiBody),
 									signal: requestSignal,
@@ -1488,7 +1488,7 @@ export const imageGenTool: CustomTool<typeof imageGenSchema, ImageGenToolDetails
 										"Content-Type": "application/json",
 										Authorization: `Bearer ${key}`,
 										"HTTP-Referer": "https://reactor.norman.id.vn/",
-										"X-OpenRouter-Title": "Oh-My-Pi",
+										"X-OpenRouter-Title": "ReActor",
 										"X-OpenRouter-Categories": "cli-agent",
 									},
 									body: JSON.stringify(requestBody),

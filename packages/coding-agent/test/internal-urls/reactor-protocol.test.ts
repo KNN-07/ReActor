@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import { InternalUrlRouter } from "@reactor/coding-agent/internal-urls";
 
-describe("OmpProtocolHandler", () => {
+describe("ReactorProtocolHandler", () => {
 	it("treats reactor://docs as the documentation root", async () => {
 		const resource = await InternalUrlRouter.instance().resolve("reactor://docs");
 

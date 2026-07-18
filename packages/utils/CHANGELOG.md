@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Replaced the legacy child-shell process marker with the ReActor-native `REACTOR_CODE` environment variable.
+
 ## [17.0.2] - 2026-07-17
 
 ### Added

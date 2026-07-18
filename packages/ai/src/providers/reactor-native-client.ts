@@ -2,7 +2,7 @@
  * Client half of the reactor-native auth-gateway protocol.
  *
  * Dispatches a {@link streamSimple}-shaped request to an `reactor auth-gateway`
- * via `POST /v1/pi/stream`, reads the SSE event stream back, and pushes the
+ * via `POST /v1/reactor/stream`, reads the SSE event stream back, and pushes the
  * parsed events into a local {@link AssistantMessageEventStream} — the same
  * stream type every other provider client produces. Callers downstream of
  * `streamSimple` cannot tell whether the events came from a real provider
@@ -53,7 +53,7 @@ const REACTOR_NATIVE_STREAM_IDLE_TIMEOUT_ERROR = "reactor-native stream stalled 
 const REACTOR_NATIVE_STREAM_FIRST_EVENT_TIMEOUT_ERROR =
 	"reactor-native stream timed out while waiting for the first event";
 
-function isPiNativeProgressEvent(event: unknown): boolean {
+function isReactorNativeProgressEvent(event: unknown): boolean {
 	if (typeof event !== "object" || event === null || !("type" in event)) return true;
 	return event.type !== "start";
 }
@@ -99,7 +99,7 @@ async function decodeGatewayError(response: Response): Promise<AIError.AuthGatew
 }
 
 /**
- * Resolve the `/v1/pi/stream` endpoint URL from the model's `baseUrl`.
+ * Resolve the `/v1/reactor/stream` endpoint URL from the model's `baseUrl`.
  * Trims a trailing slash so concatenation can't double-slash; throws when
  * the baseUrl is missing (transport=reactor-native without a gateway target is
  * a configuration error, not a runtime recoverable one).
@@ -110,7 +110,7 @@ function resolveStreamUrl(model: Model<Api>): string {
 			`reactor-native transport requires \`baseUrl\` on model ${model.id} (set it on the provider config in models.yml)`,
 		);
 	}
-	return `${model.baseUrl.replace(/\/+$/, "")}/v1/pi/stream`;
+	return `${model.baseUrl.replace(/\/+$/, "")}/v1/reactor/stream`;
 }
 
 function buildHeaders(model: Model<Api>, apiKey: string | undefined): Record<string, string> {
@@ -136,7 +136,7 @@ function buildHeaders(model: Model<Api>, apiKey: string | undefined): Record<str
  * latency, so we always stream rather than maintaining a parallel
  * non-streaming path.
  */
-export function streamPiNative<TApi extends Api>(
+export function streamReactorNative<TApi extends Api>(
 	model: Model<TApi>,
 	context: Context,
 	options?: SimpleStreamOptions,
@@ -209,7 +209,7 @@ export function streamPiNative<TApi extends Api>(
 					abortTracker.abortLocally(
 						new AIError.StreamTimeoutError(REACTOR_NATIVE_STREAM_FIRST_EVENT_TIMEOUT_ERROR),
 					),
-				isProgressItem: isPiNativeProgressEvent,
+				isProgressItem: isReactorNativeProgressEvent,
 			});
 			let sawTerminal = false;
 			for await (const event of watchedSource) {

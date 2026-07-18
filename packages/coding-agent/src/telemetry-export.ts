@@ -309,8 +309,8 @@ class AgentMetricRecorder {
 			"gen_ai.provider.name": event.provider,
 			"gen_ai.request.model": event.model,
 			"gen_ai.response.service_tier": event.serviceTier,
-			"pi.gen_ai.agent.id": event.agent?.id,
-			"pi.gen_ai.agent.name": event.agent?.name,
+			"reactor.gen_ai.agent.id": event.agent?.id,
+			"reactor.gen_ai.agent.name": event.agent?.name,
 		});
 
 		this.#recordToken(event.usage.inputTokens, baseAttrs, "input");

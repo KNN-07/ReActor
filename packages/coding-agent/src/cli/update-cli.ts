@@ -249,7 +249,7 @@ async function resolveUpdateTarget(): Promise<UpdateTarget> {
 	const miseAvailable = $which("mise") !== undefined;
 	const miseBinDirs = miseAvailable ? await getMiseBinDirs() : [];
 	const miseDataDir = miseAvailable ? getMiseDataDir() : undefined;
-	const reactorPath = resolveOmpPath();
+	const reactorPath = resolveReactorPath();
 
 	if (reactorPath) {
 		const method = resolveUpdateMethod(reactorPath, bunBinDir, {
@@ -604,7 +604,7 @@ function getBinaryName(): string {
 /**
  * Resolve the path that `reactor` maps to in the user's PATH.
  */
-function resolveOmpPath(): string | undefined {
+function resolveReactorPath(): string | undefined {
 	return $which(APP_NAME) ?? undefined;
 }
 
@@ -612,7 +612,7 @@ function resolveOmpPath(): string | undefined {
  * Run the resolved reactor binary and check if it reports the expected version.
  */
 async function verifyInstalledVersion(expectedVersion: string): Promise<InstalledVersionVerification> {
-	const reactorPath = resolveOmpPath();
+	const reactorPath = resolveReactorPath();
 	if (!reactorPath) return { ok: false };
 	try {
 		const result = await $`${reactorPath} --version`.quiet().nothrow();

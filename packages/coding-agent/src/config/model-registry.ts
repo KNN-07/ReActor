@@ -146,7 +146,7 @@ interface ProviderOverride {
  * marked `transport: reactor-native` in models.yml silently reverts to the
  * default openai-completions transport after the background catalog
  * refresh — so the first `/model` switch after boot hits the raw OpenAI
- * chat-completions URL instead of the gateway's `/v1/pi/stream` (#2555).
+ * chat-completions URL instead of the gateway's `/v1/reactor/stream` (#2555).
  * See `xiaomi-tp-discovery-merge.test.ts` and the `refresh()` baseUrl-override
  * regression in `model-registry.test.ts`.
  */

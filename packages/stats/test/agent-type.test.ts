@@ -149,7 +149,7 @@ describe("agent_type migration backfill", () => {
 			insert.run(
 				file,
 				`e${index + 1}`,
-				"/work/pi",
+				"/work/reactor",
 				"claude-sonnet-4.5",
 				"anthropic",
 				"anthropic-messages",

@@ -3,7 +3,7 @@ import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 
-import { listOmpExtensionRoots } from "@reactor/coding-agent/discovery/reactor-extension-roots";
+import { listReactorExtensionRoots } from "@reactor/coding-agent/discovery/reactor-extension-roots";
 import { getEnabledPlugins } from "@reactor/coding-agent/extensibility/plugins/loader";
 import { PluginManager } from "@reactor/coding-agent/extensibility/plugins/manager";
 import {
@@ -362,7 +362,7 @@ describe("MarketplaceManager", () => {
 			await manager.addMarketplace(FIXTURE_DIR);
 			await manager.installPlugin("hello-plugin", "test-marketplace");
 
-			const roots = await listOmpExtensionRoots({ cwd: tmpHome, home: tmpHome, repoRoot: null });
+			const roots = await listReactorExtensionRoots({ cwd: tmpHome, home: tmpHome, repoRoot: null });
 			expect(roots.map(root => root.name)).toEqual([]);
 		} finally {
 			fs.rmSync(tmpHome, { recursive: true, force: true });

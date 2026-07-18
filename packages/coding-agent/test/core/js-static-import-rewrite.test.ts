@@ -87,7 +87,7 @@ describe("rewriteImports", () => {
 		const out = await rewriteImports(`const load = async () => await ${dyn('("node:path")')}; load;`);
 		const globals = globalThis as Record<string, unknown>;
 		const hasOriginal = "__reactor_import__" in globals;
-		const originalOmpImport = globals.__reactor_import__;
+		const originalReactorImport = globals.__reactor_import__;
 		if (hasOriginal) {
 			delete globals.__reactor_import__;
 		}
@@ -113,7 +113,7 @@ describe("rewriteImports", () => {
 			expect(typeof mod.join).toBe("function");
 		} finally {
 			if (hasOriginal) {
-				globals.__reactor_import__ = originalOmpImport;
+				globals.__reactor_import__ = originalReactorImport;
 			} else {
 				delete globals.__reactor_import__;
 			}

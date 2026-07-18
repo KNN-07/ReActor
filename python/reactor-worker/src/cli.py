@@ -58,7 +58,7 @@ def _default_wait_timeout(cfg: Settings) -> float:
 
 @click.group()
 def main() -> None:
-    """roboomp control surface."""
+    """reactor-worker control surface."""
 
 
 @main.command()

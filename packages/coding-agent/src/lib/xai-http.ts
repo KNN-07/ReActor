@@ -12,7 +12,7 @@ interface XAICredentials {
 	baseURL: string;
 }
 
-export function ohMyPiXAIUserAgent(): string {
+export function reactorXAIUserAgent(): string {
 	return "ReActor/xai";
 }
 

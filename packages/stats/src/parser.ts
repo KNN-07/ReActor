@@ -56,7 +56,7 @@ function extractFolderFromPath(sessionPath: string): string {
 	const sessionsDir = getSessionsDir();
 	const rel = path.relative(sessionsDir, sessionPath);
 	const projectDir = rel.split(path.sep)[0];
-	// Convert --work--pi-- to /work/pi
+	// Convert --work--pi-- to /work/reactor
 	return projectDir.replace(/^--/, "/").replace(/--/g, "/");
 }
 

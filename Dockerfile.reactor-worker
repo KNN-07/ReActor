@@ -2,21 +2,21 @@
 ###############################################################################
 # reactor-worker — GitHub triage+fix bot orchestrator.
 #
-# Extends `reactor-base` (from /Dockerfile, default target ReActor/reactor:dev) and adds
-# the reactor-worker Python package + a Vite-built SolidJS dashboard bundle. The pi
+# Extends `reactor-base` (from /Dockerfile, default target reactor/reactor:dev) and adds
+# the reactor-worker Python package + a Vite-built SolidJS dashboard bundle. The ReActor
 # toolchain (python + bun + rustup launcher + reactor-natives + reactor_rpc wheel +
 # /usr/local/bin/reactor shim) all comes from REACTOR_BASE; this file only layers what's
 # reactor-worker-specific.
 #
-# Build (from pi root):
-#     bun run pi:image                              # build ReActor/reactor:dev first
+# Build (from repository root):
+#     bun run reactor:image                              # build reactor/reactor:dev first
 #     docker build -f Dockerfile.reactor-worker -t reactor-worker:dev .
 #
 # Compose (recommended):
 #     docker compose --project-directory python/reactor-worker build
 ###############################################################################
 
-ARG REACTOR_BASE=ReActor/reactor:dev
+ARG REACTOR_BASE=reactor/reactor:dev
 ARG BUN_VERSION=1.3.14
 
 ############################
@@ -40,8 +40,8 @@ RUN bun --cwd=python/reactor-worker/web run build
 ############################
 FROM ${REACTOR_BASE} AS runtime
 
-# reactor-worker runs against the host pi checkout mounted at /work/pi read-only.
-ENV REACTOR_ROOT=/work/pi
+# reactor-worker runs against the host ReActor checkout mounted at /work/reactor read-only.
+ENV REACTOR_ROOT=/work/reactor
 
 WORKDIR /app
 

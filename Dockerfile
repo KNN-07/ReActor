@@ -1,24 +1,24 @@
 # syntax=docker/dockerfile:1.7-labs
 ###############################################################################
-# ReActor — pi image
+# ReActor runtime image
 #
 # Stages:
 #   natives-builder — Rust + Bun → reactor_natives.linux-<arch>.node
 #   wheel-builder   — reactor_rpc Python wheel
 #   reactor-base         — python + bun + rustup launcher + natives + reactor_rpc
 #                     + /usr/local/bin/reactor shim
-#   reactor-runtime      — reactor-base + pi source + bun install      (DEFAULT, runnable)
+#   reactor-runtime      — reactor-base + ReActor source + bun install      (DEFAULT, runnable)
 #
 # Build:
-#     docker build -t ReActor/reactor:dev .                          # default = reactor-runtime
-#     docker build --target reactor-base -t ReActor/reactor-base:dev .    # base for derived images
+#     docker build -t reactor/reactor:dev .                          # default = reactor-runtime
+#     docker build --target reactor-base -t reactor/reactor-base:dev .    # base for derived images
 #
 # Run:
-#     docker run --rm ReActor/reactor:dev --help
-#     docker run --rm -it -v "$PWD":/work ReActor/reactor:dev cli    # interactive reactor
+#     docker run --rm reactor/reactor:dev --help
+#     docker run --rm -it -v "$PWD":/work reactor/reactor:dev cli    # interactive reactor
 #
 # Consume as a base in another Dockerfile (see Dockerfile.reactor-worker):
-#     ARG REACTOR_BASE=ReActor/reactor:dev
+#     ARG REACTOR_BASE=reactor/reactor:dev
 #     FROM ${REACTOR_BASE} AS reactor-base
 ###############################################################################
 
@@ -42,11 +42,11 @@ RUN apt-get update \
 RUN curl -fsSL https://bun.sh/install | bash -s "bun-v${BUN_VERSION}" \
     && /opt/bun/bin/bun --version
 
-WORKDIR /pi
+WORKDIR /reactor
 
 # Layer 1 — manifests + lockfiles only. Source edits under packages/*/src and
 # crates/*/src won't bust `bun install` below. `--parents` preserves the
-# matched path under /pi/ (requires syntax 1.7-labs).
+# matched path under /reactor/ (requires syntax 1.7-labs).
 COPY --parents \
     package.json bun.lock bunfig.toml \
     patches/*.patch \
@@ -56,7 +56,7 @@ COPY --parents \
     packages/tsconfig.workspace.json \
     python/reactor-worker/web/package.json \
     crates/*/Cargo.toml \
-    /pi/
+    /reactor/
 
 # Layer 2 — hydrate node_modules from the manifests above.
 RUN bun install --frozen-lockfile --ignore-scripts
@@ -64,14 +64,14 @@ RUN bun install --frozen-lockfile --ignore-scripts
 # Layer 3 — full source. `Dockerfile.dockerignore` keeps target/, node_modules/,
 # dist/, runs/, editor noise, etc. out of the context. node_modules from Layer 2
 # is preserved across this COPY because it's never in the build context.
-COPY . /pi/
+COPY . /reactor/
 
 # Layer 4 — compile reactor-natives to a Linux N-API addon. Persistent caches keep
 # repeat builds incremental: cargo's package index + git-deps + the workspace
 # target dir.
 RUN --mount=type=cache,target=/root/.cargo/registry \
     --mount=type=cache,target=/root/.cargo/git \
-    --mount=type=cache,target=/pi/target \
+    --mount=type=cache,target=/reactor/target \
     set -eux; \
     rustup show; \
     bun --cwd=packages/natives run build; \
@@ -97,9 +97,9 @@ RUN python -m build --wheel --outdir /out
 # 3) reactor-base — python + bun + rustup + natives + reactor_rpc + reactor shim
 #
 # Sharable runtime base. Derived images (reactor-runtime below, Dockerfile.reactor-worker)
-# extend this and overlay their own source tree. Default REACTOR_ROOT=/work/pi is
-# friendly to derived images that mount a host pi checkout there; reactor-runtime
-# overrides it to /pi because its source is baked in.
+# extend this and overlay their own source tree. Default REACTOR_ROOT=/work/reactor is
+# friendly to derived images that mount a host ReActor checkout there; reactor-runtime
+# overrides it to /reactor because its source is baked in.
 ############################
 FROM python:3.12-slim-bookworm AS reactor-base
 
@@ -109,7 +109,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     BUN_INSTALL=/opt/bun \
-    REACTOR_ROOT=/work/pi \
+    REACTOR_ROOT=/work/reactor \
     CARGO_HOME=/data/cache/cargo \
     CARGO_TARGET_DIR=/data/cache/cargo-target \
     RUSTUP_HOME=/data/cache/rustup \
@@ -125,7 +125,7 @@ RUN curl -fsSL https://bun.sh/install | bash -s "bun-v${BUN_VERSION}" \
     && /opt/bun/bin/bun --version
 
 # Rustup launcher only — the real toolchain is fetched lazily into RUSTUP_HOME
-# on first cargo invocation, driven by pi's `rust-toolchain.toml`. Keeps the
+# on first cargo invocation, driven by ReActor's `rust-toolchain.toml`. Keeps the
 # image small while sharing the toolchain across reboots when /data is mounted.
 RUN curl -fsSL https://sh.rustup.rs -o /tmp/rustup-init.sh \
     && CARGO_HOME=/usr/local/cargo RUSTUP_HOME=/usr/local/rustup-bootstrap \
@@ -134,7 +134,7 @@ RUN curl -fsSL https://sh.rustup.rs -o /tmp/rustup-init.sh \
     && rm -rf /usr/local/rustup-bootstrap \
     && /usr/local/cargo/bin/rustup --version
 
-# reactor-natives addon: pi's loader probes /opt/bun/bin as a fallback path.
+# reactor-natives addon: ReActor's loader probes /opt/bun/bin as a fallback path.
 COPY --from=natives-builder /out/reactor_natives.linux-*.node /opt/bun/bin/
 
 # reactor-rpc Python wheel.
@@ -142,13 +142,13 @@ COPY --from=wheel-builder /out/*.whl /tmp/wheels/
 RUN pip install /tmp/wheels/reactor_rpc-*.whl && rm -rf /tmp/wheels
 
 # `reactor` shim — runs the coding-agent CLI against $REACTOR_ROOT via Bun. Derived
-# images override REACTOR_ROOT to point at wherever their pi source lives.
+# images override REACTOR_ROOT to point at wherever their ReActor source lives.
 RUN printf '%s\n' \
     '#!/usr/bin/env bash' \
     'set -euo pipefail' \
-    ': "${REACTOR_ROOT:=/work/pi}"' \
+    ': "${REACTOR_ROOT:=/work/reactor}"' \
     'if [ ! -d "$REACTOR_ROOT/packages/coding-agent" ]; then' \
-    '  echo "pi: REACTOR_ROOT=$REACTOR_ROOT does not look like a pi checkout" >&2' \
+    '  echo "reactor: REACTOR_ROOT=$REACTOR_ROOT does not look like a ReActor checkout" >&2' \
     '  exit 127' \
     'fi' \
     'exec bun "$REACTOR_ROOT/packages/coding-agent/src/cli.ts" "$@"' \
@@ -156,15 +156,15 @@ RUN printf '%s\n' \
     && chmod +x /usr/local/bin/reactor
 
 ############################
-# 4) reactor-runtime — reactor-base + pi source + bun install (DEFAULT)
+# 4) reactor-runtime — reactor-base + ReActor source + bun install (DEFAULT)
 #
-# A self-contained, runnable reactor image. `docker run ReActor/reactor:dev --help`
+# A self-contained, runnable reactor image. `docker run reactor/reactor:dev --help`
 # Just Works without a host checkout.
 ############################
 FROM reactor-base AS reactor-runtime
 
-ENV REACTOR_ROOT=/pi
-WORKDIR /pi
+ENV REACTOR_ROOT=/reactor
+WORKDIR /reactor
 
 # Same manifests-only layered install pattern as natives-builder — `bun install`
 # only re-runs when a package.json / lockfile changes.
@@ -175,14 +175,14 @@ COPY --parents \
     packages/*/package.json \
     packages/tsconfig.workspace.json \
     python/reactor-worker/web/package.json \
-    /pi/
+    /reactor/
 
 RUN bun install --frozen-lockfile --ignore-scripts
 
-# Pi source. `Dockerfile.dockerignore` keeps **/node_modules out of the context
+# ReActor source. `Dockerfile.dockerignore` keeps **/node_modules out of the context
 # so stale isolated-linker symlinks from a host install can't shadow the
 # hoisted node_modules that `bun install` just produced.
-COPY . /pi/
+COPY . /reactor/
 
 # Regenerate the tool views that `--ignore-scripts` skipped above. The root
 # package.json's `prepare` script normally handles these on a vanilla install.

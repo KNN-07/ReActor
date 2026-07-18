@@ -2,7 +2,7 @@ import process from "node:process";
 
 import { $env } from "@reactor/utils";
 
-interface OmpCommand {
+interface ReactorCommand {
 	cmd: string;
 	args: string[];
 	shell: boolean;
@@ -11,7 +11,7 @@ interface OmpCommand {
 const DEFAULT_CMD = process.platform === "win32" ? "reactor.cmd" : "reactor";
 const DEFAULT_SHELL = process.platform === "win32";
 
-export function resolveOmpCommand(): OmpCommand {
+export function resolveReactorCommand(): ReactorCommand {
 	const envCmd = $env.REACTOR_SUBPROCESS_CMD;
 	if (envCmd?.trim()) {
 		return { cmd: envCmd, args: [], shell: DEFAULT_SHELL };
