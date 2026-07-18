@@ -481,6 +481,52 @@ export const COLLAB_PROTO = 3;
 /** Parameter key used for intent tracing (e.g. prompt explanation/reasoning) */
 export const INTENT_FIELD = "i";
 
+// Desktop protocol v1. Dependency-free frames shared by the Tauri shell and
+// the bundled ReActor sidecar. Unknown frame variants are intentionally safe
+// to ignore at the JSON boundary so newer hosts can talk to older clients.
+export const DESKTOP_PROTOCOL_VERSION = 1;
+
+export type DesktopSessionStatus = "idle" | "running" | "waiting" | "paused" | "disconnected" | "error";
+
+export interface DesktopSessionSummary {
+	sessionId: string;
+	title?: string;
+	cwd: string;
+	createdAt: string;
+	updatedAt: string;
+	status: DesktopSessionStatus;
+}
+
+export interface DesktopSnapshot {
+	sessionId: string;
+	header: unknown;
+	entries: unknown[];
+	status: DesktopSessionStatus;
+}
+
+export type DesktopCommand =
+	| { version: number; type: "handshake"; id: string; clientVersion: string }
+	| { version: number; type: "health"; id: string }
+	| { version: number; type: "list_sessions"; id: string; cwd?: string }
+	| { version: number; type: "create_session"; id: string; cwd: string }
+	| { version: number; type: "open_session"; id: string; sessionId: string; cwd: string }
+	| { version: number; type: "snapshot"; id: string; sessionId: string }
+	| { version: number; type: "prompt"; id: string; sessionId: string; text: string }
+	| { version: number; type: "steer"; id: string; sessionId: string; text: string }
+	| { version: number; type: "follow_up"; id: string; sessionId: string; text: string }
+	| { version: number; type: "abort"; id: string; sessionId: string }
+	| { version: number; type: "close_session"; id: string; sessionId: string }
+	| { version: number; type: "shutdown"; id: string };
+
+export type DesktopFrame =
+	| { version: number; type: "ready"; id?: string; reactorVersion: string; profile: string }
+	| { version: number; type: "response"; id: string; ok: true; data?: unknown }
+	| { version: number; type: "response"; id: string; ok: false; error: string }
+	| { version: number; type: "session_snapshot"; sessionId: string; snapshot: DesktopSnapshot }
+	| { version: number; type: "session_event"; sessionId: string; event: unknown }
+	| { version: number; type: "session_status"; sessionId: string; status: DesktopSessionStatus }
+	| { version: number; type: "notice"; level: "info" | "warning" | "error"; message: string };
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Envelope & link constants
 // ═══════════════════════════════════════════════════════════════════════════

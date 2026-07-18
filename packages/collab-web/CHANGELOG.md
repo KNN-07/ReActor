@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added the private shared transcript and tool-card renderer package used by the ReActor desktop renderer.
+
 ## [17.0.1] - 2026-07-16
 
 ### Fixed

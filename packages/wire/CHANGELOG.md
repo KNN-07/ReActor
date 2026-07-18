@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added versioned dependency-free desktop NDJSON command and event frames for the Tauri shell and ReActor sidecar.
+
 ## [16.3.0] - 2026-07-02
 
 ### Breaking Changes

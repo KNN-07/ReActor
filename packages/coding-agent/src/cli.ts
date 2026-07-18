@@ -345,6 +345,14 @@ export async function runCli(argv: string[]): Promise<void> {
 		}
 		return;
 	}
+	// Desktop is a transport mode of the bundled CLI, not a second executable.
+	// Keep this dispatch before command registration so stdout remains a strict
+	// versioned NDJSON channel for the Tauri sidecar.
+	if (resolvedArgv.includes("--mode") && resolvedArgv[resolvedArgv.indexOf("--mode") + 1] === "desktop-rpc") {
+		const { runDesktopRpcMode } = await import("./modes/desktop-rpc");
+		await runDesktopRpcMode();
+		return;
+	}
 
 	// Declare this module as the worker-host entry now that the active profile
 	// is resolved. The worker-host module is side-effect-free; importing

@@ -37,6 +37,7 @@
     "fmt": "biome format --write ."
   },
   "dependencies": {
+	"@reactor/shared-ui": "workspace:*",
     "@reactor/wire": "workspace:*",
     "lucide-react": "catalog:",
     "marked": "catalog:",

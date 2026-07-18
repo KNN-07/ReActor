@@ -1,0 +1,8 @@
+{
+  "name": "@reactor/shared-ui",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "dependencies": { "@reactor/wire": "workspace:*", "react": "catalog:" },
+  "exports": { ".": "./src/index.tsx", "./styles.css": "./src/styles.css" }
+}

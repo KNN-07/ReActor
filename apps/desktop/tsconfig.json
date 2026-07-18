@@ -1,0 +1,1 @@
+{ "extends": "../../tsconfig.json", "compilerOptions": { "jsx": "react-jsx", "noEmit": true, "paths": { "@reactor/shared-ui": ["../../packages/shared-ui/src/index.tsx"] } }, "include": ["src"] }
