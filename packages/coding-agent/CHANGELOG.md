@@ -5,6 +5,7 @@
 ### Added
 
 - Added the SDK-backed `--mode desktop-rpc` host with concurrent session lifecycle management, shared auth/model services, session-tagged snapshots, streaming events, and graceful shutdown.
+- Added desktop session rename/archive controls, persisted archive metadata, Git status/diff/stage/unstage/discard/commit operations, and autonomy pause/resume control through existing SDK services.
 - Added built-in `/survey`, `/peer-review`, and resumable `/autopaper` research workflows with SQLite checkpoints and verified artifact validation.
 
 ## [17.0.2] - 2026-07-17

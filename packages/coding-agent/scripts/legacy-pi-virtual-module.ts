@@ -16,8 +16,8 @@ interface BundledPackage {
 
 const BUNDLED_PACKAGES: readonly BundledPackage[] = [
 	{ dir: "agent", identifier: "PiAgentCore", rootShim: null },
-	{ dir: "ai", identifier: "PiAi", rootShim: "legacy-ai-shim.ts" },
-	{ dir: "coding-agent", identifier: "PiCodingAgent", rootShim: "legacy-coding-agent-shim.ts" },
+	{ dir: "ai", identifier: "PiAi", rootShim: "legacy-pi-ai-shim.ts" },
+	{ dir: "coding-agent", identifier: "PiCodingAgent", rootShim: "legacy-pi-coding-agent-shim.ts" },
 	{ dir: "natives", identifier: "PiNatives", rootShim: null },
 	{ dir: "tui", identifier: "PiTui", rootShim: null },
 	{ dir: "utils", identifier: "PiUtils", rootShim: null },

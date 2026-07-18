@@ -8,6 +8,8 @@ Run the browser renderer with `bun --cwd=apps/desktop dev`. In a packaged build,
 
 The desktop protocol version is exported from `@reactor/wire` as `DESKTOP_PROTOCOL_VERSION`. A client must complete `handshake` before creating sessions. Sessions are backed by normal ReActor session files and share the profile's credentials and model registry.
 
+Workspace mutations remain explicit: the desktop host exposes status, diff, stage, unstage, guarded discard, and commit frames through the existing coding-agent Git utilities. Archive state is an overlay in `~/.reactor/agent/desktop/state.json` and never deletes CLI session files. Autonomy controls use the existing `AutonomyController` and `GoalRuntime` stores.
+
 ## Recovery and release
 
 The shell emits `running`, `disconnected`, and `stopped` lifecycle events. A production release should add the one-shot clean restart policy around `disconnected`, preserve snapshots without replaying pending commands, and stop after repeated failures. Release artifacts must keep the sidecar version in lockstep and use Tauri updater signatures for each platform.

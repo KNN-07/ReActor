@@ -495,6 +495,7 @@ export interface DesktopSessionSummary {
 	createdAt: string;
 	updatedAt: string;
 	status: DesktopSessionStatus;
+	archived?: boolean;
 }
 
 export interface DesktopSnapshot {
@@ -502,6 +503,14 @@ export interface DesktopSnapshot {
 	header: unknown;
 	entries: unknown[];
 	status: DesktopSessionStatus;
+}
+
+export interface DesktopGitState {
+	cwd: string;
+	branch: string | null;
+	status: string;
+	diff: string;
+	sharedWorktree: boolean;
 }
 
 export type DesktopCommand =
@@ -516,6 +525,27 @@ export type DesktopCommand =
 	| { version: number; type: "follow_up"; id: string; sessionId: string; text: string }
 	| { version: number; type: "abort"; id: string; sessionId: string }
 	| { version: number; type: "close_session"; id: string; sessionId: string }
+	| { version: number; type: "rename_session"; id: string; sessionId: string; title: string }
+	| { version: number; type: "archive_session"; id: string; sessionId: string; stopAndArchive?: boolean }
+	| { version: number; type: "unarchive_session"; id: string; sessionId: string }
+	| { version: number; type: "git_status"; id: string; cwd: string }
+	| { version: number; type: "git_diff"; id: string; cwd: string; cached?: boolean; files?: string[] }
+	| { version: number; type: "git_stage"; id: string; cwd: string; files: string[] }
+	| { version: number; type: "git_unstage"; id: string; cwd: string; files: string[] }
+	| { version: number; type: "git_discard"; id: string; cwd: string; files: string[]; confirmed: boolean }
+	| { version: number; type: "git_commit"; id: string; cwd: string; message: string }
+	| { version: number; type: "autonomy_start"; id: string; sessionId: string; objective: string }
+	| { version: number; type: "autonomy_pause"; id: string; sessionId: string }
+	| { version: number; type: "autonomy_resume"; id: string; sessionId: string }
+	| {
+			version: number;
+			type: "ui_response";
+			id: string;
+			requestId: string;
+			value?: unknown;
+			confirmed?: boolean;
+			cancelled?: boolean;
+	  }
 	| { version: number; type: "shutdown"; id: string };
 
 export type DesktopFrame =
@@ -525,6 +555,19 @@ export type DesktopFrame =
 	| { version: number; type: "session_snapshot"; sessionId: string; snapshot: DesktopSnapshot }
 	| { version: number; type: "session_event"; sessionId: string; event: unknown }
 	| { version: number; type: "session_status"; sessionId: string; status: DesktopSessionStatus }
+	| { version: number; type: "git_state"; cwd: string; state: DesktopGitState }
+	| { version: number; type: "autonomy_state"; sessionId: string; state: unknown }
+	| {
+			version: number;
+			type: "ui_request";
+			sessionId: string;
+			requestId: string;
+			method: "select" | "confirm" | "input";
+			title: string;
+			message?: string;
+			placeholder?: string;
+			options?: string[];
+	  }
 	| { version: number; type: "notice"; level: "info" | "warning" | "error"; message: string };
 
 // ═══════════════════════════════════════════════════════════════════════════

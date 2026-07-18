@@ -5,7 +5,7 @@ use std::{
 };
 
 use serde::Serialize;
-use tauri::{AppHandle, Manager, State};
+use tauri::{AppHandle, Emitter, Manager, State};
 
 struct Sidecar(Arc<Mutex<Option<Child>>>);
 
@@ -30,8 +30,11 @@ fn start_host(app: AppHandle, state: State<'_, Sidecar>) -> Result<(), String> {
 		.0
 		.lock()
 		.map_err(|_| "sidecar lock poisoned".to_string())?;
-	if slot.is_some() {
-		return Ok(());
+	if let Some(child) = slot.as_mut() {
+		if child.try_wait().map_err(|e| e.to_string())?.is_none() {
+			return Ok(());
+		}
+		*slot = None;
 	}
 	let path = sidecar_path(&app)?;
 	let child = Command::new(path)
@@ -78,7 +81,7 @@ fn stop_host(app: AppHandle, state: State<'_, Sidecar>) -> Result<(), String> {
 		.map_err(|_| "sidecar lock poisoned".to_string())?;
 	if let Some(mut child) = slot.take() {
 		if let Some(stdin) = child.stdin.as_mut() {
-			let _ = writeln!(stdin, r#"{"version":1,"type":"shutdown","id":"tauri-shutdown"}"#);
+			let _ = writeln!(stdin, "{}", r#"{"version":1,"type":"shutdown","id":"tauri-shutdown"}"#);
 			let _ = stdin.flush();
 		}
 		for _ in 0..50 {

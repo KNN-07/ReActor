@@ -21,19 +21,28 @@ function tauriBridge(): TauriBridge | undefined {
 export class TauriDesktopPlatform implements DesktopPlatform {
 	#bridge: TauriBridge;
 	#listeners = new Set<(frame: DesktopFrame) => void>();
-	#stopListening: (() => void) | undefined;
+	#stopListening: Array<() => void> = [];
+	#restarted = false;
 	constructor(bridge: TauriBridge) { this.#bridge = bridge; }
 	async start(): Promise<void> {
 		await this.#bridge.invoke("start_host");
-		this.#stopListening = await this.#bridge.listen("desktop-frame", event => {
+		this.#stopListening.push(await this.#bridge.listen("desktop-frame", event => {
 			try { this.#emit(JSON.parse(String(event.payload)) as DesktopFrame); } catch { /* malformed future frames are ignored */ }
-		});
+		}));
+		this.#stopListening.push(await this.#bridge.listen("desktop-lifecycle", event => {
+			const lifecycle = event.payload as { state?: string };
+			if (lifecycle.state === "disconnected") this.#emit({ version: 1, type: "notice", level: "error", message: "ReActor backend disconnected. Restarting once..." });
+			if (lifecycle.state === "disconnected" && !this.#restarted) {
+				this.#restarted = true;
+				void this.#bridge.invoke("start_host").then(() => { this.#restarted = false; });
+			}
+		}));
 	}
 	async send(command: DesktopCommand): Promise<void> { await this.#bridge.invoke("send_frame", { frame: JSON.stringify(command) }); }
 	subscribe(listener: (frame: DesktopFrame) => void): () => void { this.#listeners.add(listener); return () => this.#listeners.delete(listener); }
 	async openPath(path: string): Promise<void> { await this.#bridge.invoke("plugin:opener|open_path", { path }); }
 	async notify(message: string): Promise<void> { await this.#bridge.invoke("plugin:notification|notify", { title: "ReActor", body: message }); }
-	dispose(): void { this.#stopListening?.(); this.#stopListening = undefined; }
+	dispose(): void { for (const stop of this.#stopListening) stop(); this.#stopListening = []; }
 	#emit(frame: DesktopFrame): void { for (const listener of this.#listeners) listener(frame); }
 }
 
@@ -57,6 +66,7 @@ export class BrowserDesktopPlatform implements DesktopPlatform {
 			this.#sessions.set(sessionId, { cwd: command.cwd, title: "New task" });
 			this.#emit({ version: 1, type: "response", id: command.id, ok: true, data: { sessionId } });
 		}
+		if (command.type === "git_status") this.#emit({ version: 1, type: "git_state", cwd: command.cwd, state: { cwd: command.cwd, status: "", diff: "", branch: null, sharedWorktree: false } });
 	}
 	subscribe(listener: (frame: DesktopFrame) => void): () => void { this.#listeners.add(listener); return () => this.#listeners.delete(listener); }
 	async openPath(path: string): Promise<void> { await this.notify(`Path ready: ${path}`); }

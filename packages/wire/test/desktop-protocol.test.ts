@@ -24,4 +24,24 @@ describe("desktop protocol contract", () => {
 		};
 		expect(frame).toMatchObject({ version: 1, sessionId: "session-1", status: "running" });
 	});
+
+	test("models guarded workspace mutations as explicit commands", () => {
+		const discard: DesktopCommand = {
+			version: DESKTOP_PROTOCOL_VERSION,
+			type: "git_discard",
+			id: "discard-1",
+			cwd: "/workspace",
+			files: ["src/app.ts"],
+			confirmed: false,
+		};
+		const autonomy: DesktopCommand = {
+			version: DESKTOP_PROTOCOL_VERSION,
+			type: "autonomy_start",
+			id: "goal-1",
+			sessionId: "session-1",
+			objective: "Verify the desktop task",
+		};
+		expect(discard.confirmed).toBe(false);
+		expect(autonomy.objective).toContain("desktop");
+	});
 });
