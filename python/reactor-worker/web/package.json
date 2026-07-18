@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "description": "Flat SolidJS operations console bundled by Vite and served by reactor_worker's FastAPI app.",
-  "homepage": "https://reactor.sh",
+  "homepage": "https://reactor.norman.id.vn",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

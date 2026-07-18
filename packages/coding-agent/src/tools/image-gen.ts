@@ -1487,7 +1487,7 @@ export const imageGenTool: CustomTool<typeof imageGenSchema, ImageGenToolDetails
 									headers: {
 										"Content-Type": "application/json",
 										Authorization: `Bearer ${key}`,
-										"HTTP-Referer": "https://reactor.sh/",
+										"HTTP-Referer": "https://reactor.norman.id.vn/",
 										"X-OpenRouter-Title": "Oh-My-Pi",
 										"X-OpenRouter-Categories": "cli-agent",
 									},

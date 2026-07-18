@@ -4,7 +4,7 @@
 	"private": true,
   "version": "0.1.0",
   "description": "Unified LLM API with automatic model discovery and provider configuration",
-  "homepage": "https://reactor.sh",
+  "homepage": "https://reactor.norman.id.vn",
   "author": "Can Boluk",
   "contributors": [
     "Mario Zechner"

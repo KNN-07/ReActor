@@ -120,10 +120,10 @@ describe("update-cli install target detection", () => {
 
 	it("uses mise update when prioritized reactor is in an active mise bin path", () => {
 		const method = resolveUpdateMethodForTest(
-			"/Users/test/.local/share/mise/installs/github-can1357-ReActor/latest/bin/reactor",
+			"/Users/test/.local/share/mise/installs/github-KNN-07-ReActor/latest/bin/reactor",
 			undefined,
 			{
-				miseBinDirs: ["/Users/test/.local/share/mise/installs/github-can1357-ReActor/latest/bin"],
+				miseBinDirs: ["/Users/test/.local/share/mise/installs/github-KNN-07-ReActor/latest/bin"],
 			},
 		);
 
@@ -141,8 +141,8 @@ describe("update-cli install target detection", () => {
 
 describe("update-cli package manager commands", () => {
 	it("targets the Homebrew tap formula and switches to reinstall for forced updates", () => {
-		expect(buildHomebrewUpdateArgs(false)).toEqual(["upgrade", "can1357/tap/reactor"]);
-		expect(buildHomebrewUpdateArgs(true)).toEqual(["reinstall", "can1357/tap/reactor"]);
+		expect(buildHomebrewUpdateArgs(false)).toEqual(["upgrade", "KNN-07/tap/reactor"]);
+		expect(buildHomebrewUpdateArgs(true)).toEqual(["reinstall", "KNN-07/tap/reactor"]);
 	});
 
 	it("targets the mise GitHub backend tool and force-reinstalls the checked version when requested", () => {

@@ -48,7 +48,7 @@ reports `rejected / source=Unnotarized Developer ID`. This is expected and is
 
 What this means in practice:
 
-- `curl https://reactor.sh/install | sh` — `curl` sets no quarantine bit, so
+- `curl https://reactor.norman.id.vn/install | sh` — `curl` sets no quarantine bit, so
   Gatekeeper is never consulted; the binary just runs. ✅
 - Homebrew **formula** installs — Homebrew does not quarantine formula files, so
   Gatekeeper is never consulted. ✅

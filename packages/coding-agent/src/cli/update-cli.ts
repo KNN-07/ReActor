@@ -16,7 +16,7 @@ import { isTimeoutError, withTimeoutSignal } from "../utils/fetch-timeout";
 
 const REPO = "KNN-07/ReActor";
 const PACKAGE = "@reactor/coding-agent";
-const HOMEBREW_FORMULA = "can1357/tap/reactor";
+const HOMEBREW_FORMULA = "KNN-07/tap/reactor";
 const MISE_TOOL = "github:KNN-07/ReActor";
 /**
  * Official npm registry origin.
@@ -648,7 +648,7 @@ async function printVerification(expectedVersion: string): Promise<void> {
 		return;
 	}
 	console.log(chalk.yellow(`\nWarning: ${formatVerificationFailure(result, expectedVersion)}`));
-	console.log(chalk.yellow(`You may need to reinstall: curl -fsSL https://reactor.sh/install | sh`));
+	console.log(chalk.yellow(`You may need to reinstall: curl -fsSL https://reactor.norman.id.vn/install | sh`));
 }
 
 async function unlinkIfExists(filePath: string): Promise<void> {

@@ -9,8 +9,8 @@ import { isSubcommand, resolveCliArgv } from "@reactor/coding-agent/cli-commands
 describe("join command is registered as a top-level subcommand", () => {
 	test("CLI runner routes `join <link>` to the join command, not launch", () => {
 		expect(isSubcommand("join")).toBe(true);
-		expect(resolveCliArgv(["join", "wss://my.reactor.sh/s/abc#key"])).toEqual({
-			argv: ["join", "wss://my.reactor.sh/s/abc#key"],
+		expect(resolveCliArgv(["join", "wss://reactor.norman.id.vn/s/abc#key"])).toEqual({
+			argv: ["join", "wss://reactor.norman.id.vn/s/abc#key"],
 		});
 	});
 });

@@ -416,7 +416,7 @@ export function makeOpenRouterRewriter(opts: OpenRouterOptions): RewriteChunk {
 					headers: {
 						Authorization: `Bearer ${opts.apiKey}`,
 						"Content-Type": "application/json",
-						"HTTP-Referer": "https://reactor.sh/",
+						"HTTP-Referer": "https://reactor.norman.id.vn/",
 						"X-Title": "Oh-My-Pi",
 					},
 					body,

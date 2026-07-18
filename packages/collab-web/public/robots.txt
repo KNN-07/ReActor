@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /r/
 
-Sitemap: https://my.reactor.sh/sitemap.xml
+Sitemap: https://reactor.norman.id.vn/sitemap.xml

@@ -2,7 +2,7 @@
   "name": "hello-extension",
   "version": "1.0.0",
   "description": "Minimal ReActor extension example",
-  "homepage": "https://reactor.sh",
+  "homepage": "https://reactor.norman.id.vn",
   "reactor": {
     "extensions": ["./index.ts"]
   }

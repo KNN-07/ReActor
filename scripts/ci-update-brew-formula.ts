@@ -12,7 +12,7 @@
 import { $ } from "bun";
 
 const REPO = process.env.REACTOR_REPO ?? "KNN-07/ReActor";
-const HOMEPAGE = "https://reactor.sh";
+const HOMEPAGE = "https://reactor.norman.id.vn";
 const DESC = "Coding agent with the IDE wired in";
 
 interface ReleaseAsset {

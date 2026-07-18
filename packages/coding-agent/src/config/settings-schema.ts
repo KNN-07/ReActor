@@ -5039,12 +5039,12 @@ export const SETTINGS_SCHEMA = {
 
 	"dev.autoqaPush.endpoint": {
 		type: "string",
-		default: "https://qa.reactor.sh/v1/grievances" as const,
+		default: "https://reactor.norman.id.vn/v1/grievances" as const,
 		ui: {
 			tab: "tools",
 			group: "Developer",
 			label: "Auto QA Push Endpoint",
-			description: "Full URL receiving Auto QA JSON reports (default https://qa.reactor.sh/v1/grievances)",
+			description: "Full URL receiving Auto QA JSON reports (default https://reactor.norman.id.vn/v1/grievances)",
 		},
 	},
 

@@ -20,7 +20,7 @@ if (!outPath) {
 
 const loaderJs = await Bun.file(new URL("../src/export/html/share-loader.js", import.meta.url).pathname).text();
 // Pin the reactor brand palette (collab-web pink/purple identity) — the viewer is
-// a public artifact matching the live my.reactor.sh client, not a per-user export
+// a public artifact matching the live reactor.norman.id.vn client, not a per-user export
 // that should mirror the host's terminal theme.
 const themeVars = await generateThemeVars("web");
 

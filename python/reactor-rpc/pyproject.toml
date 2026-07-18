@@ -23,7 +23,7 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://reactor.sh/"
+Homepage = "https://reactor.norman.id.vn/"
 Repository = "https://github.com/KNN-07/ReActor"
 Documentation = "https://github.com/KNN-07/ReActor/blob/main/docs/rpc.md"
 

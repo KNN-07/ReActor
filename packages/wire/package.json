@@ -4,7 +4,7 @@
 	"private": true,
   "version": "0.1.0",
   "description": "Shared wire protocol types for ReActor packages",
-  "homepage": "https://reactor.sh",
+  "homepage": "https://reactor.norman.id.vn",
   "author": "Can Boluk",
   "license": "MIT",
   "repository": {

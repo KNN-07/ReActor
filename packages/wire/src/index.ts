@@ -501,10 +501,10 @@ export const ROOM_KEY_BYTES = 32;
 export const WRITE_TOKEN_BYTES = 16;
 
 /** Default public relay; bare `<roomId>.<key>` links resolve against it. */
-export const DEFAULT_RELAY_URL = "wss://my.reactor.sh";
+export const DEFAULT_RELAY_URL = "wss://reactor.norman.id.vn";
 
 /** Default share viewer/upload base; `/share` links resolve against `<base>/<id>#<key>`. */
-export const DEFAULT_SHARE_URL = "https://my.reactor.sh/s";
+export const DEFAULT_SHARE_URL = "https://reactor.norman.id.vn/s";
 
 export interface ParsedCollabLink {
 	/** wss://host[:port]/r/<roomId> — no query, no fragment. */

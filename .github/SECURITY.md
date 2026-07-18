@@ -6,10 +6,7 @@ Only the latest release is supported with security updates.
 
 ## Reporting a Vulnerability
 
-To report a security issue, either:
-
-- Email can1357 directly, or
-- Open a [private security advisory](https://github.com/KNN-07/ReActor/security/advisories/new) on GitHub
+Report security issues through a [private security advisory](https://github.com/KNN-07/ReActor/security/advisories/new) on GitHub.
 
 Include steps to reproduce and any relevant details. Do not open a public issue for security vulnerabilities.
 

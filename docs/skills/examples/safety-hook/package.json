@@ -2,7 +2,7 @@
   "name": "safety-hook",
   "version": "1.0.0",
   "description": "ReActor extension example: block rm -rf / via tool_call hook",
-  "homepage": "https://reactor.sh",
+  "homepage": "https://reactor.norman.id.vn",
   "reactor": {
     "extensions": ["./index.ts"]
   }

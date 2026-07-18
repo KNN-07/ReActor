@@ -2,7 +2,7 @@
  * `reactor install <target>` — top-level convenience over `reactor plugin install` /
  * `reactor plugin link`.
  *
- * The docs (reactor.sh/docs/extension-authoring) advertise
+ * The docs (reactor.norman.id.vn/docs/extension-authoring) advertise
  *
  *   reactor install ./my-extension
  *

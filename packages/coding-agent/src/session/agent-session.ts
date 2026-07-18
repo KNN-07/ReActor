@@ -17363,7 +17363,7 @@ export class AgentSession {
 	 */
 	async exportToHtml(outputPath?: string): Promise<string> {
 		// Public HTML export ships in the reactor brand palette (collab-web
-		// pink/purple), matching my.reactor.sh — not the host's terminal theme.
+		// pink/purple), matching reactor.norman.id.vn — not the host's terminal theme.
 		// Callers who want a themed export can pass `palette: "theme"` with
 		// `themeName` directly to `exportSessionToHtml`.
 		const { exportSessionToHtml } = await import("../export/html");

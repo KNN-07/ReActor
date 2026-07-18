@@ -1,6 +1,6 @@
 /**
  * Web/export palette — the reactor brand identity shared by the collab-web live
- * client (`my.reactor.sh/`) and every public HTML export / share viewer (`/s/<id>`).
+ * client (`reactor.norman.id.vn/`) and every public HTML export / share viewer (`/s/<id>`).
  *
  * Why this exists separately from `modes/theme/dark.json`: the `dark` theme is
  * the **default TUI theme** — its amber accent (`#febc38`) drives the terminal

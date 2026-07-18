@@ -4,7 +4,7 @@
 	"private": true,
   "version": "0.1.0",
   "description": "Local observability dashboard for ReActor AI usage statistics",
-  "homepage": "https://reactor.sh",
+  "homepage": "https://reactor.norman.id.vn",
   "author": "Can Boluk",
   "license": "MIT",
   "repository": {

@@ -4,7 +4,7 @@
 	"private": true,
   "version": "0.1.0",
   "description": "Local SQLite memory engine for ReActor agents",
-  "homepage": "https://reactor.sh",
+  "homepage": "https://reactor.norman.id.vn",
   "author": "Can Boluk",
   "contributors": [
     "Abdias J"

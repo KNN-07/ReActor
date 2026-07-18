@@ -195,7 +195,7 @@ function makeProgressBar(total: number, width = 30): ProgressBar {
  * ignoring the user-facing consent gate (manual push is the user's
  * explicit "yes ship these now" intent).
  *
- * Requires endpoint configuration (default `qa.reactor.sh/v1/grievances`).
+ * Requires endpoint configuration (default `reactor.norman.id.vn/v1/grievances`).
  */
 export async function pushGrievances(options: PushGrievancesOptions): Promise<void> {
 	const db = openAutoQaDb();

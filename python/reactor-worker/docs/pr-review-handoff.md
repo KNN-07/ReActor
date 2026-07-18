@@ -361,7 +361,7 @@ Do **not** enable the integration smoke (`REACTOR_WORKER_INTEGRATION=1`) in the 
 
 ---
 
-## 14. Open questions for @can1357
+## 14. Open questions for the maintainer
 
 1. **Rank label namespace**: `review:p0..p3` (proposed, avoids colliding with issue `prio:p0..p3`)
    — or reuse `prio:`? These must exist (or be auto-creatable) as repo labels.
